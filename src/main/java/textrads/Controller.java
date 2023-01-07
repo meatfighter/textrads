@@ -5,7 +5,8 @@ public class Controller {
     private Mode mode;
     private boolean terminate;
     
-    public void setMode(final Mode mode) {
+    public void setMode(final Mode mode) throws Exception {
+        mode.init();
         this.mode = mode;
     }
     

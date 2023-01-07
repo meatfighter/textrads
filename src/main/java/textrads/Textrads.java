@@ -19,6 +19,8 @@ public class Textrads {
     public void launch() throws Exception {
         
         final Controller controller = new Controller();
+        controller.setMode(Mode.PLAY);
+        
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor
@@ -36,7 +38,7 @@ public class Textrads {
                 final Mode mode = controller.getMode();
                 int updateFrames = 0;
                 while (true) {
-                    mode.update(controller);
+                    mode.update(controller, screen);
                     updateTime += NANOS_PER_FRAME;
                     if (updateTime > System.nanoTime()) {
                         break;
