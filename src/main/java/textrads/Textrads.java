@@ -19,7 +19,9 @@ public class Textrads {
     public void launch() throws Exception {
         
         final Controller controller = new Controller();
-        controller.setMode(Mode.PLAY);
+        Mode mode = Mode.PLAY;
+        mode.init();
+        controller.setMode(mode);
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             screen.startScreen();
@@ -33,12 +35,15 @@ public class Textrads {
                 final TerminalSize size = screen.doResizeIfNecessary​();
                 if (size != null) {
                     terminalSize = size;
+                }                
+                if (controller.getMode() != mode) {
+                    mode.dispose();
+                    mode = controller.getMode();
+                    mode.init();
                 }
-                
-                final Mode mode = controller.getMode();
                 int updateFrames = 0;
                 while (true) {
-                    mode.update(controller, screen);
+                    mode.update(controller);
                     updateTime += NANOS_PER_FRAME;
                     if (updateTime > System.nanoTime()) {
                         break;

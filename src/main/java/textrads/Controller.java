@@ -6,7 +6,6 @@ public class Controller {
     private boolean terminate;
     
     public void setMode(final Mode mode) throws Exception {
-        mode.init();
         this.mode = mode;
     }
     
