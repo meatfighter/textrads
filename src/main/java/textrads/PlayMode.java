@@ -8,25 +8,24 @@ import com.googlecode.lanterna.screen.Screen;
 
 public class PlayMode implements Mode {
 
-    private int rotation;
-    
-    
     @Override
-    public void init() throws Exception {
+    public void init(final AppState appState) throws Exception {
     }    
     
     @Override
-    public void update(final Controller controller) throws Exception {
+    public void update(final AppState appState) throws Exception {
 
     }
 
     @Override
-    public void render(final Screen screen, final TextGraphics g, final TerminalSize size) throws Exception {        
+    public void render(final AppState appState, final Screen screen, final TextGraphics g, final TerminalSize size) 
+            throws Exception {        
+        
         g.setBackgroundColor(ANSI.BLACK);
-        g.fillRectangle(TerminalPosition.TOP_LEFT_CORNER, size, ' ');
+        g.fillRectangle(TerminalPosition.TOP_LEFT_CORNER, size, '\u2510');
     } 
     
     @Override
-    public void dispose() throws Exception {
+    public void dispose(final AppState appState) throws Exception {
     } 
 }

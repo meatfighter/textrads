@@ -8,8 +8,8 @@ public interface Mode {
     
     static Mode PLAY = new PlayMode();
     
-    void init() throws Exception;
-    void update(Controller controller) throws Exception;
-    void render(Screen screen, TextGraphics g, TerminalSize size) throws Exception;
-    void dispose() throws Exception;
+    void init(AppState appState) throws Exception;
+    void update(AppState appState) throws Exception;
+    void render(AppState appState, Screen screen, TextGraphics g, TerminalSize size) throws Exception;
+    void dispose(AppState appState) throws Exception;
 }

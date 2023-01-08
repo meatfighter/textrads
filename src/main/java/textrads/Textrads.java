@@ -18,10 +18,10 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        final Controller controller = new Controller();
+        final AppState appState = new AppState();
         Mode mode = Mode.PLAY;
-        mode.init();
-        controller.setMode(mode);
+        mode.init(appState);
+        appState.setMode(mode);
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             screen.startScreen();
@@ -31,19 +31,24 @@ public class Textrads {
             TerminalSize terminalSize = screen.getTerminalSize();
             
             long updateTime = System.nanoTime();
-            while (!controller.isTerminate()) {
+            while (!appState.isTerminate()) {
+                
+                if (screen.pollInput() != null) {
+                    break; // TODO REMOVE THIS
+                }
+                
                 final TerminalSize size = screen.doResizeIfNecessary​();
                 if (size != null) {
                     terminalSize = size;
                 }                
-                if (controller.getMode() != mode) {
-                    mode.dispose();
-                    mode = controller.getMode();
-                    mode.init();
+                if (appState.getMode() != mode) {
+                    mode.dispose(appState);
+                    mode = appState.getMode();
+                    mode.init(appState);
                 }
                 int updateFrames = 0;
                 while (true) {
-                    mode.update(controller);
+                    mode.update(appState);
                     updateTime += NANOS_PER_FRAME;
                     if (updateTime > System.nanoTime()) {
                         break;
@@ -54,7 +59,7 @@ public class Textrads {
                     }
                 }
                 
-                mode.render(screen, textGraphics, terminalSize);
+                mode.render(appState, screen, textGraphics, terminalSize);
                 screen.refresh();                 
                 
                 final long remainingTime = updateTime - System.nanoTime();

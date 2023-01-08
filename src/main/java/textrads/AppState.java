@@ -1,6 +1,6 @@
 package textrads;
 
-public class Controller {
+public class AppState {
     
     private Mode mode;
     private boolean terminate;
