@@ -2,26 +2,34 @@ package textrads;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InputMap {
+public final class InputMap {
     
     private static final String VALUE_ALT = "Alt";
     private static final String VALUE_CTRL = "Ctrl";
+    private static final String VALUE_SHIFT = "Shift";
      
     private final Map<Character, InputType> charToInputTypeMap = new ConcurrentHashMap<>();
     private final Map<KeyType, InputType> keyTypeToInputTypeMap = new ConcurrentHashMap<>();
 
     private volatile InputType altInputType;
     private volatile InputType ctrlInputType;
+    private volatile InputType shiftInputType;
     
-    public InputMap() {        
+    public static InputMap fromStringsList(final List<String[]> list) {
+        return new InputMap(list);
+    }    
+    
+    public InputMap() {
+        reset();
     }
     
-    public InputMap(final Properties props) {
-        set(props);
+    public InputMap(final List<String[]> list) {
+        set(list);
     }
     
     public InputType get(final KeyStroke keyStroke) {        
@@ -30,6 +38,9 @@ public class InputMap {
         }
         if (keyStroke.isCtrlDown()) {
             return ctrlInputType;
+        }
+        if (keyStroke.isShiftDown()) {
+            return shiftInputType;
         }
         if (keyStroke.getKeyType() == KeyType.Character) {
             return charToInputTypeMap.get(Character.toLowerCase(keyStroke.getCharacter()));
@@ -44,6 +55,9 @@ public class InputMap {
         if (ctrlInputType == inputType) {
             ctrlInputType = null;
         }
+        if (shiftInputType == inputType) {
+            shiftInputType = null;
+        }
         charToInputTypeMap.entrySet().removeIf(e -> e.getValue() == inputType);
         keyTypeToInputTypeMap.entrySet().removeIf(e -> e.getValue() == inputType);
         
@@ -51,6 +65,8 @@ public class InputMap {
             altInputType = inputType;
         } else if (keyStroke.isCtrlDown()) {
             ctrlInputType = inputType;
+        } else if (keyStroke.isShiftDown()) {
+            shiftInputType = inputType;
         } else if (keyStroke.getKeyType() == KeyType.Character) {
             charToInputTypeMap.put(Character.toLowerCase(keyStroke.getCharacter()), inputType);
         } else {
@@ -58,45 +74,62 @@ public class InputMap {
         }        
     }
     
-    public void set(final Properties props) {
+    public void clear() {
         altInputType = null;
         ctrlInputType = null;
+        shiftInputType = null;
         charToInputTypeMap.clear();
         keyTypeToInputTypeMap.clear();
-        props.entrySet().forEach(e -> {
-            try {                
-                final String key = e.getKey().toString();
-                final String value = e.getValue().toString();
-                final InputType inputType = InputType.valueOf(key); 
-                if (VALUE_ALT.equals(value)) {
-                    altInputType = inputType;
-                } else if (VALUE_CTRL.equals(value)) {
-                    ctrlInputType = inputType;
-                } else if (value.length() == 1) {
-                    charToInputTypeMap.put(value.charAt(0), inputType);
-                } else {
-                    keyTypeToInputTypeMap.put(KeyType.valueOf(value), inputType);
-                }
-            } catch (final Exception ignore) {                
-                ignore.printStackTrace(); // TODO REMOVE
+    }
+    
+    public void reset() {
+        clear();        
+        charToInputTypeMap.put('z', InputType.ROTATE_CCW);
+        charToInputTypeMap.put('x', InputType.ROTATE_CW);        
+        keyTypeToInputTypeMap.put(KeyType.ArrowLeft, InputType.SHIFT_LEFT);
+        keyTypeToInputTypeMap.put(KeyType.ArrowRight, InputType.SHIFT_RIGHT);
+        keyTypeToInputTypeMap.put(KeyType.ArrowDown, InputType.SOFT_DROP);
+        keyTypeToInputTypeMap.put(KeyType.Enter, InputType.PAUSE);
+        keyTypeToInputTypeMap.put(KeyType.Escape, InputType.QUIT);
+    }
+    
+    public void set(final List<String[]> list) {
+        clear();
+        list.forEach(s -> {
+            if (s == null || s.length != 2 || s[0] == null || s[1] == null) {
+                return;
             }
+            final InputType inputType = EnumUtil.valueOf(InputType.class, s[0]);
+            if (inputType == null) {
+                return;
+            }
+            if (s[1].length() == 1) {
+                charToInputTypeMap.put(Character.toLowerCase(s[1].charAt(0)), inputType);
+                return;
+            } 
+            final KeyType keyType = EnumUtil.valueOf(KeyType.class, s[1]);
+            if (keyType == null) {
+                return;
+            }
+            keyTypeToInputTypeMap.put(keyType, inputType);
         });
     }
     
-    public InputMap fromProperties(final Properties props) {
-        return new InputMap(props);
-    }
-    
-    public Properties toProperties() {
-        final Properties props = new Properties();
+    public List<String[]> toStringsList() {
+        final List<String[]> list = new ArrayList<>();
         if (altInputType != null) {
-            props.put(altInputType, VALUE_ALT);
+            list.add(new String[] { altInputType.toString(), VALUE_ALT });
         }
         if (ctrlInputType != null) {
-            props.put(ctrlInputType, VALUE_CTRL);
+            list.add(new String[] { ctrlInputType.toString(), VALUE_CTRL });
         }
-        charToInputTypeMap.entrySet().forEach(e -> props.put(e.getValue(), e.getKey()));
-        keyTypeToInputTypeMap.entrySet().forEach(e -> props.put(e.getValue(), e.getKey()));
-        return props;
+        if (shiftInputType != null) {
+            list.add(new String[] { shiftInputType.toString(), VALUE_SHIFT });
+        }
+        charToInputTypeMap.entrySet()
+                .forEach(e -> list.add(new String[] { e.getValue().toString(), e.getKey().toString() }));
+        keyTypeToInputTypeMap.entrySet()
+                .forEach(e -> list.add(new String[] { e.getValue().toString(), e.getKey().toString() }));        
+        return list;
     }
 }
