@@ -1,3 +1,13 @@
+Make GameState into serializable SingleGameState
+It should have update() method that accepts InputType values
+update() is repeatedly called in PlayMode update(), once for each available input
+input may come from second player over network or from AI
+It should have a render(x, y) method
+It fully encapsulates the state of a single game
+
+Use geometric color space to fix the colors
+Write problem to solve best values
+
    --
    21012
 -2 .....
