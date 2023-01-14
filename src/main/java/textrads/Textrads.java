@@ -38,10 +38,12 @@ public class Textrads {
                     break; // TODO REMOVE THIS
                 }
                 
-                final TerminalSize size = screen.doResizeIfNecessary​();
-                if (size != null) {
-                    terminalSize = size;
-                }                
+                if (terminalSize == null) {
+                    final TerminalSize size = screen.doResizeIfNecessary​();
+                    if (size != null) {
+                        terminalSize = size;
+                    }
+                }
                 if (appState.getMode() != mode) {
                     mode.dispose(appState);
                     mode = appState.getMode();
