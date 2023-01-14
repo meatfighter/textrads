@@ -19,7 +19,7 @@ public class PlayMode implements Mode {
     public static final TextColor L_COLOR = new TextColor.Indexed(173);
     public static final TextColor I_COLOR = new TextColor.Indexed(36);
     
-    public static final TextColor GARBAGE_COLOR = new TextColor.Indexed(237);
+    public static final TextColor GARBAGE_COLOR = new TextColor.Indexed(238);
     
     public static final TextColor[] BLOCK_COLORS = {
         BACKGROUND_COLOR,  // 0
@@ -51,7 +51,7 @@ public class PlayMode implements Mode {
         g.setBackgroundColor(BLOCK_COLORS[0]);
         g.fillRectangle(TerminalPosition.TOP_LEFT_CORNER, size, ' ');
         
-        drawGameModel(g, gameModel, 0, 0, false);
+        drawGameModel(g, gameModel, 0, 0, true);
     } 
     
     private void drawGameModel(final TextGraphics g, final GameModel model, final int x, final int y, 
