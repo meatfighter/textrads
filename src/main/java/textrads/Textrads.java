@@ -24,6 +24,7 @@ public class Textrads {
         appState.setMode(mode);
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
+            
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor
             

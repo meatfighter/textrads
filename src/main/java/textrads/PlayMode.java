@@ -8,18 +8,18 @@ import com.googlecode.lanterna.screen.Screen;
 
 public class PlayMode implements Mode {
     
-    public static final TextColor BACKGROUND_COLOR = TextColor.Indexed.fromRGB(0x08, 0x08, 0x08);
-    public static final TextColor LINE_COLOR = TextColor.Indexed.fromRGB(0xFF, 0xFF, 0xFF);
+    public static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(0);
+    public static final TextColor LINE_COLOR = new TextColor.Indexed(15);
     
-    public static final TextColor T_COLOR = TextColor.Indexed.fromRGB(0xA3, 0x3D, 0x9A);
-    public static final TextColor J_COLOR = TextColor.Indexed.fromRGB(0x4E, 0x3D, 0xA3);
-    public static final TextColor Z_COLOR = TextColor.Indexed.fromRGB(0xB2, 0x33, 0x3A);
-    public static final TextColor O_COLOR = TextColor.Indexed.fromRGB(0xE1, 0xBC, 0x27);
-    public static final TextColor S_COLOR = TextColor.Indexed.fromRGB(0x82, 0xB2, 0x31);
-    public static final TextColor L_COLOR = TextColor.Indexed.fromRGB(0xB2, 0x62, 0x31);
-    public static final TextColor I_COLOR = TextColor.Indexed.fromRGB(0x31, 0xB2, 0x82);
+    public static final TextColor T_COLOR = new TextColor.Indexed(133);
+    public static final TextColor J_COLOR = new TextColor.Indexed(61);
+    public static final TextColor Z_COLOR = new TextColor.Indexed(167);
+    public static final TextColor O_COLOR = new TextColor.Indexed(179);
+    public static final TextColor S_COLOR = new TextColor.Indexed(149);
+    public static final TextColor L_COLOR = new TextColor.Indexed(173);
+    public static final TextColor I_COLOR = new TextColor.Indexed(36);
     
-    public static final TextColor GARBAGE_COLOR = TextColor.Indexed.fromRGB(0x4A, 0x4A, 0x4A);
+    public static final TextColor GARBAGE_COLOR = new TextColor.Indexed(237);
     
     public static final TextColor[] BLOCK_COLORS = {
         BACKGROUND_COLOR,  // 0
