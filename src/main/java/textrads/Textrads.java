@@ -18,10 +18,10 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        final AppState appState = new AppState();
+        final App app = new App();
         Mode mode = Mode.PLAY;
-        mode.init(appState);
-        appState.setMode(mode);
+        mode.init(app);
+        app.setMode(mode);
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -31,27 +31,25 @@ public class Textrads {
             final TextGraphics textGraphics = screen.newTextGraphics();
             TerminalSize terminalSize = screen.getTerminalSize();
             
+            app.setGameEventSupplierP1(new MonoGameEventSupplier(new InputMap(), screen)); // TODO ENHANCE
+            
             long updateTime = System.nanoTime();
-            while (!appState.isTerminate()) {
-                
-                if (screen.pollInput() != null) {
-                    break; // TODO REMOVE THIS
-                }
-                
+            while (!app.isTerminate()) {
+            
                 if (terminalSize == null) {
                     final TerminalSize size = screen.doResizeIfNecessary​();
                     if (size != null) {
                         terminalSize = size;
                     }
                 }
-                if (appState.getMode() != mode) {
-                    mode.dispose(appState);
-                    mode = appState.getMode();
-                    mode.init(appState);
+                if (app.getMode() != mode) {
+                    mode.dispose(app);
+                    mode = app.getMode();
+                    mode.init(app);
                 }
                 int updateFrames = 0;
                 while (true) {
-                    mode.update(appState);
+                    mode.update(app);
                     updateTime += NANOS_PER_FRAME;
                     if (updateTime > System.nanoTime()) {
                         break;
@@ -62,7 +60,7 @@ public class Textrads {
                     }
                 }
                 
-                mode.render(appState, screen, textGraphics, terminalSize);
+                mode.render(app, screen, textGraphics, terminalSize);
                 screen.refresh();                 
                 
                 final long remainingTime = updateTime - System.nanoTime();

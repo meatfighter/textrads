@@ -111,6 +111,9 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
             drawSmallTetromino(g, ox + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 25 : 26), 
                     y + 1 + 3 * i, type, 0);
         }
+        
+        drawSmallTetromino(g, ox + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), state.getTetrominoType(), 
+                state.getTetrominoRotation());
     }
     
     private void renderBig(final TextGraphics g, final MonoGameState state, final int x, final int y, 
@@ -179,6 +182,9 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
             drawBigTetromino(g, ox + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 47 : 49), 
                     y + 1 + 6 * i, type, 0);
         }
+        
+        drawBigTetromino(g, ox + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), state.getTetrominoType(), 
+                state.getTetrominoRotation());
     }  
     
     private void drawBigTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation) {

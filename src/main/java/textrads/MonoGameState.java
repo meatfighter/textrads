@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MonoGameState {
 
@@ -15,16 +14,17 @@ public class MonoGameState {
     private final List<Integer> nexts = new ArrayList<>();
     private final Random random = new Random();
     
-    private int attackRows = 5; // TODO TESTING
+    private int attackRows;
+    private int score;
+    private int level;
+    private int lines;
+    
+    private int tetrominoType = 0;
+    private int tetrominoRotation = 0;
+    private int tetrominoX = 5;
+    private int tetrominoY = 0;
     
     public MonoGameState() {
-        
-        // TODO REMOVE
-        for (int i = 0; i < PLAYFIELD_HEIGHT; ++i) {
-            for (int j = 0; j < PLAYFIELD_WIDTH; ++j) {
-                playfield[i][j] = ThreadLocalRandom.current().nextInt(9);
-            }
-        }
         updateNexts();
     }
     
@@ -34,6 +34,27 @@ public class MonoGameState {
                 nexts.add(i);
             }
             Collections.shuffle(nexts.subList(nexts.size() - 7, nexts.size()), random);
+        }
+    }
+    
+    public void handleEvents(final List<GameEvent> events) {
+        for (final GameEvent event : events) {
+            switch (event) {
+                case ROTATE_CCW:
+                    if (tetrominoRotation == 0) {
+                        tetrominoRotation = 3;
+                    } else {
+                        --tetrominoRotation;
+                    }
+                    break;
+                case ROTATE_CW:
+                    if (tetrominoRotation == 3) {
+                        tetrominoRotation = 0;
+                    } else {
+                        ++tetrominoRotation;
+                    }
+                    break;
+            }
         }
     }
     
@@ -55,5 +76,21 @@ public class MonoGameState {
 
     public void setAttackRows(final int attackRows) {
         this.attackRows = attackRows;
+    }
+
+    public int getTetrominoType() {
+        return tetrominoType;
+    }
+
+    public int getTetrominoRotation() {
+        return tetrominoRotation;
+    }
+
+    public int getTetrominoX() {
+        return tetrominoX;
+    }
+
+    public int getTetrominoY() {
+        return tetrominoY;
     }
 }

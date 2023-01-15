@@ -14,29 +14,30 @@ public class PlayMode implements Mode {
     private MonoGameRenderer gameRenderer = new DefaultMonoGameRenderer();
 
     @Override
-    public void init(final AppState appState) throws Exception {        
+    public void init(final App app) throws Exception {        
     }    
     
     @Override
-    public void update(final AppState appState) throws Exception {
-
+    public void update(final App app) throws Exception {
+        app.getGameEventSupplierP1().update(app);
+        state.handleEvents(app.getGameEventSupplierP1().get());
     }
 
     public int index = 0;
     
     @Override
-    public void render(final AppState appState, final Screen screen, final TextGraphics g, final TerminalSize size) 
+    public void render(final App app, final Screen screen, final TextGraphics g, final TerminalSize size) 
             throws Exception {        
         
         g.setBackgroundColor(BACKGROUND_COLOR);
         g.fill(' ');
         
-        gameRenderer.render(g, state, 5, 5, true, true);
+        gameRenderer.render(g, state, 5, 5, false, true);
     } 
     
    
     
     @Override
-    public void dispose(final AppState appState) throws Exception {
+    public void dispose(final App app) throws Exception {
     } 
 }
