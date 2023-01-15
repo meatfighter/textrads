@@ -32,7 +32,7 @@ public class PlayMode implements Mode {
         g.setBackgroundColor(BACKGROUND_COLOR);
         g.fill(' ');
         
-        gameRenderer.render(g, state, 5, 5, true, true);
+        gameRenderer.render(g, state, 5, 5, false, true);
     } 
     
    
