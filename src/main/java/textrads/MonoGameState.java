@@ -36,7 +36,7 @@ public class MonoGameState {
     
     private int attackRows;
     private int score;
-    private int level = 20;
+    private int level = 5;
     private int lines;
     
     private int tetrominoType;
@@ -44,10 +44,10 @@ public class MonoGameState {
     private int tetrominoX;
     private int tetrominoY;
     
-    private double framesPerGravityDrop;
-    private double framesPerLock;        
+    private double framesPerGravityDrop;       
     private double gravityDropTimer;
-    private double lockTimer;
+    private int framesPerLock;
+    private int lockTimer;
     private boolean dropFailed;
     
     private int lineClearTimer;
@@ -63,16 +63,6 @@ public class MonoGameState {
     public MonoGameState() {
         spawn();
         updateFramesPerConstants();
-        resetGravityDropTimer();
-        resetLockTimer();
-    }
-    
-    private void resetGravityDropTimer() {
-        gravityDropTimer = framesPerGravityDrop;
-    }
-    
-    private void resetLockTimer() {
-        lockTimer = framesPerLock;
     }
     
     private void resetLineClearTimer() {
@@ -95,7 +85,7 @@ public class MonoGameState {
     
     private void updateFramesPerConstants() {
         framesPerGravityDrop = LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * level);
-        framesPerLock = Math.max(32.0, framesPerGravityDrop + 4.0);
+        framesPerLock = (int)Math.round(Math.max(32.0, framesPerGravityDrop + 4.0));
     }
     
     private void lockTetrimino() {
@@ -233,8 +223,8 @@ public class MonoGameState {
         final int y = tetrominoY + 1;
         if (testPosition(tetrominoRotation, tetrominoX, y)) {
             tetrominoY = y;
-            resetGravityDropTimer();
-            resetLockTimer();
+            gravityDropTimer = framesPerGravityDrop;
+            lockTimer = framesPerLock;
         } else {
             lockTetrimino();
         } 
@@ -246,8 +236,8 @@ public class MonoGameState {
         if (!dropFailed) {            
             dropFailed = false;
             tetrominoY = y;
-            resetGravityDropTimer();
-            resetLockTimer();
+            gravityDropTimer += framesPerGravityDrop;
+            lockTimer = framesPerLock;
         } 
     }
     
@@ -274,11 +264,11 @@ public class MonoGameState {
         
     private void updateFallingTetromino() {
         if (dropFailed) {
-            if (--lockTimer < 0) {                
+            attemptGravityDrop();            
+            if (dropFailed && --lockTimer < 0) {                
                 lockTetrimino();                
             }
-        } else if (--gravityDropTimer < 0) {
-            resetGravityDropTimer();
+        } else if (--gravityDropTimer <= 0) {            
             attemptGravityDrop();
         }
     }  
@@ -303,8 +293,8 @@ public class MonoGameState {
     private void spawn() {
         mode = GameStateMode.TETROMINO_FALLING;
         dropFailed = false;
-        resetGravityDropTimer();
-        resetLockTimer();
+        gravityDropTimer = framesPerGravityDrop;
+        lockTimer = framesPerLock;
         updateNexts();
         tetrominoType = nexts.remove(0);
         tetrominoX = SPAWN_X;

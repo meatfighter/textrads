@@ -36,12 +36,11 @@ public class Textrads {
             long updateTime = System.nanoTime();
             while (!app.isTerminate()) {
             
-                if (terminalSize == null) {
-                    final TerminalSize size = screen.doResizeIfNecessary​();
-                    if (size != null) {
-                        terminalSize = size;
-                    }
+                final TerminalSize size = screen.doResizeIfNecessary​();
+                if (size != null) {
+                    terminalSize = size;
                 }
+                
                 if (app.getMode() != mode) {
                     mode.dispose(app);
                     mode = app.getMode();
