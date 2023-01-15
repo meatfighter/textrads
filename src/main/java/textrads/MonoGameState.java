@@ -15,6 +15,8 @@ public class MonoGameState {
     private final List<Integer> nexts = new ArrayList<>();
     private final Random random = new Random();
     
+    private int attackRows = 5; // TODO TESTING
+    
     public MonoGameState() {
         
         // TODO REMOVE
@@ -45,5 +47,13 @@ public class MonoGameState {
     
     public List<Integer> getNexts() {
         return nexts;
+    }
+
+    public int getAttackRows() {
+        return attackRows;
+    }
+
+    public void setAttackRows(final int attackRows) {
+        this.attackRows = attackRows;
     }
 }
