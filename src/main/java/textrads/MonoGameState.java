@@ -36,7 +36,7 @@ public class MonoGameState {
     
     private int attackRows;
     private int score;
-    private int level = 10;
+    private int level = 20;
     private int lines;
     
     private int tetrominoType;
