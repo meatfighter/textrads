@@ -19,7 +19,7 @@ public class MonoGameState {
     private int level;
     private int lines;
     
-    private int tetrominoType = 0;
+    private int tetrominoType = 6;
     private int tetrominoRotation = 0;
     private int tetrominoX = 5;
     private int tetrominoY = 0;
@@ -41,6 +41,10 @@ public class MonoGameState {
         for (final GameEvent event : events) {
             switch (event) {
                 case ROTATE_CCW:
+                    if (tetrominoType == Tetrominoes.O_TYPE) {
+                        break;
+                    }
+                    
                     if (tetrominoRotation == 0) {
                         tetrominoRotation = 3;
                     } else {
@@ -48,6 +52,10 @@ public class MonoGameState {
                     }
                     break;
                 case ROTATE_CW:
+                    if (tetrominoType == Tetrominoes.O_TYPE) {
+                        break;
+                    }
+                    
                     if (tetrominoRotation == 3) {
                         tetrominoRotation = 0;
                     } else {
