@@ -33,7 +33,7 @@ public class MonoGameEventSupplier implements GameEventSupplier {
                     events.add(event);
                 }
             }
-        } catch (final Exception e) {
+        } catch (final Exception e) {            
             e.printStackTrace(); // TODO ENHANCE
             System.exit(0);
         }

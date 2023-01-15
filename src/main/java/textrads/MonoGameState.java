@@ -1,19 +1,24 @@
 package textrads;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class MonoGameState {
     
-    private static enum GameStateMode {
+    public static enum GameStateMode {
         TETROMINO_FALLING,
         CLEARING_LINES,
     }
 
     public static final int PLAYFIELD_WIDTH = 10;
-    public static final int PLAYFIELD_HEIGHT = 20;    
+    public static final int PLAYFIELD_HEIGHT = 20; 
+    
+    private static final int SPAWN_X = 5;
+    private static final int SPAWN_Y = 0;
+    private static final int SPAWN_ROTATION = 0;
     
     private static final int EMPTY_BLOCK = 0;
     
@@ -27,15 +32,17 @@ public class MonoGameState {
     private final List<Integer> nexts = new ArrayList<>();
     private final Random random = new Random();
     
+    private final List<Integer> lineYs = new ArrayList<>();
+    
     private int attackRows;
     private int score;
     private int level;
     private int lines;
     
-    private int tetrominoType = 0;
-    private int tetrominoRotation = 0;
-    private int tetrominoX = 5;
-    private int tetrominoY = 0;
+    private int tetrominoType;
+    private int tetrominoRotation;
+    private int tetrominoX;
+    private int tetrominoY;
     
     private double framesPerGravityDrop;
     private double framesPerLock;        
@@ -43,10 +50,18 @@ public class MonoGameState {
     private double lockTimer;
     private boolean dropFailed;
     
+    private int lineClearTimer;
+    
+    private boolean softDropPressed;
+    private boolean softDropReleased = true;
+    private boolean justLocked;
+    private int softDropNotPressedFrames;
+    private int lastSoftDropNotPressedFrames;
+    
     private GameStateMode mode = GameStateMode.TETROMINO_FALLING;
     
     public MonoGameState() {
-        updateNexts();
+        spawn();
         updateFramesPerConstants();
         resetGravityDropTimer();
         resetLockTimer();
@@ -60,8 +75,12 @@ public class MonoGameState {
         lockTimer = framesPerLock;
     }
     
+    private void resetLineClearTimer() {
+        lineClearTimer = 50;
+    }
+    
     private void updateNexts() {
-        if (nexts.size() < 5) {            
+        if (nexts.size() < 7) {            
             for (int i = 0; i < 7; ++i) {
                 nexts.add(i);
             }
@@ -80,6 +99,7 @@ public class MonoGameState {
     }
     
     private void lockTetrimino() {
+        justLocked = true;
         for (final int[] block : Tetrominoes.TETROMINOES[tetrominoType][tetrominoRotation]) {
             final int by = tetrominoY + block[1];
             if (by < 0) {
@@ -87,6 +107,13 @@ public class MonoGameState {
             }
             final int bx = tetrominoX + block[0];
             playfield[by][bx] = tetrominoType + 1;
+        }
+        findLines();
+        if (lineYs.isEmpty()) {
+            spawn();
+        } else {
+            mode = GameStateMode.CLEARING_LINES;
+            resetLineClearTimer();
         }
     }
     
@@ -105,9 +132,27 @@ public class MonoGameState {
         return true;
     }
     
+    private void findLines() {
+        final int maxY = Math.min(PLAYFIELD_HEIGHT - 1, tetrominoY + 1);
+        final int minY = Math.max(0, tetrominoY - 2);
+        outer: for (int y = minY; y <= maxY; ++y) {
+            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                if (playfield[y][x] == EMPTY_BLOCK) {
+                    continue outer;
+                }
+            }
+            lineYs.add(y);
+        }
+    }
+    
     public void handleEvents(final List<GameEvent> events) {
         for (final GameEvent event : events) {
-            if (event == GameEvent.UPDATE) {
+            if (event == GameEvent.SOFT_DROP) {
+                softDropPressed = true;                
+                if (!justLocked && mode == GameStateMode.TETROMINO_FALLING) {
+                    attemptSoftDrop();
+                }
+            } else if (event == GameEvent.UPDATE) {
                 update();
             } else if (mode == GameStateMode.TETROMINO_FALLING) {
                 switch (event) {
@@ -122,9 +167,6 @@ public class MonoGameState {
                         break;
                     case SHIFT_RIGHT:
                         attemptShiftRight();
-                        break;
-                    case SOFT_DROP:
-                        attemptDrop();
                         break;
                 }
             }
@@ -187,7 +229,18 @@ public class MonoGameState {
         }
     }
     
-    private void attemptDrop() {
+    private void attemptSoftDrop() {
+        final int y = tetrominoY + 1;
+        if (testPosition(tetrominoRotation, tetrominoX, y)) {
+            tetrominoY = y;
+            resetGravityDropTimer();
+            resetLockTimer();
+        } else {
+            lockTetrimino();
+        } 
+    }
+    
+    private void attemptGravityDrop() {
         final int y = tetrominoY + 1;
         dropFailed = !testPosition(tetrominoRotation, tetrominoX, y);
         if (!dropFailed) {            
@@ -199,16 +252,64 @@ public class MonoGameState {
     }
     
     private void update() {
-        if (mode == GameStateMode.TETROMINO_FALLING) {
-            if (dropFailed) {
-                if (--lockTimer < 0) {
-                    mode = GameStateMode.CLEARING_LINES;
-                }
-            } else if (--gravityDropTimer < 0) {
-                resetGravityDropTimer();
-                attemptDrop();
-            }
+        if (justLocked && softDropReleased) {
+            justLocked = false;
         }
+        if (softDropPressed) {
+            softDropPressed = false;
+            lastSoftDropNotPressedFrames = softDropNotPressedFrames;
+            softDropNotPressedFrames = 0;            
+        } else {
+            softDropReleased = ++softDropNotPressedFrames > lastSoftDropNotPressedFrames + 3;
+        }
+        switch (mode) {
+            case TETROMINO_FALLING:
+                updateFallingTetromino();
+                break;
+            case CLEARING_LINES:
+                updateClearingLines();
+                break;
+        }
+    }
+        
+    private void updateFallingTetromino() {
+        if (dropFailed) {
+            if (--lockTimer < 0) {                
+                lockTetrimino();                
+            }
+        } else if (--gravityDropTimer < 0) {
+            resetGravityDropTimer();
+            attemptGravityDrop();
+        }
+    }  
+    
+    private void updateClearingLines() {
+        if (--lineClearTimer < 0) {
+            clearLines();
+            spawn();
+        }
+    }
+    
+    private void clearLines() {
+        for (final int lineY : lineYs) {
+            for (int y = lineY; y > 0; --y) {
+                System.arraycopy(playfield[y - 1], 0, playfield[y], 0, PLAYFIELD_WIDTH);
+            }
+            Arrays.fill(playfield[0], EMPTY_BLOCK);
+        }
+        lineYs.clear();
+    }
+    
+    private void spawn() {
+        mode = GameStateMode.TETROMINO_FALLING;
+        dropFailed = false;
+        resetGravityDropTimer();
+        resetLockTimer();
+        updateNexts();
+        tetrominoType = nexts.remove(0);
+        tetrominoX = SPAWN_X;
+        tetrominoY = SPAWN_Y;
+        tetrominoRotation = SPAWN_ROTATION;
     }
     
     public void setSeed(final long seed) {
@@ -245,5 +346,21 @@ public class MonoGameState {
 
     public int getTetrominoY() {
         return tetrominoY;
+    }
+
+    public double getLockTimer() {
+        return lockTimer;
+    }
+
+    public GameStateMode getMode() {
+        return mode;
+    }
+
+    public int getLineClearTimer() {
+        return lineClearTimer;
+    }
+
+    public List<Integer> getLineYs() {
+        return lineYs;
     }
 }

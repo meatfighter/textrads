@@ -8,6 +8,7 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
 
     public static final TextColor EMPTY_COLOR = new TextColor.Indexed(0);
     public static final TextColor LINE_COLOR = new TextColor.Indexed(15);
+    public static final TextColor FLASH_COLOR = new TextColor.Indexed(15);
     public static final TextColor ATTACK_COLOR = new TextColor.Indexed(160);
     
     public static final TextColor T_COLOR = new TextColor.Indexed(133);
@@ -112,8 +113,25 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
                     y + 1 + 3 * i, type, 0);
         }
         
-        drawSmallTetromino(g, ox + 1 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
-                state.getTetrominoType(), state.getTetrominoRotation());
+        switch (state.getMode()) {
+            case TETROMINO_FALLING:
+                drawSmallTetromino(g, ox + 1 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
+                        state.getTetrominoType(), state.getTetrominoRotation(),
+                        state.getLockTimer() < 2 ? FLASH_COLOR : BLOCK_COLORS[state.getTetrominoType() + 1]);                
+                break;
+            case CLEARING_LINES: {
+                final int timer = state.getLineClearTimer();
+                if (timer >= 36 || timer >= 6 && timer <= 20) {
+                    g.setBackgroundColor(FLASH_COLOR);
+                    for (final int lineY : state.getLineYs()) {
+                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
+                            g.putString(ox + 1 + 2 * j, y + lineY + 1, "  ");
+                        }
+                    }
+                }
+                break;
+            }
+        }
     }
     
     private void renderBig(final TextGraphics g, final MonoGameState state, final int x, final int y, 
@@ -183,12 +201,35 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
                     y + 1 + 6 * i, type, 0);
         }
         
-        drawBigTetromino(g, ox + 1 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
-                state.getTetrominoType(), state.getTetrominoRotation());
+        switch (state.getMode()) {
+            case TETROMINO_FALLING:
+                drawBigTetromino(g, ox + 1 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
+                        state.getTetrominoType(), state.getTetrominoRotation(),
+                        state.getLockTimer() < 2 ? FLASH_COLOR : BLOCK_COLORS[state.getTetrominoType() + 1]);                
+                break;
+            case CLEARING_LINES: {
+                final int timer = state.getLineClearTimer();
+                if (timer >= 36 || timer >= 6 && timer <= 20) {
+                    g.setBackgroundColor(FLASH_COLOR);
+                    for (final int lineY : state.getLineYs()) {
+                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
+                            g.putString(ox + 1 + 4 * j, y + 2 * lineY + 1, "    ");
+                            g.putString(ox + 1 + 4 * j, y + 2 * lineY + 2, "    ");
+                        }
+                    }
+                }
+                break;
+            }
+        }
     }  
     
     private void drawBigTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation) {
-        g.setBackgroundColor(BLOCK_COLORS[type + 1]);
+        drawBigTetromino(g, x, y, type, rotation, BLOCK_COLORS[type + 1]);
+    }
+    
+    private void drawBigTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation, 
+            final TextColor color) {
+        g.setBackgroundColor(color);
         final int[][] blocks = Tetrominoes.TETROMINOES[type][rotation];
         for (int i = blocks.length - 1; i >= 0; --i) {
             final int[] coordinates = blocks[i];
@@ -201,7 +242,12 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
     
     private void drawSmallTetromino(final TextGraphics g, final int x, final int y, final int type, 
             final int rotation) {
-        g.setBackgroundColor(BLOCK_COLORS[type + 1]);
+        drawSmallTetromino(g, x, y, type, rotation, BLOCK_COLORS[type + 1]);
+    }
+    
+    private void drawSmallTetromino(final TextGraphics g, final int x, final int y, final int type, 
+            final int rotation, final TextColor color) {
+        g.setBackgroundColor(color);
         final int[][] blocks = Tetrominoes.TETROMINOES[type][rotation];
         for (int i = blocks.length - 1; i >= 0; --i) {
             final int[] coordinates = blocks[i];

@@ -9,6 +9,9 @@ public enum GameEvent {
     UPDATE;
     
     static GameEvent fromInputType(final InputType inputType) {
+        if (inputType == null) {
+            return null;
+        }
         switch (inputType) {
             case ROTATE_CCW:
                 return ROTATE_CCW;
