@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Textrads {
     
-    private static final int FRAMES_PER_SECOND = 60;
+    public static final int FRAMES_PER_SECOND = 60;
+    
     private static final int MAX_FRAME_SKIPS = 3;
     private static final int MIN_SLEEP_MICROS = 1500;
     

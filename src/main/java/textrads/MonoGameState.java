@@ -52,11 +52,7 @@ public class MonoGameState {
     
     private int lineClearTimer;
     
-    private boolean softDropPressed;
-    private boolean softDropReleased = true;
-    private boolean justLocked;
-    private int softDropNotPressedFrames;
-    private int lastSoftDropNotPressedFrames;
+    private boolean newlySpawened;
     
     private GameStateMode mode = GameStateMode.TETROMINO_FALLING;
     
@@ -89,7 +85,6 @@ public class MonoGameState {
     }
     
     private void lockTetrimino() {
-        justLocked = true;
         for (final int[] block : Tetrominoes.TETROMINOES[tetrominoType][tetrominoRotation]) {
             final int by = tetrominoY + block[1];
             if (by < 0) {
@@ -137,26 +132,34 @@ public class MonoGameState {
     
     public void handleEvents(final List<GameEvent> events) {
         for (final GameEvent event : events) {
-            if (event == GameEvent.SOFT_DROP) {
-                softDropPressed = true;                
-                if (!justLocked && mode == GameStateMode.TETROMINO_FALLING) {
-                    attemptSoftDrop();
-                }
-            } else if (event == GameEvent.UPDATE) {
+            if (event == GameEvent.UPDATE) {
                 update();
             } else if (mode == GameStateMode.TETROMINO_FALLING) {
                 switch (event) {
-                    case ROTATE_CCW: 
+                    case ROTATE_CCW_PRESSED:
+                    case ROTATE_CCW_REPEATED:    
                         attemptRotateCCW();
                         break;
-                    case ROTATE_CW:
+                    case ROTATE_CW_PRESSED:
+                    case ROTATE_CW_REPEATED:    
                         attemptRotateCW();               
                         break;
-                    case SHIFT_LEFT:
+                    case SHIFT_LEFT_PRESSED:
+                    case SHIFT_LEFT_REPEATED:
                         attemptShiftLeft();
                         break;
-                    case SHIFT_RIGHT:
+                    case SHIFT_RIGHT_PRESSED:
+                    case SHIFT_RIGHT_REPEATED:    
                         attemptShiftRight();
+                        break;
+                    case SOFT_DROP_PRESSED:
+                        newlySpawened = false;
+                        attemptSoftDrop();
+                        break;
+                    case SOFT_DROP_REPEATED:
+                        if (!newlySpawened) {
+                            attemptSoftDrop();
+                        }
                         break;
                 }
             }
@@ -242,16 +245,6 @@ public class MonoGameState {
     }
     
     private void update() {
-        if (justLocked && softDropReleased) {
-            justLocked = false;
-        }
-        if (softDropPressed) {
-            softDropPressed = false;
-            lastSoftDropNotPressedFrames = softDropNotPressedFrames;
-            softDropNotPressedFrames = 0;            
-        } else {
-            softDropReleased = ++softDropNotPressedFrames > lastSoftDropNotPressedFrames + 3;
-        }
         switch (mode) {
             case TETROMINO_FALLING:
                 updateFallingTetromino();
@@ -291,6 +284,7 @@ public class MonoGameState {
     }
     
     private void spawn() {
+        newlySpawened = true;
         mode = GameStateMode.TETROMINO_FALLING;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;
