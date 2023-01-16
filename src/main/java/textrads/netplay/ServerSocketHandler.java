@@ -30,8 +30,16 @@ public class ServerSocketHandler {
     private void handleInput() {
         try {
             while (true) {
-                //in.read()
+                switch (in.read()) {
+                    case Command.HEARTBEAT:
+                        break;
+                    case Command.STATE:
+                        break;
+                    case Command.EVENTS:
+                        break;
+                }
             }
+        } catch (final Exception ignored) {            
         } finally {
             close();
         }

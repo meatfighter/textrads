@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MonoGameState implements Serializable {
     
@@ -14,6 +15,7 @@ public class MonoGameState implements Serializable {
     public static enum GameStateMode {
         TETROMINO_FALLING,
         CLEARING_LINES,
+        ADDING_GARBAGE,
         GAME_OVER,
     }
 
@@ -25,6 +27,9 @@ public class MonoGameState implements Serializable {
     private static final int SPAWN_ROTATION = 0;
     
     private static final byte EMPTY_BLOCK = 0;
+    private static final byte GARBAGE_BLOCK = 8;
+    
+    private static final int MOVES_PER_GARBAGE_ROW = 8;
     
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
     private static final double LEVEL_THIRTY_FRAMES_PER_DROP = 2.0;
@@ -42,7 +47,7 @@ public class MonoGameState implements Serializable {
     
     private int attackRows;
     private int score;
-    private int level = 100;
+    private int level = 5;
     private int lines;
     
     private int tetrominoType;
@@ -60,6 +65,9 @@ public class MonoGameState implements Serializable {
     private int gameOverTimer;
     
     private boolean newlySpawened;
+    
+    private int garbageX;
+    private int garbageCounter;
     
     private GameStateMode mode = GameStateMode.TETROMINO_FALLING;
     
@@ -102,7 +110,11 @@ public class MonoGameState implements Serializable {
         }
         findLines();
         if (lineYs.isEmpty()) {
-            attemptSpawn();
+            if (attackRows > 0) {
+                mode = GameStateMode.ADDING_GARBAGE;
+            } else {
+                attemptSpawn();
+            }
         } else {
             mode = GameStateMode.CLEARING_LINES;
             resetLineClearTimer();
@@ -259,9 +271,19 @@ public class MonoGameState implements Serializable {
             case CLEARING_LINES:
                 updateClearingLines();
                 break;
+            case ADDING_GARBAGE:
+                updateAddingGarbage();
+                break;
             case GAME_OVER:
                 updateGameOver();
                 break;
+        }
+        
+        
+        // TODO TESTING (REMOVE)
+        final Random random = ThreadLocalRandom.current();
+        if (random.nextInt(600) == 0) {
+            addAttackRows(random.nextInt(2) + 1);
         }
     }
         
@@ -282,7 +304,38 @@ public class MonoGameState implements Serializable {
     private void updateClearingLines() {
         if (--lineClearTimer < 0) {
             clearLines();
+            if (attackRows > 0) {
+                mode = GameStateMode.ADDING_GARBAGE;
+            } else {
+                attemptSpawn();
+            }
+        }
+    }
+    
+    private void updateAddingGarbage() {
+        if (attackRows == 0) {
             attemptSpawn();
+            return;
+        }
+        
+        --attackRows;
+        
+        if (garbageCounter == 0) {
+            garbageCounter = MOVES_PER_GARBAGE_ROW;
+            int x;
+            do {
+                x = garbageRandomizer.nextInt(PLAYFIELD_WIDTH);
+            } while (x == garbageX);
+            garbageX = x;
+        } else {
+            --garbageCounter;
+        }
+        
+        for (int y = 1; y < PLAYFIELD_HEIGHT; ++y) {
+            System.arraycopy(playfield[y], 0, playfield[y - 1], 0, PLAYFIELD_WIDTH);
+        }
+        for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+            playfield[PLAYFIELD_HEIGHT - 1][x] = (x == garbageX) ? EMPTY_BLOCK : GARBAGE_BLOCK;
         }
     }
     
@@ -334,9 +387,13 @@ public class MonoGameState implements Serializable {
     public int getAttackRows() {
         return attackRows;
     }
+    
+    public void addAttackRows(final int rows) {
+        setAttackRows(attackRows + rows);
+    }
 
-    public void setAttackRows(final int attackRows) {
-        this.attackRows = attackRows;
+    public void setAttackRows(final int rows) {
+        attackRows = Math.min(PLAYFIELD_HEIGHT, rows);
     }
 
     public int getTetrominoType() {
