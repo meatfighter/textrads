@@ -1,5 +1,6 @@
 package textrads;
 
+import textrads.netplay.Server;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
@@ -79,6 +80,7 @@ public class Textrads {
 
     
     public static void main(final String... args) throws Exception {
-        new Textrads().launch();
+        //new Textrads().launch();
+        System.out.println(Server.getNetworkInterfaceAddresses());
     }
 }
