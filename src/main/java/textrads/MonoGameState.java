@@ -11,12 +11,13 @@ public class MonoGameState {
     public static enum GameStateMode {
         TETROMINO_FALLING,
         CLEARING_LINES,
+        GAME_OVER,
     }
 
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20; 
     
-    private static final int SPAWN_X = 5;
+    private static final int SPAWN_X = 4;
     private static final int SPAWN_Y = 0;
     private static final int SPAWN_ROTATION = 0;
     
@@ -51,13 +52,14 @@ public class MonoGameState {
     private boolean dropFailed;
     
     private int lineClearTimer;
+    private int gameOverTimer;
     
     private boolean newlySpawened;
     
     private GameStateMode mode = GameStateMode.TETROMINO_FALLING;
     
     public MonoGameState() {
-        spawn();
+        attemptSpawn();
         updateFramesPerConstants();
     }
     
@@ -95,7 +97,7 @@ public class MonoGameState {
         }
         findLines();
         if (lineYs.isEmpty()) {
-            spawn();
+            attemptSpawn();
         } else {
             mode = GameStateMode.CLEARING_LINES;
             resetLineClearTimer();
@@ -252,6 +254,9 @@ public class MonoGameState {
             case CLEARING_LINES:
                 updateClearingLines();
                 break;
+            case GAME_OVER:
+                updateGameOver();
+                break;
         }
     }
         
@@ -269,7 +274,13 @@ public class MonoGameState {
     private void updateClearingLines() {
         if (--lineClearTimer < 0) {
             clearLines();
-            spawn();
+            attemptSpawn();
+        }
+    }
+    
+    private void updateGameOver() {
+        if (gameOverTimer < 1024) {
+            ++gameOverTimer;
         }
     }
     
@@ -283,9 +294,8 @@ public class MonoGameState {
         lineYs.clear();
     }
     
-    private void spawn() {
+    private void attemptSpawn() {
         newlySpawened = true;
-        mode = GameStateMode.TETROMINO_FALLING;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;
         lockTimer = framesPerLock;
@@ -294,6 +304,10 @@ public class MonoGameState {
         tetrominoX = SPAWN_X;
         tetrominoY = SPAWN_Y;
         tetrominoRotation = SPAWN_ROTATION;
+        gameOverTimer = 0;
+        
+        mode = testPosition(tetrominoRotation, tetrominoX, tetrominoY) 
+                ? GameStateMode.TETROMINO_FALLING : GameStateMode.GAME_OVER;
     }
     
     public void setSeed(final long seed) {
@@ -346,5 +360,9 @@ public class MonoGameState {
 
     public List<Integer> getLineYs() {
         return lineYs;
+    }
+
+    public int getGameOverTimer() {
+        return gameOverTimer;
     }
 }

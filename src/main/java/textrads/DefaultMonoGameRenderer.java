@@ -20,6 +20,7 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
     public static final TextColor I_COLOR = new TextColor.Indexed(36);
     
     public static final TextColor GARBAGE_COLOR = new TextColor.Indexed(238);
+    public static final TextColor GAME_OVER_COLOR = new TextColor.Indexed(238);
     
     public static final TextColor[] BLOCK_COLORS = {
         EMPTY_COLOR,   // 0
@@ -131,6 +132,23 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
                 }
                 break;
             }
+            case GAME_OVER: {
+                final int t = state.getGameOverTimer();
+                if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
+                    drawSmallTetromino(g, ox + 1 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
+                            state.getTetrominoType(), state.getTetrominoRotation(),
+                            BLOCK_COLORS[state.getTetrominoType() + 1]);
+                } else if (t >= 90) {
+                    g.setBackgroundColor(GAME_OVER_COLOR);
+                    final int start = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89));
+                    for (int i = start; i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
+                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {                            
+                            g.putString(ox + 1 + 2 * j, y + 1 + i, "  ");
+                        }
+                    }
+                }
+                break;
+            }            
         }
     }
     
@@ -215,6 +233,24 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
                         for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                             g.putString(ox + 1 + 4 * j, y + 2 * lineY + 1, "    ");
                             g.putString(ox + 1 + 4 * j, y + 2 * lineY + 2, "    ");
+                        }
+                    }
+                }
+                break;
+            }
+            case GAME_OVER: {
+                final int t = state.getGameOverTimer();
+                if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
+                    drawBigTetromino(g, ox + 1 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
+                            state.getTetrominoType(), state.getTetrominoRotation(),
+                            BLOCK_COLORS[state.getTetrominoType() + 1]);                    
+                } else if (t >= 90) {
+                    g.setBackgroundColor(GAME_OVER_COLOR);
+                    final int start = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89));
+                    for (int i = start; i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
+                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {                            
+                            g.putString(ox + 1 + 4 * j, y + 1 + 2 * i, "    ");
+                            g.putString(ox + 1 + 4 * j, y + 2 + 2 * i, "    ");
                         }
                     }
                 }
