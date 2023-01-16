@@ -1,31 +1,31 @@
 package textrads;
 
-public enum GameEvent {
+public interface GameEvent {
     
-    ROTATE_CCW_PRESSED,
-    ROTATE_CCW_REPEATED,
+    int ROTATE_CCW_PRESSED = 0;
+    int ROTATE_CCW_REPEATED = 1;
     
-    ROTATE_CW_PRESSED,
-    ROTATE_CW_REPEATED,
+    int ROTATE_CW_PRESSED = 2;
+    int ROTATE_CW_REPEATED = 3;
     
-    SHIFT_LEFT_PRESSED,
-    SHIFT_LEFT_REPEATED,
+    int SHIFT_LEFT_PRESSED = 4;
+    int SHIFT_LEFT_REPEATED = 5;
     
-    SHIFT_RIGHT_PRESSED,
-    SHIFT_RIGHT_REPEATED,
+    int SHIFT_RIGHT_PRESSED = 6;
+    int SHIFT_RIGHT_REPEATED = 7;
     
-    SOFT_DROP_PRESSED,
-    SOFT_DROP_REPEATED,
+    int SOFT_DROP_PRESSED = 8;
+    int SOFT_DROP_REPEATED = 9;
     
-    PAUSE_PRESSED,
-    PAUSE_REPEATED,
+    int PAUSE_PRESSED = 10;
+    int PAUSE_REPEATED = 11;
     
-    QUIT_PRESSED,
-    QUIT_REPEATED,
+    int QUIT_PRESSED = 12;
+    int QUIT_REPEATED = 13;
     
-    UPDATE;
+    int UPDATE = 14;
     
-    static GameEvent fromInputType(final InputType inputType, final boolean repeated) {
+    static Integer fromInputType(final InputType inputType, final boolean repeated) {
         
         if (inputType == null) {
             return null;

@@ -27,10 +27,10 @@ public class MonoGameState implements Serializable {
     private static final byte EMPTY_BLOCK = 0;
     
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
-    private static final double LEVEL_TWENTY_FRAMES_PER_DROP = 2.0;
+    private static final double LEVEL_THIRTY_FRAMES_PER_DROP = 2.0;
     
     private static final double DROP_DECAY_CONSTANT 
-            = Math.log(LEVEL_TWENTY_FRAMES_PER_DROP / LEVEL_ZERO_FRAMES_PER_DROP) / 20.0;
+            = Math.log(LEVEL_THIRTY_FRAMES_PER_DROP / LEVEL_ZERO_FRAMES_PER_DROP) / 30.0;
     
     private final byte[][] playfield = new byte[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private final List<Integer> nexts = new ArrayList<>();
@@ -42,7 +42,7 @@ public class MonoGameState implements Serializable {
     
     private int attackRows;
     private int score;
-    private int level = 5;
+    private int level = 100;
     private int lines;
     
     private int tetrominoType;
@@ -137,33 +137,33 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    public void handleEvents(final List<GameEvent> events) {
-        for (final GameEvent event : events) {
+    public void handleEvents(final List<Integer> events) {
+        for (final Integer event : events) {
             if (event == GameEvent.UPDATE) {
                 update();
             } else if (mode == GameStateMode.TETROMINO_FALLING) {
                 switch (event) {
-                    case ROTATE_CCW_PRESSED:
-                    case ROTATE_CCW_REPEATED:    
+                    case GameEvent.ROTATE_CCW_PRESSED:
+                    case GameEvent.ROTATE_CCW_REPEATED:    
                         attemptRotateCCW();
                         break;
-                    case ROTATE_CW_PRESSED:
-                    case ROTATE_CW_REPEATED:    
+                    case GameEvent.ROTATE_CW_PRESSED:
+                    case GameEvent.ROTATE_CW_REPEATED:    
                         attemptRotateCW();               
                         break;
-                    case SHIFT_LEFT_PRESSED:
-                    case SHIFT_LEFT_REPEATED:
+                    case GameEvent.SHIFT_LEFT_PRESSED:
+                    case GameEvent.SHIFT_LEFT_REPEATED:
                         attemptShiftLeft();
                         break;
-                    case SHIFT_RIGHT_PRESSED:
-                    case SHIFT_RIGHT_REPEATED:    
+                    case GameEvent.SHIFT_RIGHT_PRESSED:
+                    case GameEvent.SHIFT_RIGHT_REPEATED:    
                         attemptShiftRight();
                         break;
-                    case SOFT_DROP_PRESSED:
+                    case GameEvent.SOFT_DROP_PRESSED:
                         newlySpawened = false;
                         attemptSoftDrop();
                         break;
-                    case SOFT_DROP_REPEATED:
+                    case GameEvent.SOFT_DROP_REPEATED:
                         if (!newlySpawened) {
                             attemptSoftDrop();
                         }
@@ -271,7 +271,10 @@ public class MonoGameState implements Serializable {
             if (dropFailed && --lockTimer < 0) {                
                 lockTetrimino();                
             }
-        } else if (--gravityDropTimer <= 0) {            
+            return;
+        } 
+        
+        while (--gravityDropTimer <= 0 && !dropFailed) {            
             attemptGravityDrop();
         }
     }  

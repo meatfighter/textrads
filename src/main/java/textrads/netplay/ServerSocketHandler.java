@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
+import textrads.DualGameState;
+import textrads.GameEvent;
 
 public class ServerSocketHandler {
     
@@ -21,9 +24,36 @@ public class ServerSocketHandler {
         this.socket = socket;
         in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        new Thread(this::handleInput).start();
     }
     
-    public void sendHeartbeat() {        
+    private void handleInput() {
+        try {
+            while (true) {
+                //in.read()
+            }
+        } finally {
+            close();
+        }
+    }
+    
+    public void sendHeartbeat() {
+        synchronized (out) {
+            try {
+                out.write(Command.HEARTBEAT);
+                out.flush();
+            } catch (final IOException e) {
+                close();
+            }
+        }
+    }
+    
+    public void sendState(final DualGameState state) {
+        
+    }
+    
+    public void sendEvents(final List<GameEvent>[] events) {
+        
     }
     
     public void close() {
@@ -33,5 +63,7 @@ public class ServerSocketHandler {
             socket.close();
         } catch (final IOException ignored) {
         }
+        
+        server.removeHandler(this);
     }
 }

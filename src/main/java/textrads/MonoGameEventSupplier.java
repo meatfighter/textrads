@@ -33,7 +33,7 @@ public class MonoGameEventSupplier implements GameEventSupplier {
         }
     }
     
-    private final List<GameEvent> events = new ArrayList<>();
+    private final List<Integer> events = new ArrayList<>();
     private final Map<InputType, KeyPressedTimes> keyPressedTimes = new HashMap<>(); 
     
     private final InputMap inputMap;
@@ -83,7 +83,7 @@ public class MonoGameEventSupplier implements GameEventSupplier {
     }
 
     @Override
-    public List<GameEvent> get() {
+    public List<Integer> get() {
         return events;
     }    
 }

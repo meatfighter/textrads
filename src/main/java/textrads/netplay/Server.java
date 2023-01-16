@@ -1,12 +1,9 @@
 package textrads.netplay;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,6 +120,12 @@ public class Server {
             synchronized (monitor) {
                 running = cancelled = false;
             }
+        }
+    }
+    
+    void removeHandler(final ServerSocketHandler handler) {
+        synchronized (handlers) {
+            handlers.add(handler);
         }
     }
     
