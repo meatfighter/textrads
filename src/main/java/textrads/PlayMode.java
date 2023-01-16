@@ -19,8 +19,10 @@ public class PlayMode implements Mode {
     
     @Override
     public void update(final App app) throws Exception {
-        app.getGameEventSupplierP1().update(app);
-        state.handleEvents(app.getGameEventSupplierP1().get());
+        
+        // TODO ENHANCE
+        app.getEventSuppliers()[0].update(app);
+        state.handleEvents(app.getEventSuppliers()[0].get());
     }
 
     public int index = 0;

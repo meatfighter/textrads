@@ -99,7 +99,7 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
         g.putString(ox + 21, y + 15, "\u2523");
         g.putString(ox + 32, y + 15, "\u251B");
                 
-        final int[][] playfield = state.getPlayfield();
+        final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                 g.setBackgroundColor(BLOCK_COLORS[playfield[i][j]]);
@@ -203,7 +203,7 @@ public class DefaultMonoGameRenderer implements MonoGameRenderer {
         g.putString(ox + 41, y + 29, "\u2523");
         g.putString(ox + 60, y + 29, "\u251B");
                 
-        final int[][] playfield = state.getPlayfield();
+        final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                 g.setBackgroundColor(BLOCK_COLORS[playfield[i][j]]);

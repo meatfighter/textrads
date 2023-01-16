@@ -1,12 +1,15 @@
 package textrads;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class MonoGameState {
+public class MonoGameState implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     
     public static enum GameStateMode {
         TETROMINO_FALLING,
@@ -21,7 +24,7 @@ public class MonoGameState {
     private static final int SPAWN_Y = 0;
     private static final int SPAWN_ROTATION = 0;
     
-    private static final int EMPTY_BLOCK = 0;
+    private static final byte EMPTY_BLOCK = 0;
     
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
     private static final double LEVEL_TWENTY_FRAMES_PER_DROP = 2.0;
@@ -29,9 +32,11 @@ public class MonoGameState {
     private static final double DROP_DECAY_CONSTANT 
             = Math.log(LEVEL_TWENTY_FRAMES_PER_DROP / LEVEL_ZERO_FRAMES_PER_DROP) / 20.0;
     
-    private final int[][] playfield = new int[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
+    private final byte[][] playfield = new byte[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private final List<Integer> nexts = new ArrayList<>();
-    private final Random random = new Random();
+    
+    private final Random tetrominoRandomizer = new Random();
+    private final Random garbageRandomizer = new Random();
     
     private final List<Integer> lineYs = new ArrayList<>();
     
@@ -72,7 +77,7 @@ public class MonoGameState {
             for (int i = 0; i < 7; ++i) {
                 nexts.add(i);
             }
-            Collections.shuffle(nexts.subList(nexts.size() - 7, nexts.size()), random);
+            Collections.shuffle(nexts.subList(nexts.size() - 7, nexts.size()), tetrominoRandomizer);
         }
     }
     
@@ -93,7 +98,7 @@ public class MonoGameState {
                 continue;
             }
             final int bx = tetrominoX + block[0];
-            playfield[by][bx] = tetrominoType + 1;
+            playfield[by][bx] = (byte)(tetrominoType + 1);
         }
         findLines();
         if (lineYs.isEmpty()) {
@@ -311,10 +316,11 @@ public class MonoGameState {
     }
     
     public void setSeed(final long seed) {
-        random.setSeed(seed);
+        tetrominoRandomizer.setSeed(seed);
+        garbageRandomizer.setSeed(seed);
     }
 
-    public int[][] getPlayfield() {
+    public byte[][] getPlayfield() {
         return playfield;
     }
     

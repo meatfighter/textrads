@@ -33,7 +33,7 @@ public class Textrads {
             final TextGraphics textGraphics = screen.newTextGraphics();
             TerminalSize terminalSize = screen.getTerminalSize();
             
-            app.setGameEventSupplierP1(new MonoGameEventSupplier(new InputMap(), screen)); // TODO ENHANCE
+            app.getEventSuppliers()[0] = new MonoGameEventSupplier(new InputMap(), screen); // TODO ENHANCE
             
             long updateTime = System.nanoTime();
             while (!app.isTerminate()) {

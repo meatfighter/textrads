@@ -1,12 +1,11 @@
 package textrads;
 
 public class App {
+
+    private final GameEventSupplier[] eventSuppliers = new GameEventSupplier[2];
     
     private Mode mode;
     private boolean terminate;
-    
-    private GameEventSupplier gameEventSupplierP1;
-    private GameEventSupplier gameEventSupplierP2;
     
     public void setMode(final Mode mode) throws Exception {
         this.mode = mode;
@@ -24,19 +23,7 @@ public class App {
         this.terminate = terminate;
     }
 
-    public GameEventSupplier getGameEventSupplierP1() {
-        return gameEventSupplierP1;
-    }
-
-    public void setGameEventSupplierP1(final GameEventSupplier gameEventSupplierP1) {
-        this.gameEventSupplierP1 = gameEventSupplierP1;
-    }
-
-    public GameEventSupplier getGameEventSupplierP2() {
-        return gameEventSupplierP2;
-    }
-
-    public void setGameEventSupplierP2(final GameEventSupplier gameEventSupplierP2) {
-        this.gameEventSupplierP2 = gameEventSupplierP2;
+    public GameEventSupplier[] getEventSuppliers() {
+        return eventSuppliers;
     }
 }
