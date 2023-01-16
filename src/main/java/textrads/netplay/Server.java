@@ -43,6 +43,7 @@ public class Server {
     private volatile ServerSocket serverSocket;
     
     private volatile boolean error;
+    private volatile boolean playerConnected;
     
     public void start() {
         
@@ -161,5 +162,9 @@ public class Server {
 
     public void setError(final boolean error) {
         this.error = error;
+    }
+
+    public boolean isPlayerConnected() {
+        return playerConnected;
     }
 }
