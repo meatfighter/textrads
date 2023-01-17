@@ -12,12 +12,10 @@ public class MonoGameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public static enum GameStateMode {
-        TETROMINO_FALLING,
-        CLEARING_LINES,
-        ADDING_GARBAGE,
-        GAME_OVER,
-    }
+    public static final byte TETROMINO_FALLING_MODE = 0;
+    public static final byte CLEARING_LINES_MODE = 1;
+    public static final byte ADDING_GARBAGE_MODE = 2;
+    public static final byte GAME_OVER_MODE = 3;
 
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20; 
@@ -38,38 +36,38 @@ public class MonoGameState implements Serializable {
             = Math.log(LEVEL_THIRTY_FRAMES_PER_DROP / LEVEL_ZERO_FRAMES_PER_DROP) / 30.0;
     
     private final byte[][] playfield = new byte[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
-    private final List<Integer> nexts = new ArrayList<>();
+    private final List<Byte> nexts = new ArrayList<>();
     
     private final Random tetrominoRandomizer = new Random();
     private final Random garbageRandomizer = new Random();
     
-    private final List<Integer> lineYs = new ArrayList<>();
+    private final List<Byte> lineYs = new ArrayList<>();
     
-    private int attackRows;
+    private byte attackRows;
     private int score;
-    private int level;
-    private int lines;
+    private byte level;
+    private short lines;
     
-    private int tetrominoType;
-    private int tetrominoRotation;
-    private int tetrominoX;
-    private int tetrominoY;
+    private byte tetrominoType;
+    private byte tetrominoRotation;
+    private byte tetrominoX;
+    private byte tetrominoY;
     
-    private double framesPerGravityDrop;       
-    private double gravityDropTimer;
-    private int framesPerLock;
-    private int lockTimer;
+    private float framesPerGravityDrop;       
+    private float gravityDropTimer;
+    private byte framesPerLock;
+    private byte lockTimer;
     private boolean dropFailed;
     
-    private int lineClearTimer;
-    private int gameOverTimer;
+    private byte lineClearTimer;
+    private byte gameOverTimer;
     
     private boolean newlySpawened;
     
-    private int garbageX;
-    private int garbageCounter;
+    private byte garbageX;
+    private byte garbageCounter;
     
-    private GameStateMode mode;
+    private byte mode;
     
     public MonoGameState() {
         reset();
@@ -95,7 +93,7 @@ public class MonoGameState implements Serializable {
         newlySpawened = false;
         garbageX = 0;
         garbageCounter = 0;
-        mode = GameStateMode.TETROMINO_FALLING;
+        mode = TETROMINO_FALLING_MODE;
         
         for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
             Arrays.fill(playfield[y], (byte) 0);
@@ -104,7 +102,7 @@ public class MonoGameState implements Serializable {
         lineYs.clear();
     }
     
-    private void init() {
+    public void init() {
         attemptSpawn();
         updateFramesPerConstants();
     }
@@ -116,7 +114,7 @@ public class MonoGameState implements Serializable {
     private void updateNexts() {
         if (nexts.size() < 7) {            
             for (int i = 0; i < 7; ++i) {
-                nexts.add(i);
+                nexts.add((byte) i);
             }
             Collections.shuffle(nexts.subList(nexts.size() - 7, nexts.size()), tetrominoRandomizer);
         }
@@ -128,8 +126,8 @@ public class MonoGameState implements Serializable {
     }
     
     private void updateFramesPerConstants() {
-        framesPerGravityDrop = LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * level);
-        framesPerLock = (int)Math.round(Math.max(32.0, framesPerGravityDrop + 4.0));
+        framesPerGravityDrop = (float) (LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * level));
+        framesPerLock = (byte) Math.round(Math.max(32.0, framesPerGravityDrop + 4.0));
     }
     
     private void lockTetrimino() {
@@ -139,17 +137,17 @@ public class MonoGameState implements Serializable {
                 continue;
             }
             final int bx = tetrominoX + block[0];
-            playfield[by][bx] = (byte)(tetrominoType + 1);
+            playfield[by][bx] = (byte) (tetrominoType + 1);
         }
         findLines();
         if (lineYs.isEmpty()) {
             if (attackRows > 0) {
-                mode = GameStateMode.ADDING_GARBAGE;
+                mode = ADDING_GARBAGE_MODE;
             } else {
                 attemptSpawn();
             }
         } else {
-            mode = GameStateMode.CLEARING_LINES;
+            mode = CLEARING_LINES_MODE;
             resetLineClearTimer();
         }
     }
@@ -178,7 +176,7 @@ public class MonoGameState implements Serializable {
                     continue outer;
                 }
             }
-            lineYs.add(y);
+            lineYs.add((byte) y);
         }
     }
     
@@ -186,7 +184,7 @@ public class MonoGameState implements Serializable {
         for (final Integer event : events) {
             if (event == GameEvent.UPDATE) {
                 update();
-            } else if (mode == GameStateMode.TETROMINO_FALLING) {
+            } else if (mode == TETROMINO_FALLING_MODE) {
                 switch (event) {
                     case GameEvent.ROTATE_CCW_PRESSED:
                     case GameEvent.ROTATE_CCW_REPEATED:    
@@ -225,7 +223,7 @@ public class MonoGameState implements Serializable {
 
         final int rotation = (tetrominoRotation == 0) ? 3 : tetrominoRotation - 1;
         if (testPosition(rotation, tetrominoX, tetrominoY)) {
-            tetrominoRotation = rotation;
+            tetrominoRotation = (byte) rotation;
             return;
         }
 
@@ -233,9 +231,9 @@ public class MonoGameState implements Serializable {
         final int x = tetrominoX + offsets[0];
         final int y = tetrominoY + offsets[1];
         if (testPosition(rotation, x, y)) {
-            tetrominoRotation = rotation;
-            tetrominoX = x;
-            tetrominoY = y;
+            tetrominoRotation = (byte) rotation;
+            tetrominoX = (byte) x;
+            tetrominoY = (byte) y;
         }
     }
     
@@ -246,7 +244,7 @@ public class MonoGameState implements Serializable {
 
         final int rotation = (tetrominoRotation == 3) ? 0 : tetrominoRotation + 1;
         if (testPosition(rotation, tetrominoX, tetrominoY)) {
-            tetrominoRotation = rotation;
+            tetrominoRotation = (byte) rotation;
             return;
         }
 
@@ -254,30 +252,30 @@ public class MonoGameState implements Serializable {
         final int x = tetrominoX + offsets[0];
         final int y = tetrominoY + offsets[1];
         if (testPosition(rotation, x, y)) {
-            tetrominoRotation = rotation;
-            tetrominoX = x;
-            tetrominoY = y;
+            tetrominoRotation = (byte) rotation;
+            tetrominoX = (byte) x;
+            tetrominoY = (byte) y;
         }     
     }
     
     private void attemptShiftLeft() {
         final int x = tetrominoX - 1;
         if (testPosition(tetrominoRotation, x, tetrominoY)) {
-            tetrominoX = x;
+            tetrominoX = (byte) x;
         }
     }
     
     private void attemptShiftRight() {
         final int x = tetrominoX + 1;
         if (testPosition(tetrominoRotation, x, tetrominoY)) {
-            tetrominoX = x;
+            tetrominoX = (byte) x;
         }
     }
     
     private void attemptSoftDrop() {
         final int y = tetrominoY + 1;
         if (testPosition(tetrominoRotation, tetrominoX, y)) {
-            tetrominoY = y;
+            tetrominoY = (byte) y;
             gravityDropTimer = framesPerGravityDrop;
             lockTimer = framesPerLock;
         } else {
@@ -290,7 +288,7 @@ public class MonoGameState implements Serializable {
         dropFailed = !testPosition(tetrominoRotation, tetrominoX, y);
         if (!dropFailed) {            
             dropFailed = false;
-            tetrominoY = y;
+            tetrominoY = (byte) y;
             gravityDropTimer += framesPerGravityDrop;
             lockTimer = framesPerLock;
         } 
@@ -298,16 +296,16 @@ public class MonoGameState implements Serializable {
     
     private void update() {
         switch (mode) {
-            case TETROMINO_FALLING:
+            case TETROMINO_FALLING_MODE:
                 updateFallingTetromino();
                 break;
-            case CLEARING_LINES:
+            case CLEARING_LINES_MODE:
                 updateClearingLines();
                 break;
-            case ADDING_GARBAGE:
+            case ADDING_GARBAGE_MODE:
                 updateAddingGarbage();
                 break;
-            case GAME_OVER:
+            case GAME_OVER_MODE:
                 updateGameOver();
                 break;
         }
@@ -338,7 +336,7 @@ public class MonoGameState implements Serializable {
         if (--lineClearTimer < 0) {
             clearLines();
             if (attackRows > 0) {
-                mode = GameStateMode.ADDING_GARBAGE;
+                mode = ADDING_GARBAGE_MODE;
             } else {
                 attemptSpawn();
             }
@@ -359,7 +357,7 @@ public class MonoGameState implements Serializable {
             do {
                 x = garbageRandomizer.nextInt(PLAYFIELD_WIDTH);
             } while (x == garbageX);
-            garbageX = x;
+            garbageX = (byte) x;
         } else {
             --garbageCounter;
         }
@@ -373,7 +371,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void updateGameOver() {
-        if (gameOverTimer < 1024) {
+        if (gameOverTimer < Byte.MAX_VALUE) {
             ++gameOverTimer;
         }
     }
@@ -400,8 +398,7 @@ public class MonoGameState implements Serializable {
         tetrominoRotation = SPAWN_ROTATION;
         gameOverTimer = 0;
         
-        mode = testPosition(tetrominoRotation, tetrominoX, tetrominoY) 
-                ? GameStateMode.TETROMINO_FALLING : GameStateMode.GAME_OVER;
+        mode = testPosition(tetrominoRotation, tetrominoX, tetrominoY) ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
     }
     
     public void setSeed(final long seed) {
@@ -413,7 +410,7 @@ public class MonoGameState implements Serializable {
         return playfield;
     }
     
-    public List<Integer> getNexts() {
+    public List<Byte> getNexts() {
         return nexts;
     }
 
@@ -426,42 +423,42 @@ public class MonoGameState implements Serializable {
     }
 
     public void setAttackRows(final int rows) {
-        attackRows = Math.min(PLAYFIELD_HEIGHT, rows);
+        attackRows = (byte) Math.min(PLAYFIELD_HEIGHT, rows);
     }
 
-    public int getTetrominoType() {
+    public byte getTetrominoType() {
         return tetrominoType;
     }
 
-    public int getTetrominoRotation() {
+    public byte getTetrominoRotation() {
         return tetrominoRotation;
     }
 
-    public int getTetrominoX() {
+    public byte getTetrominoX() {
         return tetrominoX;
     }
 
-    public int getTetrominoY() {
+    public byte getTetrominoY() {
         return tetrominoY;
     }
 
-    public double getLockTimer() {
+    public byte getLockTimer() {
         return lockTimer;
     }
 
-    public GameStateMode getMode() {
+    public byte getMode() {
         return mode;
     }
 
-    public int getLineClearTimer() {
+    public byte getLineClearTimer() {
         return lineClearTimer;
     }
 
-    public List<Integer> getLineYs() {
+    public List<Byte> getLineYs() {
         return lineYs;
     }
 
-    public int getGameOverTimer() {
+    public byte getGameOverTimer() {
         return gameOverTimer;
     }
 }

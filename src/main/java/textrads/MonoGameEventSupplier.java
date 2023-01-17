@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class MonoGameEventSupplier implements GameEventSupplier {
     
-    private static final long REPEAT_MARGIN = 3;
+    private static final long REPEAT_MARGIN = Textrads.FRAMES_PER_SECOND / 5;
     
     private static class KeyPressedTimes {
         

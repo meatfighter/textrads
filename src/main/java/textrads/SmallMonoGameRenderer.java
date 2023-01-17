@@ -72,20 +72,20 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
             }
         }
         
-        final List<Integer> nexts = state.getNexts();
+        final List<Byte> nexts = state.getNexts();
         for (int i = 0; i < 5; ++i) {
-            final int type = nexts.get(i);
+            final byte type = nexts.get(i);
             drawTetromino(g, ox + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 25 : 26), 
                     y + 1 + 3 * i, type, 0);
         }
         
         switch (state.getMode()) {
-            case TETROMINO_FALLING:
+            case MonoGameState.TETROMINO_FALLING_MODE:
                 drawTetromino(g, ox + 1 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),
                         state.getLockTimer() < 2 ? FLASH_COLOR : BLOCK_COLORS[state.getTetrominoType() + 1]);                
                 break;
-            case CLEARING_LINES: {
+            case MonoGameState.CLEARING_LINES_MODE: {
                 final int timer = state.getLineClearTimer();
                 if (timer >= 36 || timer >= 6 && timer <= 20) {
                     g.setBackgroundColor(FLASH_COLOR);
@@ -97,7 +97,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 }
                 break;
             }
-            case GAME_OVER: {
+            case MonoGameState.GAME_OVER_MODE: {
                 final int t = state.getGameOverTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
                     drawTetromino(g, ox + 1 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 

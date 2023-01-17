@@ -15,7 +15,8 @@ public class PlayMode implements Mode {
     private MonoGameState state = new MonoGameState();
 
     @Override
-    public void init(final App app) throws Exception {        
+    public void init(final App app) throws Exception { 
+        state.init(); // TODO ENHANCE
     }    
     
     @Override
