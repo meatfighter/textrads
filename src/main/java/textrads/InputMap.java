@@ -1,5 +1,6 @@
 package textrads;
 
+import textrads.util.EnumUtil;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import java.util.ArrayList;

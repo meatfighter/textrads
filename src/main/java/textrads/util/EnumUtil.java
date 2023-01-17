@@ -1,4 +1,4 @@
-package textrads;
+package textrads.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
