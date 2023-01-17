@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 import textrads.DualGameState;
-import textrads.GameEvent;
 
 public class ServerSocketHandler {
     
@@ -57,11 +56,15 @@ public class ServerSocketHandler {
     }
     
     public void sendState(final DualGameState state) {
-        
+        synchronized (out) {
+            
+        }
     }
     
-    public void sendEvents(final List<GameEvent>[] events) {
-        
+    public void sendEvents(final List<Integer>[] events) {
+        synchronized (out) {
+            
+        }
     }
     
     public void close() {

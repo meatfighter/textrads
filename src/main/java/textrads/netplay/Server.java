@@ -11,10 +11,12 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
      
-    private static final Integer DEFAULT_PORT = 8080;
+    public static final int DEFAULT_PORT = 8080;
+    
     private static final int BACKLOG = 50;    
     
     public static enum Error {
@@ -36,9 +38,9 @@ public class Server {
     }
     
     private volatile InetAddress bindAddress;
-    private volatile Integer port;
+    private volatile int port = DEFAULT_PORT;
     
-    private final List<ServerSocketHandler> handlers = new ArrayList<>();
+    private final List<ServerSocketHandler> handlers = new CopyOnWriteArrayList<>();
     
     private final Object monitor = new Object();
     private boolean running;
@@ -100,7 +102,9 @@ public class Server {
     
     private void sendHeartbeats() {
         while (true) {
-            
+            handlers.forEach(handler -> {
+                handler.sendHeartbeat();
+            });
         }
     }
     
@@ -122,14 +126,10 @@ public class Server {
                         break;
                     }
                     address = addresses.get(0);
-                }
-                Integer p = port;
-                if (p == null) {
-                    p = DEFAULT_PORT;
-                }
+                }                
                 
                 try {
-                    serverSocket = new ServerSocket(p, BACKLOG, address);
+                    serverSocket = new ServerSocket(port, BACKLOG, address);
                 } catch (final IOException ignored) {
                     setError(Error.SERVER_SOCKET);
                     break;
@@ -143,10 +143,7 @@ public class Server {
                     }
                     
                     try {
-                        final ServerSocketHandler handler = new ServerSocketHandler(this, serverSocket.accept());
-                        synchronized (handlers) {
-                            handlers.add(handler);
-                        }
+                        handlers.add(new ServerSocketHandler(this, serverSocket.accept()));
                     } catch (final IOException ignored) {
                     }
                 }
@@ -164,9 +161,7 @@ public class Server {
     }
     
     void removeHandler(final ServerSocketHandler handler) {
-        synchronized (handlers) {
-            handlers.add(handler);
-        }
+        handlers.remove(handler);
     }
     
     private void closeServerSocket() {
