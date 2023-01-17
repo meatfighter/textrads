@@ -17,6 +17,11 @@ public class Server {
     private static final Integer DEFAULT_PORT = 8080;
     private static final int BACKLOG = 50;    
     
+    public static enum Error {
+        NETWORK_INTERFACE_ADDRESSES,
+        SERVER_SOCKET,
+    }
+    
     public static List<InetAddress> getNetworkInterfaceAddresses() {
         final Set<InetAddress> addressSet = new HashSet<>();
         try {
@@ -40,9 +45,10 @@ public class Server {
     private boolean cancelled;
     
     private volatile Thread listenerThread;
+    private volatile Thread heartbeatThread;
     private volatile ServerSocket serverSocket;
     
-    private volatile boolean error;
+    private volatile Error error;
     private volatile boolean playerConnected;
     
     public void start() {
@@ -56,15 +62,46 @@ public class Server {
         
         listenerThread = new Thread(this::listen);
         listenerThread.start();
+        heartbeatThread = new Thread(this::sendHeartbeats);
+        heartbeatThread.start();
     }
     
     public void stop() {
         
         synchronized (monitor) {
+            if (!running || cancelled) {
+                return;
+            }
             cancelled = true;
         }
                
         closeServerSocket();
+        interruptThread(listenerThread);
+        interruptThread(heartbeatThread);
+    }
+    
+    private void interruptThread(final Thread thread) {
+        if (thread != null) {
+            thread.interrupt();
+        }
+    }
+    
+    private void joinThread(final Thread thread) {
+        if (thread != null) {
+            while (true) {
+                try {
+                    thread.join();
+                    return;
+                } catch (final InterruptedException ignored) {                
+                }
+            }
+        }
+    }
+    
+    private void sendHeartbeats() {
+        while (true) {
+            
+        }
     }
     
     private void listen() {
@@ -81,7 +118,7 @@ public class Server {
                 if (address == null) {
                     final List<InetAddress> addresses = getNetworkInterfaceAddresses();
                     if (addresses.isEmpty()) {
-                        setError(true);
+                        setError(Error.NETWORK_INTERFACE_ADDRESSES);
                         break;
                     }
                     address = addresses.get(0);
@@ -94,7 +131,7 @@ public class Server {
                 try {
                     serverSocket = new ServerSocket(p, BACKLOG, address);
                 } catch (final IOException ignored) {
-                    setError(true);
+                    setError(Error.SERVER_SOCKET);
                     break;
                 }
                 
@@ -116,8 +153,10 @@ public class Server {
             }
         } finally {
             closeServerSocket();
+            joinThread(heartbeatThread);
             serverSocket = null;
             listenerThread = null;
+            heartbeatThread = null;
             synchronized (monitor) {
                 running = cancelled = false;
             }
@@ -156,11 +195,11 @@ public class Server {
         this.port = port;
     }
 
-    public boolean isError() {
+    public Error getError() {
         return error;
     }
 
-    public void setError(final boolean error) {
+    public void setError(final Error error) {
         this.error = error;
     }
 
