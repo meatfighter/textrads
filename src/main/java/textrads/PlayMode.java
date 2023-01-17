@@ -9,9 +9,10 @@ public class PlayMode implements Mode {
     
     public static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(0);
 
+    private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
+    private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
     
     private MonoGameState state = new MonoGameState();
-    private MonoGameRenderer gameRenderer = new BigMonoGameRenderer();
 
     @Override
     public void init(final App app) throws Exception {        
@@ -34,8 +35,15 @@ public class PlayMode implements Mode {
         g.setBackgroundColor(BACKGROUND_COLOR);
         g.fill(' ');
         
-        final Dimensions d = gameRenderer.getDimensions(true);        
-        gameRenderer.render(g, state, (size.getColumns() - d.getWidth()) / 2, (size.getRows() - d.getHeight()) / 2, 
+        final boolean showAttackBar = true;
+        MonoGameRenderer renderer = bigRenderer;
+        Dimensions dims = renderer.getDimensions(showAttackBar);
+        if (dims.getWidth() > size.getColumns() || dims.getHeight() > size.getRows()) {
+            renderer = smallRenderer;
+            dims = renderer.getDimensions(showAttackBar);            
+        }
+              
+        renderer.render(g, state, (size.getColumns() - dims.getWidth()) / 2, (size.getRows() - dims.getHeight()) / 2, 
                 true);
     } 
     
