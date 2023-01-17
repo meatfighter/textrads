@@ -90,7 +90,7 @@ public final class InputMap {
         keyTypeToInputTypeMap.put(KeyType.ArrowLeft, InputType.SHIFT_LEFT);
         keyTypeToInputTypeMap.put(KeyType.ArrowRight, InputType.SHIFT_RIGHT);
         keyTypeToInputTypeMap.put(KeyType.ArrowDown, InputType.SOFT_DROP);
-        keyTypeToInputTypeMap.put(KeyType.Enter, InputType.PAUSE);
+        keyTypeToInputTypeMap.put(KeyType.Enter, InputType.START_PAUSE);
         keyTypeToInputTypeMap.put(KeyType.Escape, InputType.QUIT);
     }
     

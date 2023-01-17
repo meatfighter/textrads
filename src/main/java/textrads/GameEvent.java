@@ -17,8 +17,8 @@ public interface GameEvent {
     int SOFT_DROP_PRESSED = 8;
     int SOFT_DROP_REPEATED = 9;
     
-    int PAUSE_PRESSED = 10;
-    int PAUSE_REPEATED = 11;
+    int START_PAUSE_PRESSED = 10;
+    int START_PAUSE_REPEATED = 11;
     
     int QUIT_PRESSED = 12;
     int QUIT_REPEATED = 13;
@@ -43,8 +43,8 @@ public interface GameEvent {
                     return SHIFT_RIGHT_REPEATED;
                 case SOFT_DROP:
                     return SOFT_DROP_REPEATED;
-                case PAUSE:
-                    return PAUSE_REPEATED;
+                case START_PAUSE:
+                    return START_PAUSE_REPEATED;
                 case QUIT:
                     return QUIT_REPEATED;
                 default:
@@ -63,8 +63,8 @@ public interface GameEvent {
                 return SHIFT_RIGHT_PRESSED;
             case SOFT_DROP:
                 return SOFT_DROP_PRESSED;
-            case PAUSE:
-                return PAUSE_PRESSED;
+            case START_PAUSE:
+                return START_PAUSE_PRESSED;
             case QUIT:
                 return QUIT_PRESSED;    
             default:

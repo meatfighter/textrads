@@ -6,6 +6,6 @@ public enum InputType {
     SHIFT_LEFT,
     SHIFT_RIGHT,
     SOFT_DROP,
-    PAUSE,
+    START_PAUSE,
     QUIT,
 }

@@ -34,7 +34,9 @@ public class PlayMode implements Mode {
         g.setBackgroundColor(BACKGROUND_COLOR);
         g.fill(' ');
         
-        gameRenderer.render(g, state, 5, 5, true);
+        final Dimensions d = gameRenderer.getDimensions(true);        
+        gameRenderer.render(g, state, (size.getColumns() - d.getWidth()) / 2, (size.getRows() - d.getHeight()) / 2, 
+                true);
     } 
     
    

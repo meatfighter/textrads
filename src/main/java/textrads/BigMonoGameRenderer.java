@@ -6,9 +6,12 @@ import java.util.List;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
 
+    private final Dimensions DIMENSIONS_WITH_ATTACK_BAR = new Dimensions(64, 42);
+    private final Dimensions DIMENSIONS_WITHOUT_ATTACK_BAR = new Dimensions(61, 42);
+    
     @Override
     public Dimensions getDimensions(final boolean attackBar) {
-        return null; // TODO
+        return attackBar ? DIMENSIONS_WITH_ATTACK_BAR : DIMENSIONS_WITHOUT_ATTACK_BAR;
     }
 
     @Override
