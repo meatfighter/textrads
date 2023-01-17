@@ -47,7 +47,7 @@ public class MonoGameState implements Serializable {
     
     private int attackRows;
     private int score;
-    private int level = 5;
+    private int level;
     private int lines;
     
     private int tetrominoType;
@@ -69,9 +69,42 @@ public class MonoGameState implements Serializable {
     private int garbageX;
     private int garbageCounter;
     
-    private GameStateMode mode = GameStateMode.TETROMINO_FALLING;
+    private GameStateMode mode;
     
     public MonoGameState() {
+        reset();
+    }
+    
+    public void reset() {
+        
+        attackRows = 0;
+        score = 0;
+        level = 0;
+        lines = 0;
+        tetrominoType = 0;
+        tetrominoRotation = 0;
+        tetrominoX = 0;
+        tetrominoY = 0;
+        framesPerGravityDrop = 0;       
+        gravityDropTimer = 0;
+        framesPerLock = 0;
+        lockTimer = 0;
+        dropFailed = false;
+        lineClearTimer = 0;
+        gameOverTimer = 0;
+        newlySpawened = false;
+        garbageX = 0;
+        garbageCounter = 0;
+        mode = GameStateMode.TETROMINO_FALLING;
+        
+        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+            Arrays.fill(playfield[y], (byte) 0);
+        }
+        nexts.clear();
+        lineYs.clear();
+    }
+    
+    private void init() {
         attemptSpawn();
         updateFramesPerConstants();
     }

@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
-import textrads.DualGameState;
+import textrads.GameState;
 
 public class ServerSocketHandler {
     
@@ -55,7 +55,7 @@ public class ServerSocketHandler {
         }
     }
     
-    public void sendState(final DualGameState state) {
+    public void sendState(final GameState state) {
         synchronized (out) {
             
         }
