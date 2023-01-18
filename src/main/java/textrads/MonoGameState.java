@@ -180,38 +180,36 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    public void handleEvents(final List<Integer> events) {
-        for (final Integer event : events) {
-            if (event == GameEvent.UPDATE) {
-                update();
-            } else if (mode == TETROMINO_FALLING_MODE) {
-                switch (event) {
-                    case GameEvent.ROTATE_CCW_PRESSED:
-                    case GameEvent.ROTATE_CCW_REPEATED:    
-                        attemptRotateCCW();
-                        break;
-                    case GameEvent.ROTATE_CW_PRESSED:
-                    case GameEvent.ROTATE_CW_REPEATED:    
-                        attemptRotateCW();               
-                        break;
-                    case GameEvent.SHIFT_LEFT_PRESSED:
-                    case GameEvent.SHIFT_LEFT_REPEATED:
-                        attemptShiftLeft();
-                        break;
-                    case GameEvent.SHIFT_RIGHT_PRESSED:
-                    case GameEvent.SHIFT_RIGHT_REPEATED:    
-                        attemptShiftRight();
-                        break;
-                    case GameEvent.SOFT_DROP_PRESSED:
-                        newlySpawened = false;
+    public void handleEvent(final int event) {
+        if (event == GameEvent.UPDATE) {
+            update();
+        } else if (mode == TETROMINO_FALLING_MODE) {
+            switch (event) {
+                case GameEvent.ROTATE_CCW_PRESSED:
+                case GameEvent.ROTATE_CCW_REPEATED:    
+                    attemptRotateCCW();
+                    break;
+                case GameEvent.ROTATE_CW_PRESSED:
+                case GameEvent.ROTATE_CW_REPEATED:    
+                    attemptRotateCW();               
+                    break;
+                case GameEvent.SHIFT_LEFT_PRESSED:
+                case GameEvent.SHIFT_LEFT_REPEATED:
+                    attemptShiftLeft();
+                    break;
+                case GameEvent.SHIFT_RIGHT_PRESSED:
+                case GameEvent.SHIFT_RIGHT_REPEATED:    
+                    attemptShiftRight();
+                    break;
+                case GameEvent.SOFT_DROP_PRESSED:
+                    newlySpawened = false;
+                    attemptSoftDrop();
+                    break;
+                case GameEvent.SOFT_DROP_REPEATED:
+                    if (!newlySpawened) {
                         attemptSoftDrop();
-                        break;
-                    case GameEvent.SOFT_DROP_REPEATED:
-                        if (!newlySpawened) {
-                            attemptSoftDrop();
-                        }
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }

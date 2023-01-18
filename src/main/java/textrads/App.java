@@ -1,8 +1,6 @@
 package textrads;
 
 public class App {
-
-    private final GameEventSupplier[] eventSuppliers = new GameEventSupplier[2];
     
     private Mode mode;
     private boolean terminate;
@@ -21,9 +19,5 @@ public class App {
 
     public void setTerminate(final boolean terminate) {
         this.terminate = terminate;
-    }
-
-    public GameEventSupplier[] getEventSuppliers() {
-        return eventSuppliers;
     }
 }

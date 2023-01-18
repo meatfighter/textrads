@@ -1,6 +1,5 @@
 package textrads;
 
-import textrads.netplay.Server;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
@@ -30,10 +29,12 @@ public class Textrads {
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor
             
+            final InputSource inputSource = new InputSource(screen);
+            
             final TextGraphics textGraphics = screen.newTextGraphics();
             TerminalSize terminalSize = screen.getTerminalSize();
             
-            app.getEventSuppliers()[0] = new MonoGameEventSupplier(new InputMap(), screen); // TODO ENHANCE
+            app.getEventSuppliers()[0] = new GameEventSupplier(new InputMap(), screen); // TODO ENHANCE
             
             long updateTime = System.nanoTime();
             while (!app.isTerminate()) {
