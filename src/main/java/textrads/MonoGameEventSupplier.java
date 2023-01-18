@@ -9,32 +9,10 @@ import java.util.Map;
 
 public class MonoGameEventSupplier implements GameEventSupplier {
     
-    private static final long REPEAT_MARGIN = Textrads.FRAMES_PER_SECOND / 5;
-    
-    private static class KeyPressedTimes {
-        
-        private long older;
-        private long newer;
-
-        public long getOlder() {
-            return older;
-        }
-
-        public void setOlder(final long older) {
-            this.older = older;
-        }
-
-        public long getNewer() {
-            return newer;
-        }
-
-        public void setNewer(final long newer) {
-            this.newer = newer;
-        }
-    }
+    private static long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
     
     private final List<Integer> events = new ArrayList<>();
-    private final Map<InputType, KeyPressedTimes> keyPressedTimes = new HashMap<>(); 
+    private final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
     
     private final InputMap inputMap;
     private final Screen screen;
@@ -46,7 +24,7 @@ public class MonoGameEventSupplier implements GameEventSupplier {
         this.screen = screen;
         
         for (final InputType inputType : InputType.values()) {
-            keyPressedTimes.put(inputType, new KeyPressedTimes());
+            lastPressedTimes.put(inputType, 0L);
         }
     }
     
@@ -66,13 +44,10 @@ public class MonoGameEventSupplier implements GameEventSupplier {
                     return;
                 }
                 
-                final KeyPressedTimes times = keyPressedTimes.get(inputType);
-                final long duration = updates - times.getNewer();
-                final long previousDuration = times.getNewer() - times.getOlder();
-                times.setOlder(times.getNewer());
-                times.setNewer(updates);
-                                
-                events.add(GameEvent.fromInputType(inputType, duration < previousDuration + REPEAT_MARGIN));
+                final long last = lastPressedTimes.get(inputType);
+                lastPressedTimes.put(inputType, updates);
+                
+                events.add(GameEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
             }
         } catch (final Exception e) {            
             e.printStackTrace(); // TODO ENHANCE
