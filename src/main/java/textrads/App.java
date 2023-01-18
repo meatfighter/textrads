@@ -2,17 +2,8 @@ package textrads;
 
 public class App {
     
-    private Mode mode;
     private boolean terminate;
     
-    public void setMode(final Mode mode) throws Exception {
-        this.mode = mode;
-    }
-    
-    public Mode getMode() {
-        return mode;
-    }
-
     public boolean isTerminate() {
         return terminate;
     }

@@ -78,8 +78,6 @@ public class Textrads {
 
     }
     
-
-    
     public static void main(final String... args) throws Exception {
         new Textrads().launch();
     }
