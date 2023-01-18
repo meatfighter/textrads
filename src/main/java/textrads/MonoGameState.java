@@ -128,11 +128,6 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    private void incrementLevel() {
-        ++level;
-        updateFramesPerConstants();
-    }
-    
     private void updateFramesPerConstants() {
         framesPerGravityDrop = (float) (LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * level));
         framesPerLock = (byte) Math.round(Math.max(32.0, framesPerGravityDrop + 4.0));
@@ -284,6 +279,7 @@ public class MonoGameState implements Serializable {
             tetrominoY = (byte) y;
             gravityDropTimer = framesPerGravityDrop;
             lockTimer = framesPerLock;
+            ++score;
         } else {
             lockTetrimino();
         } 
@@ -314,13 +310,6 @@ public class MonoGameState implements Serializable {
             case GAME_OVER_MODE:
                 updateGameOver();
                 break;
-        }
-        
-        
-        // TODO TESTING (REMOVE)
-        final Random random = ThreadLocalRandom.current();
-        if (random.nextInt(600) == 0) {
-            addAttackRows(random.nextInt(2) + 1);
         }
     }
         
@@ -388,6 +377,12 @@ public class MonoGameState implements Serializable {
         }
         score += CLEAR_POINTS[lineYs.size()] * (level + 1);
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
+        lines += lineYs.size(); 
+        final int lev = lines / 10;
+        if (level != lev) {
+            level = lev;
+            updateFramesPerConstants();
+        }
         for (final int lineY : lineYs) {
             for (int y = lineY; y > 0; --y) {
                 System.arraycopy(playfield[y - 1], 0, playfield[y], 0, PLAYFIELD_WIDTH);

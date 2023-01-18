@@ -13,12 +13,15 @@ public class GameState implements Serializable {
     public GameState() {
         states[0].setOpponent(states[1]);
         states[1].setOpponent(states[0]);
+        
+        states[0].init();
+        states[1].init();
     }
 
     public MonoGameState[] getStates() {
         return states;
     }
-
+    
     public boolean isPaused() {
         return paused;
     }

@@ -68,6 +68,10 @@ public class Server {
         heartbeatThread.start();
     }
     
+    public void update() {
+        // TODO
+    }
+    
     public void stop() {
         
         synchronized (monitor) {

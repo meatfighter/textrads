@@ -38,6 +38,11 @@ public final class GameEventSource {
             if (inputType == null) {
                 continue;
             }
+            
+            if (inputType == InputType.QUIT) {
+                Terminator.setTerminate(true); // TODO ENHANCE
+            }
+            
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
             events.add(GameEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));

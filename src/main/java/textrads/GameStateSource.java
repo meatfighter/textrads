@@ -2,7 +2,7 @@ package textrads;
 
 public final class GameStateSource {
 
-    private static volatile GameState state;
+    private static volatile GameState state = new GameState();
     
     public static void setState(final GameState state) {
         GameStateSource.state = state;

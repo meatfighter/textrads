@@ -1,17 +1,19 @@
 package textrads.netplay;
 
-import java.net.Socket;
-
 public class Client {
     
     private String host;
     private int port = Server.DEFAULT_PORT;
     
     public void start() {
-        new Socket();
+        // TODO
     }
     
+    public void update() {
+        // TODO
+    }    
+    
     public void stop() {
-        
+        // TODO
     }
 }
