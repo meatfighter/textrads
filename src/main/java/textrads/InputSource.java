@@ -4,15 +4,15 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
-public class InputSource {
+public final class InputSource {
     
-    private final Screen screen;
+    private static Screen screen;
     
-    public InputSource(final Screen screen) {
-        this.screen = screen;
+    public static synchronized void setScreen(final Screen screen) {
+        InputSource.screen = screen;
     }
     
-    public KeyStroke poll() {
+    public static synchronized KeyStroke poll() {
         try {
             return screen.pollInput();
         } catch (final IOException ignored) {            
@@ -20,8 +20,11 @@ public class InputSource {
         return null;
     }
     
-    public void clear() {
+    public static synchronized void clear() {
         while (poll() != null) {            
         }
+    }
+    
+    private InputSource() {        
     }
 }

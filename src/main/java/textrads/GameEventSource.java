@@ -5,56 +5,49 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
-public class GameEventSupplier implements Supplier<Integer> {
+public final class GameEventSource {
     
     private static final long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
     
-    private final List<Integer> events = new ArrayList<>();
-    private final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
+    private static final List<Integer> events = new ArrayList<>();
+    private static final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
     
-    private final InputMap inputMap;
+    private static InputMap inputMap;
     
-    private long updates;
+    private static long updates;
     
-    public GameEventSupplier(final InputMap inputMap) {
-        this.inputMap = inputMap;
-        
+    static {
         for (final InputType inputType : InputType.values()) {
             lastPressedTimes.put(inputType, 0L);
         }
     }
     
-    public void update(final App app) {        
+    public static synchronized void setInputMap(final InputMap inputMap) {
+        GameEventSource.inputMap = inputMap;        
+    }
+    
+    public static synchronized void update() {        
         KeyStroke keyStroke;
         while ((keyStroke = InputSource.poll()) != null) {
             final InputType inputType = inputMap.get(keyStroke);
             if (inputType == null) {
                 continue;
             }
-
-            if (inputType == InputType.QUIT) {
-                app.setTerminate(true); // TODO ENHANCE
-                return;
-            }
-
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
-
             events.add(GameEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
         }
         events.add(GameEvent.UPDATE);
         ++updates;
     }
        
-    public void clear() {
+    public static synchronized void clear() {
         InputSource.clear();
         events.clear();
     }
 
-    @Override
-    public Integer get() {
+    public static synchronized Integer poll() {
         return events.isEmpty() ? null : events.remove(0);
     }    
 }

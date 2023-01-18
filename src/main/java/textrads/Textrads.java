@@ -19,39 +19,29 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        final App app = new App();
-        Mode mode = Mode.PLAY;
-        mode.init(app);
-        app.setMode(mode);
+        GameEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor
             
-            final InputSource inputSource = new InputSource(screen);
-            
-            final TextGraphics textGraphics = screen.newTextGraphics();
-            TerminalSize terminalSize = screen.getTerminalSize();
-            
-            app.getEventSuppliers()[0] = new GameEventSupplier(new InputMap(), screen); // TODO ENHANCE
+            InputSource.setScreen(screen);
+                        
+            final TextGraphics g = screen.newTextGraphics();
+            TerminalSize size = screen.getTerminalSize();
             
             long updateTime = System.nanoTime();
             while (!app.isTerminate()) {
             
-                final TerminalSize size = screen.doResizeIfNecessary​();
-                if (size != null) {
-                    terminalSize = size;
+                final TerminalSize ts = screen.doResizeIfNecessary​();
+                if (ts != null) {
+                    size = ts;
                 }
                 
-                if (app.getMode() != mode) {
-                    mode.dispose(app);
-                    mode = app.getMode();
-                    mode.init(app);
-                }
                 int updateFrames = 0;
                 while (true) {
-                    mode.update(app);
+                    update();
                     updateTime += NANOS_PER_FRAME;
                     if (updateTime > System.nanoTime()) {
                         break;
@@ -62,7 +52,7 @@ public class Textrads {
                     }
                 }
                 
-                mode.render(app, screen, textGraphics, terminalSize);
+                render(g, size);
                 screen.refresh();                 
                 
                 final long remainingTime = updateTime - System.nanoTime();
@@ -76,6 +66,14 @@ public class Textrads {
         } 
         
 
+    }
+    
+    private void update() {
+        
+    }
+    
+    private void render(final TextGraphics g, final TerminalSize size) {
+        
     }
     
     public static void main(final String... args) throws Exception {
