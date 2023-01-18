@@ -6,14 +6,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MonoGameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private static final int[] CLEAR_POINTS = { 40, 100, 300, 1200 };
-    private static final int[] ATTACK_ROWS = { 0, 1, 2, 4 };
+    private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
+    private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
     public static final byte TETROMINO_FALLING_MODE = 0;
     public static final byte CLEARING_LINES_MODE = 1;
