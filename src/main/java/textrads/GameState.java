@@ -6,14 +6,13 @@ public class GameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private final MonoGameState[] states = new MonoGameState[2];
+    private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
     private boolean paused;
     
     public GameState() {
-        for (int i = states.length - 1; i >= 0; --i) {
-            states[i] = new MonoGameState();
-        }
+        states[0].setOpponent(states[1]);
+        states[1].setOpponent(states[0]);
     }
 
     public MonoGameState[] getStates() {

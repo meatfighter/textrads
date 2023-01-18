@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public final class InputSource {
     
+    private static final int MAX_POLLS = 32;
+    
     private static Screen screen;
     
     public static synchronized void setScreen(final Screen screen) {
@@ -21,7 +23,7 @@ public final class InputSource {
     }
     
     public static synchronized void clear() {
-        while (poll() != null) {            
+        for (int i = 0; i < MAX_POLLS && poll() != null; ++i) {
         }
     }
     

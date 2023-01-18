@@ -9,6 +9,7 @@ import java.util.Map;
 public final class GameEventSource {
     
     private static final long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
+    private static final int MAX_POLLS = 32;
     
     private static final List<Integer> events = new ArrayList<>();
     private static final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
@@ -27,9 +28,12 @@ public final class GameEventSource {
         GameEventSource.inputMap = inputMap;        
     }
     
-    public static synchronized void update() {        
-        KeyStroke keyStroke;
-        while ((keyStroke = InputSource.poll()) != null) {
+    public static synchronized void update() {                
+        for (int i = 0; i < MAX_POLLS; ++i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            }
             final InputType inputType = inputMap.get(keyStroke);
             if (inputType == null) {
                 continue;
