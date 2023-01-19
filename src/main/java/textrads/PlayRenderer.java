@@ -25,6 +25,6 @@ public class PlayRenderer {
         }
               
         renderer.render(g, state, (size.getColumns() - dims.getWidth()) / 2, (size.getRows() - dims.getHeight()) / 2, 
-                false);
+                true);
     }
 }

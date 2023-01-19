@@ -85,9 +85,9 @@ public class Textrads {
             if (event == null) {
                 break;
             }
-            state.getStates()[0].handleInputEvent(event);
+            state.handleInputEvent(event, 0);
         } 
-        state.getStates()[0].update();
+        state.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {

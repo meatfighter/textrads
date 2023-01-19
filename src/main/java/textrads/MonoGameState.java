@@ -16,10 +16,11 @@ public class MonoGameState implements Serializable {
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
-    public static final byte TETROMINO_FALLING_MODE = 0;
-    public static final byte CLEARING_LINES_MODE = 1;
-    public static final byte ADDING_GARBAGE_MODE = 2;
-    public static final byte GAME_OVER_MODE = 3;
+    public static final byte DISABLED_MODE = 0;
+    public static final byte TETROMINO_FALLING_MODE = 1;
+    public static final byte CLEARING_LINES_MODE = 2;
+    public static final byte ADDING_GARBAGE_MODE = 3;
+    public static final byte GAME_OVER_MODE = 4;
 
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20; 
@@ -54,6 +55,7 @@ public class MonoGameState implements Serializable {
     private int score;
     private short level;
     private short lines;
+    private short wins;
     private byte attackRows;
     
     private byte tetrominoType;
@@ -482,5 +484,13 @@ public class MonoGameState implements Serializable {
 
     public short getLines() {
         return lines;
+    }
+
+    public short getWins() {
+        return wins;
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 }

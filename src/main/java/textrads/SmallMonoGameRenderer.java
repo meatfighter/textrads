@@ -70,12 +70,18 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         g.putString(ox + 22, y + 17, "Time");
         g.putString(ox + 22, y + 18, "Level");
         g.putString(ox + 22, y + 19, "Lines");
-        g.putString(ox + 22, y + 20, "Wins");
+        if (attackBar) {
+            g.putString(ox + 22, y + 20, "Wins");
+        }
 
         g.setForegroundColor(VALUE_COLOR);
         RenderUtil.putIntRight(g, ox + 31, y + 16, state.getScore());
+        RenderUtil.putStringRight(g, ox + 31, y + 17, RenderUtil.formatTime(state.getGameState().getUpdates()));
         RenderUtil.putIntRight(g, ox + 31, y + 18, state.getLevel());
         RenderUtil.putIntRight(g, ox + 31, y + 19, state.getLines());
+        if (attackBar) {
+            RenderUtil.putIntRight(g, ox + 31, y + 20, state.getWins());
+        }
         
         final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {

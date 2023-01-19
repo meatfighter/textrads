@@ -8,6 +8,7 @@ public class GameState implements Serializable {
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
+    private int updates;
     private boolean paused;
     
     public GameState() {
@@ -16,6 +17,16 @@ public class GameState implements Serializable {
         
         states[0].init();
         states[1].init();
+    }
+    
+    public void handleInputEvent(final int event, final int player) {
+        states[player].handleInputEvent(event);
+    }
+    
+    public void update() {
+        states[0].update();
+        states[1].update();
+        ++updates;
     }
 
     public MonoGameState[] getStates() {
@@ -28,5 +39,9 @@ public class GameState implements Serializable {
 
     public void setPaused(final boolean paused) {
         this.paused = paused;
+    }
+
+    public int getUpdates() {
+        return updates;
     }
 }
