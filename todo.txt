@@ -32,6 +32,12 @@ lines
 
 wins?
 
+000000000
+HH:MM:SS
+Level LL
+Lines NNN
+ Wins W
+
 
    --
    21012
