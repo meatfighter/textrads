@@ -3,6 +3,7 @@ package textrads;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
+import textrads.util.RenderUtil;
 
 public class SmallMonoGameRenderer extends MonoGameRenderer {
     
@@ -63,7 +64,19 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         g.putString(ox + 32, y, "\u2513");
         g.putString(ox + 21, y + 15, "\u2523");
         g.putString(ox + 32, y + 15, "\u251B");
-                
+        
+        g.setForegroundColor(LABEL_COLOR);
+        g.putString(ox + 22, y + 16, "Score");
+        g.putString(ox + 22, y + 17, "Time");
+        g.putString(ox + 22, y + 18, "Level");
+        g.putString(ox + 22, y + 19, "Lines");
+        g.putString(ox + 22, y + 20, "Wins");
+
+        g.setForegroundColor(VALUE_COLOR);
+        RenderUtil.putIntRight(g, ox + 31, y + 16, state.getScore());
+        RenderUtil.putIntRight(g, ox + 31, y + 18, state.getLevel());
+        RenderUtil.putIntRight(g, ox + 31, y + 19, state.getLines());
+        
         final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {

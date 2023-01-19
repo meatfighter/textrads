@@ -11,6 +11,8 @@ public class MonoGameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    private static final int MAX_SCORE = 999_999_999;
+    
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
@@ -49,9 +51,9 @@ public class MonoGameState implements Serializable {
     
     private MonoGameState opponent;
 
-    private long score;
-    private int level;
-    private int lines;    
+    private int score;
+    private short level;
+    private short lines;
     private byte attackRows;
     
     private byte tetrominoType;
@@ -373,12 +375,12 @@ public class MonoGameState implements Serializable {
         if (lineYs.isEmpty()) {
             return;
         }
-        score += CLEAR_POINTS[lineYs.size()] * (level + 1);
+        score = Math.min(MAX_SCORE, score + CLEAR_POINTS[lineYs.size()] * (level + 1));
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
         lines += lineYs.size(); 
         final int lev = lines / 10;
         if (level != lev) {
-            level = lev;
+            level = (short) lev;
             updateFramesPerConstants();
         }
         for (final int lineY : lineYs) {
@@ -468,5 +470,17 @@ public class MonoGameState implements Serializable {
 
     public byte getGameOverTimer() {
         return gameOverTimer;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public short getLevel() {
+        return level;
+    }
+
+    public short getLines() {
+        return lines;
     }
 }
