@@ -1,6 +1,6 @@
 package textrads;
 
-public interface GameEvent {
+public interface InputEvent {
     
     int ROTATE_CCW_PRESSED = 0;
     int ROTATE_CCW_REPEATED = 1;
@@ -22,8 +22,6 @@ public interface GameEvent {
     
     int QUIT_PRESSED = 12;
     int QUIT_REPEATED = 13;
-    
-    int UPDATE = 14;
     
     static Integer fromInputType(final InputType inputType, final boolean repeated) {
         

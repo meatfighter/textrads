@@ -25,7 +25,7 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        GameEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
+        InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -79,14 +79,15 @@ public class Textrads {
         server.update();
         
         final GameState state = GameStateSource.getState();
-        GameEventSource.update();
+        InputEventSource.update();
         while (true) {
-            final Integer event = GameEventSource.poll();
+            final Integer event = InputEventSource.poll();
             if (event == null) {
                 break;
             }
-            state.getStates()[0].handleEvent(event);
-        }        
+            state.getStates()[0].handleInputEvent(event);
+        } 
+        state.getStates()[0].update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {

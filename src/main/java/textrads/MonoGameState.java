@@ -182,37 +182,36 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    public void handleEvent(final int event) {
-        if (event == GameEvent.UPDATE) {
-            update();
-        } else if (mode == TETROMINO_FALLING_MODE) {
-            switch (event) {
-                case GameEvent.ROTATE_CCW_PRESSED:
-                case GameEvent.ROTATE_CCW_REPEATED:    
-                    attemptRotateCCW();
-                    break;
-                case GameEvent.ROTATE_CW_PRESSED:
-                case GameEvent.ROTATE_CW_REPEATED:    
-                    attemptRotateCW();               
-                    break;
-                case GameEvent.SHIFT_LEFT_PRESSED:
-                case GameEvent.SHIFT_LEFT_REPEATED:
-                    attemptShiftLeft();
-                    break;
-                case GameEvent.SHIFT_RIGHT_PRESSED:
-                case GameEvent.SHIFT_RIGHT_REPEATED:    
-                    attemptShiftRight();
-                    break;
-                case GameEvent.SOFT_DROP_PRESSED:
-                    newlySpawened = false;
+    public void handleInputEvent(final int event) {
+        if (mode != TETROMINO_FALLING_MODE) {
+            return;
+        }
+        switch (event) {
+            case InputEvent.ROTATE_CCW_PRESSED:
+            case InputEvent.ROTATE_CCW_REPEATED:    
+                attemptRotateCCW();
+                break;
+            case InputEvent.ROTATE_CW_PRESSED:
+            case InputEvent.ROTATE_CW_REPEATED:    
+                attemptRotateCW();               
+                break;
+            case InputEvent.SHIFT_LEFT_PRESSED:
+            case InputEvent.SHIFT_LEFT_REPEATED:
+                attemptShiftLeft();
+                break;
+            case InputEvent.SHIFT_RIGHT_PRESSED:
+            case InputEvent.SHIFT_RIGHT_REPEATED:    
+                attemptShiftRight();
+                break;
+            case InputEvent.SOFT_DROP_PRESSED:
+                newlySpawened = false;
+                attemptSoftDrop();
+                break;
+            case InputEvent.SOFT_DROP_REPEATED:
+                if (!newlySpawened) {
                     attemptSoftDrop();
-                    break;
-                case GameEvent.SOFT_DROP_REPEATED:
-                    if (!newlySpawened) {
-                        attemptSoftDrop();
-                    }
-                    break;
-            }
+                }
+                break;
         }
     }
     
@@ -295,7 +294,7 @@ public class MonoGameState implements Serializable {
         } 
     }
     
-    private void update() {
+    public void update() {
         switch (mode) {
             case TETROMINO_FALLING_MODE:
                 updateFallingTetromino();

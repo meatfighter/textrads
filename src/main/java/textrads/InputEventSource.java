@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class GameEventSource {
+public final class InputEventSource {
     
     private static final long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
     private static final int MAX_POLLS = 32;
@@ -25,7 +25,7 @@ public final class GameEventSource {
     }
     
     public static synchronized void setInputMap(final InputMap inputMap) {
-        GameEventSource.inputMap = inputMap;        
+        InputEventSource.inputMap = inputMap;        
     }
     
     public static synchronized void update() {                
@@ -45,9 +45,8 @@ public final class GameEventSource {
             
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
-            events.add(GameEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
+            events.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
         }
-        events.add(GameEvent.UPDATE);
         ++updates;
     }
        
