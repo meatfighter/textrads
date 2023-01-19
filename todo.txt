@@ -1,7 +1,36 @@
 does Ctrl and Alt actually work?
 
+marathon:
+score
+level
+lines
 
+ultra:
+score
+time (3:00)
+lines
 
+40 lines: (solid height)
+score
+time ( :  ) -- counts up
+lines -- counts down from 40
+
+vs. com:
+score
+time ( :  ) -- counts up
+lines
+
+b-type: (random garbage height)
+level
+high -- random garbage height
+lines -- counts down from 25
+
+c-type: (rising garbage)
+score
+level
+lines
+
+wins?
 
 
    --
