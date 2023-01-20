@@ -12,12 +12,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import textrads.util.ThreadUtil;
 
 public class Server {
      
     public static final int DEFAULT_PORT = 8080;
     
-    private static final int BACKLOG = 50;    
+    private static final int BACKLOG = 50;  
+    private static final long HEARTBEAT_PERIOD = TimeUnit.SECONDS.toMillis(10);
     
     public static enum Error {
         NETWORK_INTERFACE_ADDRESSES,
@@ -62,10 +65,13 @@ public class Server {
             running = true;
         }
         
-        listenerThread = new Thread(this::listen);
-        listenerThread.start();
-        heartbeatThread = new Thread(this::sendHeartbeats);
-        heartbeatThread.start();
+        final Thread listThread = new Thread(this::listen);
+        listenerThread = listThread;
+        listThread.start();
+        
+        final Thread heartThread = new Thread(this::sendHeartbeats);
+        heartbeatThread = heartThread;
+        heartThread.start();
     }
     
     public void update() {
@@ -82,34 +88,16 @@ public class Server {
         }
                
         closeServerSocket();
-        interruptThread(listenerThread);
-        interruptThread(heartbeatThread);
-    }
-    
-    private void interruptThread(final Thread thread) {
-        if (thread != null) {
-            thread.interrupt();
-        }
-    }
-    
-    private void joinThread(final Thread thread) {
-        if (thread != null) {
-            while (true) {
-                try {
-                    thread.join();
-                    return;
-                } catch (final InterruptedException ignored) {                
-                }
-            }
-        }
+        ThreadUtil.interruptThread(listenerThread);
+        ThreadUtil.interruptThread(heartbeatThread);
     }
     
     private void sendHeartbeats() {
-        while (true) {
-            handlers.forEach(handler -> {
-                handler.sendHeartbeat();
-            });
-        }
+//        while (true) {
+//            handlers.forEach(handler -> {
+//                handler.sendHeartbeat();
+//            });
+//        }
     }
     
     private void listen() {
@@ -154,7 +142,7 @@ public class Server {
             }
         } finally {
             closeServerSocket();
-            joinThread(heartbeatThread);
+            ThreadUtil.joinThread(heartbeatThread);
             serverSocket = null;
             listenerThread = null;
             heartbeatThread = null;

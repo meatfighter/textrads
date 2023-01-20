@@ -3,8 +3,8 @@ package textrads.netplay;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 import textrads.GameState;
@@ -13,16 +13,16 @@ public class ServerSocketHandler {
     
     private final Server server;
     private final Socket socket;
-    private final ObjectInputStream in;
-    private final ObjectOutputStream out;
+    private final InputStream in;
+    private final OutputStream out;
     
     private volatile boolean running = true;
     
     public ServerSocketHandler(final Server server, final Socket socket) throws IOException {
         this.server = server;
         this.socket = socket;
-        in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-        out = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        in = new BufferedInputStream(socket.getInputStream());
+        out = new BufferedOutputStream(socket.getOutputStream());
         new Thread(this::handleInput).start();
     }
     
