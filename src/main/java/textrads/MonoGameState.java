@@ -11,7 +11,7 @@ public class MonoGameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private static final int MAX_SCORE = 999_999_999;
+    private static final long MAX_SCORE = 999_999_999L;
     
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
@@ -281,10 +281,14 @@ public class MonoGameState implements Serializable {
             tetrominoY = (byte) y;
             gravityDropTimer = framesPerGravityDrop;
             lockTimer = framesPerLock;
-            ++score;
+            incrementScore(1);
         } else {
             lockTetrimino();
         } 
+    }
+    
+    private void incrementScore(final int value) {
+        score = (int) Math.min(MAX_SCORE, ((long) score) + value);
     }
     
     private void attemptGravityDrop() {
@@ -377,7 +381,7 @@ public class MonoGameState implements Serializable {
         if (lineYs.isEmpty()) {
             return;
         }
-        score = Math.min(MAX_SCORE, score + CLEAR_POINTS[lineYs.size()] * (level + 1));
+        incrementScore(CLEAR_POINTS[lineYs.size()] * (level + 1));
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
         lines += lineYs.size(); 
         final int lev = lines / 10;

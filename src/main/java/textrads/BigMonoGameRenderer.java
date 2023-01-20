@@ -3,6 +3,7 @@ package textrads;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
+import textrads.util.RenderUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
 
@@ -65,6 +66,25 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         g.putString(ox + 60, y, "\u2513");
         g.putString(ox + 41, y + 29, "\u2523");
         g.putString(ox + 60, y + 29, "\u251B");
+        
+        g.setForegroundColor(LABEL_COLOR);
+        final int oy = y + (attackBar ? 31 : 32);
+        g.putString(ox + 43, oy, "Score");
+        g.putString(ox + 43, oy + 2, "Time");
+        g.putString(ox + 43, oy + 4, "Level");
+        g.putString(ox + 43, oy + 6, "Lines");
+        if (attackBar) {
+            g.putString(ox + 43, oy + 8, "Wins");
+        }
+
+        g.setForegroundColor(VALUE_COLOR);
+        g.putString(ox + 49, oy, Integer.toString(state.getScore()));
+        g.putString(ox + 48, oy + 2, RenderUtil.formatTime(state.getGameState().getUpdates()));
+        g.putString(ox + 49, oy + 4, Integer.toString(state.getLevel()));
+        g.putString(ox + 49, oy + 6, Integer.toString(state.getLines()));
+        if (attackBar) {
+            g.putString(ox + 49, oy + 8, Integer.toString(state.getWins()));
+        }        
                 
         final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {

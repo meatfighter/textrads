@@ -15,19 +15,19 @@ public final class RenderUtil {
     public static String formatTime(int time) {        
         time /= 60;
         if (time < 60) {
-            return Integer.toString(time);
+            return String.format(" %d", time);
         }
         final int seconds = time % 60;
         time /= 60;
         if (time < 60) {
-            return String.format("%d:%02d", time, seconds);
+            return String.format(" %d:%02d", time, seconds);
         }
         final int minutes = time % 60;
         time /= 60;
         if (time < 24) {
-            return String.format("%d:%02d:%02d", time, minutes, seconds);
+            return String.format(" %d:%02d:%02d", time, minutes, seconds);
         }
-        return String.format("%d:%02d:%02d:%02d", time / 24, time % 24, minutes, seconds);
+        return String.format(" %d:%02d:%02d:%02d", time / 24, time % 24, minutes, seconds);
     }
     
     private RenderUtil() {        
