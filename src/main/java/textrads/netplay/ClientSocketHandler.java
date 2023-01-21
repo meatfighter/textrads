@@ -7,7 +7,7 @@ import java.net.Socket;
 import textrads.InputEventSource;
 
 public class ClientSocketHandler {
-        
+           
     private final Client client;
     private final Socket socket;
     private final InputStream in;
@@ -23,6 +23,8 @@ public class ClientSocketHandler {
     private final Object monitor = new Object();
     private boolean running;
     private boolean cancelled;
+    
+    private boolean handlingEvents;
     
     public ClientSocketHandler(final Client client, final Socket socket) throws IOException {
         this.client = client;
@@ -66,7 +68,66 @@ public class ClientSocketHandler {
     }
     
     private void readEvents() {
-        
+        try {
+            Buffer reader = null;
+            do {
+                synchronized (monitor) {
+                    if (!running || cancelled) {
+                        return;
+                    }
+                }
+                try {
+                    reader = inPipe.getReader();
+                } catch (final InterruptedException ignored) {                    
+                }
+            } while (reader == null);
+            
+            final byte[] data = reader.getData();
+            while (true) {
+                synchronized (monitor) {
+                    if (!running || cancelled) {
+                        return;
+                    }
+                }
+                
+                if (reader.isEmpty()) {
+                    break;
+                }
+                                
+                final int startIndex;
+                outer: {
+                    for (int i = reader.getReadIndex(), end = reader.getWriteIndex(); i < end; ++i) {
+                        if (data[i] != Command.HEARTBEAT) {
+                            startIndex = i;
+                            break outer;
+                        }
+                    }
+                    throw new IOException("No start.");
+                }
+                
+                final int endIndex;
+                outer: {
+                    for (int i = startIndex + 1, end = reader.getWriteIndex(); i < end; ++i) {
+                        if (data[i] == Command.END) {
+                            endIndex = i;
+                            break outer;
+                        }                   
+                    }
+                    throw new IOException("No end.");
+                }
+                
+                switch (data[startIndex]) {
+                    case Command.HEARTBEAT:
+                        break;
+                    case Command.EVENTS:
+                        break;
+                    default:
+                        throw new IOException("Invalid command.");
+                }
+            }
+        } catch (final IOException ignored) {
+            stop();
+        }
     }
     
     private void writeEvents() {
@@ -85,6 +146,7 @@ public class ClientSocketHandler {
             } while (buffer == null);
             
             boolean wroteEvents = false;
+            final OutputStream bufferOut = buffer.getOutputStream();
             while (true) {
                 final Byte event = InputEventSource.poll();
                 if (event == null) {
@@ -92,11 +154,11 @@ public class ClientSocketHandler {
                 }
                 if (!wroteEvents) {
                     wroteEvents = true;
-                    buffer.write(Command.EVENTS);
+                    bufferOut.write(Command.EVENTS);
                 }
             }
             if (wroteEvents) {
-                buffer.write(Command.END);
+                bufferOut.write(Command.END);
             }            
         } catch (final IOException ignored) {
             stop();
@@ -132,21 +194,33 @@ public class ClientSocketHandler {
     private void runInPipe() {        
         try {
             outer: while (true) {
+                
                 synchronized (monitor) {
                     if (!running || cancelled) {
                         break;
                     }
-                }                
+                }       
+                
+                Buffer writer = null;
                 try {
-                    if (inBuffer.getMaxWriteLength() <= 0) {
+                    
+                    // If inBuffer is out of room, break the connection.
+                    final int maxLength = inBuffer.getMaxWriteLength();
+                    if (maxLength <= 0) {
                         break;
                     }
+                    
+                    // Read available bytes into inBuffer.
                     final byte[] inBufferData = inBuffer.getData();
-                    inBuffer.incrementWriteIndex(in.read(inBufferData, inBuffer.getWriteIndex(), 
-                            inBuffer.getMaxWriteLength()));
-                    for (int i = inBuffer.getWriteIndex() - 1, end = inBuffer.getReadIndex(); i >= end; --i) {
-                        if (inBufferData[i] == Command.END) {
-                            Buffer writer = null;
+                    final int writeIndex = inBuffer.getWriteIndex();
+                    inBuffer.incrementWriteIndex(in.read(inBufferData, writeIndex, maxLength));                    
+                    if (writeIndex == inBuffer.getWriteIndex()) {
+                        continue;
+                    }
+                    
+                    // If inBuffer contains an end of block marker, append the block to the inPipe, and remove it.
+                    for (int i = inBuffer.getWriteIndex() - 1; i >= writeIndex; --i) {
+                        if (inBufferData[i] == Command.END) {                            
                             do {
                                 synchronized (monitor) {
                                     if (!running || cancelled) {
@@ -160,14 +234,15 @@ public class ClientSocketHandler {
                             } while (writer == null);
                             writer.write(inBuffer, 0, i + 1);
                             writer.shift();
-                            break;
+                            continue outer;
                         }
                     }
-                    inBuffer.setReadIndex(inBuffer.getWriteIndex());   
                 } catch (final IOException e) {
                     break;
                 } finally {
-                    inPipe.returnWriter();
+                    if (writer != null) {
+                        inPipe.returnWriter();
+                    }
                 }
             }
         } finally {

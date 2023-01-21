@@ -1,11 +1,56 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
-public class Buffer extends OutputStream {
+public class Buffer {
     
     public static final int DEFAULT_CAPACITY = 1024 * 1024;
+    
+    private final OutputStream out = new OutputStream() {
+        
+        @Override
+        public void write(final int b) throws IOException {
+            if (writeIndex >= data.length) {
+                throw new IOException("overflow");
+            }
+            data[writeIndex++] = (byte) b;
+        }        
+    };
+    
+    private final InputStream in = new InputStream() {
+        
+        private int markIndex;
+        
+        @Override
+        public int read() throws IOException {
+            if (readIndex >= writeIndex) {
+                return -1;
+            }
+            return data[readIndex++];
+        }    
+        
+        @Override
+        public int available() throws IOException {
+            return writeIndex - readIndex;
+        }
+        
+        @Override
+        public void mark(final int readlimit) {
+            markIndex = readIndex;
+        }
+        
+        @Override
+        public void reset() throws IOException {
+            readIndex = markIndex;
+        }
+        
+        @Override
+        public boolean markSupported() {
+            return true;
+        }
+    };    
     
     private final byte[] data;
     
@@ -21,7 +66,7 @@ public class Buffer extends OutputStream {
     }
        
     public boolean isEmpty() {
-        return writeIndex == readIndex;
+        return readIndex >= writeIndex;
     }
     
     public int getSize() {
@@ -78,26 +123,22 @@ public class Buffer extends OutputStream {
         }
         System.arraycopy(data, readIndex, data, 0, writeIndex - readIndex);
         writeIndex -= readIndex;
-        readIndex = 0;        
+        readIndex = 0;       
     }
 
-    @Override
-    public void write(final int b) throws IOException {
-        if (writeIndex >= data.length) {
-            throw new IOException("overflow");
-        }
-        data[writeIndex++] = (byte) b;
-    }
-    
-    public void write(final Buffer buffer) throws IOException {
-        write(buffer, buffer.getSize());
-    }
-    
-    public void write(final Buffer buffer, final int length) throws IOException {
+    public void write(final Buffer buffer, final int offset, final int length) throws IOException {
         if (writeIndex + length >= data.length) {
             throw new IOException("overflow");
         }
-        System.arraycopy(buffer.getData(), buffer.getReadIndex(), data, writeIndex, length);
+        System.arraycopy(buffer.getData(), offset, data, writeIndex, length);
         writeIndex += length;
+    }
+    
+    public InputStream getInputStream() {
+        return in;
+    }
+    
+    public OutputStream getOutputStream() {
+        return out;
     }
 }
