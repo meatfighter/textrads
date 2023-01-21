@@ -1,7 +1,5 @@
 package textrads.netplay;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,9 +19,9 @@ public class ServerSocketHandler {
     public ServerSocketHandler(final Server server, final Socket socket) throws IOException {
         this.server = server;
         this.socket = socket;
-        in = new BufferedInputStream(socket.getInputStream());
-        out = new BufferedOutputStream(socket.getOutputStream());
-        new Thread(this::handleInput).start();
+        in = socket.getInputStream();
+        out = socket.getOutputStream();
+        new Thread(this::handleInput).start(); // TODO DON'T START THREADS IN CONSTRUCTOR
     }
     
     private void handleInput() {

@@ -2,29 +2,47 @@ package textrads.netplay;
 
 public class ByteQueue {
     
-    private final BytePipe[] outs = new BytePipe[2];
+    private BytePipe writer;
+    private BytePipe reader;
     
-    private int writerIndex;
+    private boolean writerBorrowed;
     
     public ByteQueue() {
-        outs[0] = new BytePipe();
-        outs[1] = new BytePipe();
+        writer = new BytePipe();
+        reader = new BytePipe();
     }
     
     public ByteQueue(final int capacity) {
-        outs[0] = new BytePipe(capacity);
-        outs[1] = new BytePipe(capacity);
+        writer = new BytePipe(capacity);
+        reader = new BytePipe(capacity);
     }
     
     public synchronized BytePipe borrowWriter() {
-        return outs[writerIndex];
+        writerBorrowed = true;
+        return writer;
     }
     
-    public synchronized BytePipe borrowReader() {
-        return outs[1 - writerIndex];
+    public synchronized void returnWriter() {
+        writerBorrowed = false;
+        notifyAll();
     }
     
-    public synchronized void returnReader() {
-        outs[1 - writerIndex].reset();
+    public synchronized BytePipe getReader() {
+        return reader;
+    }
+    
+    public synchronized BytePipe waitForWrites() throws InterruptedException {
+        
+        while (writerBorrowed || writer.isEmpty()) {
+            wait();
+        }
+        
+        final BytePipe t = writer;
+        writer = reader;
+        reader = t;
+        
+        writer.clear();
+        
+        return reader;
     }
 }

@@ -1,9 +1,6 @@
 package textrads.netplay;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class BytePipe extends OutputStream {
+public class BytePipe {
     
     public static final int DEFAULT_CAPACITY = 1024 * 1024;
     
@@ -19,23 +16,17 @@ public class BytePipe extends OutputStream {
     public BytePipe(final int capacity) {
         data = new byte[capacity];
     }
-    
-    @Override
-    public void write(final int b) throws IOException {
-        
-        if (writeIndex == data.length) {
-            throw new IOException("overflow");
-        }
-        
-        data[writeIndex++] = (byte) b;
-    }
-    
+       
     public boolean isEmpty() {
-        return writeIndex == 0;
+        return writeIndex == readIndex;
     }
     
-    public boolean isFull() {
-        return writeIndex == data.length;
+    public int getSize() {
+        return writeIndex - readIndex;
+    }
+       
+    public int getMaxWriteLength() {
+        return data.length - writeIndex;
     }
     
     public int getCapacity() {
@@ -54,11 +45,23 @@ public class BytePipe extends OutputStream {
         this.readIndex = readIndex;
     }
     
+    public void incrementReadIndex(final int value) {
+        readIndex += value;
+    }
+    
     public int getWriteIndex() {
         return writeIndex;
     }
     
-    public void reset() {
+    public void setWriteIndex(final int writeIndex) {
+        this.writeIndex = writeIndex;
+    }
+    
+    public void incrementWriteIndex(final int value) {
+        readIndex += value;
+    }
+    
+    public void clear() {
         readIndex = writeIndex = 0;
     }
 }

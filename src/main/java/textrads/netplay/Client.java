@@ -1,8 +1,6 @@
 package textrads.netplay;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import textrads.util.ThreadUtil;
 
@@ -16,10 +14,6 @@ public class Client {
     private boolean cancelled;
     
     private volatile Thread listenerThread;
-    private volatile Thread heartbeatThread;
-    private volatile Socket socket;
-    private volatile InputStream in;
-    private volatile OutputStream out;
     
     public void start() {
         
@@ -79,16 +73,6 @@ public class Client {
         }
     }
     
-    private void closeSocket() {
-        try {   
-            final Socket s = socket;
-            if (s != null) {
-                s.close();
-            }
-        } catch (final IOException ignored) {            
-        }
-    }    
-    
     public void update() {
         // TODO
     }    
@@ -101,6 +85,10 @@ public class Client {
             }
             cancelled = true;
         }
+    }
+    
+    public void removeHandler(final ClientSocketHandler handler) {
+        
     }
 
     public String getHost() {
