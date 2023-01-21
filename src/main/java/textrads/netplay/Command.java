@@ -1,7 +1,7 @@
 package textrads.netplay;
 
 public interface Command {
-    int HEARTBEAT = 0;
-    int STATE = 1;
-    int EVENTS = 2;
+    byte END = 0;
+    byte HEARTBEAT = 1;
+    byte EVENTS = 2;
 }

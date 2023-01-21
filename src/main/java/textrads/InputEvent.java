@@ -2,28 +2,28 @@ package textrads;
 
 public interface InputEvent {
     
-    int ROTATE_CCW_PRESSED = 0;
-    int ROTATE_CCW_REPEATED = 1;
+    byte ROTATE_CCW_PRESSED = 0;
+    byte ROTATE_CCW_REPEATED = 1;
     
-    int ROTATE_CW_PRESSED = 2;
-    int ROTATE_CW_REPEATED = 3;
+    byte ROTATE_CW_PRESSED = 2;
+    byte ROTATE_CW_REPEATED = 3;
     
-    int SHIFT_LEFT_PRESSED = 4;
-    int SHIFT_LEFT_REPEATED = 5;
+    byte SHIFT_LEFT_PRESSED = 4;
+    byte SHIFT_LEFT_REPEATED = 5;
     
-    int SHIFT_RIGHT_PRESSED = 6;
-    int SHIFT_RIGHT_REPEATED = 7;
+    byte SHIFT_RIGHT_PRESSED = 6;
+    byte SHIFT_RIGHT_REPEATED = 7;
     
-    int SOFT_DROP_PRESSED = 8;
-    int SOFT_DROP_REPEATED = 9;
+    byte SOFT_DROP_PRESSED = 8;
+    byte SOFT_DROP_REPEATED = 9;
     
-    int START_PAUSE_PRESSED = 10;
-    int START_PAUSE_REPEATED = 11;
+    byte START_PAUSE_PRESSED = 10;
+    byte START_PAUSE_REPEATED = 11;
     
-    int QUIT_PRESSED = 12;
-    int QUIT_REPEATED = 13;
+    byte QUIT_PRESSED = 12;
+    byte QUIT_REPEATED = 13;
     
-    static Integer fromInputType(final InputType inputType, final boolean repeated) {
+    static Byte fromInputType(final InputType inputType, final boolean repeated) {
         
         if (inputType == null) {
             return null;

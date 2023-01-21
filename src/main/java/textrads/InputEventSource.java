@@ -11,7 +11,7 @@ public final class InputEventSource {
     private static final long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
     private static final int MAX_POLLS = 32;
     
-    private static final List<Integer> events = new ArrayList<>();
+    private static final List<Byte> events = new ArrayList<>();
     private static final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
     
     private static InputMap inputMap;
@@ -55,7 +55,7 @@ public final class InputEventSource {
         events.clear();
     }
 
-    public static synchronized Integer poll() {
+    public static synchronized Byte poll() {
         return events.isEmpty() ? null : events.remove(0);
     }    
 }

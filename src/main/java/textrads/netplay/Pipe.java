@@ -17,7 +17,10 @@ public class Pipe {
         reader = new Buffer(capacity);
     }
     
-    public synchronized Buffer borrowWriter() {
+    public synchronized Buffer borrowWriter() throws InterruptedException {        
+        while (writerBorrowed) {
+            wait();
+        }        
         writerBorrowed = true;
         return writer;
     }
