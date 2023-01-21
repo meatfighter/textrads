@@ -12,11 +12,11 @@ public class ClientSocketHandler {
     private final InputStream in;
     private final OutputStream out;
 
-    private final ByteQueue outQueue = new ByteQueue();
-    private final Thread outQueueThread;
+    private final Pipe outPipe = new Pipe();
+    private final Thread outPipeThread;
     
-    private final ByteQueue inQueue = new ByteQueue();
-    private final Thread inQueueThread;
+    private final Pipe inPipe = new Pipe();
+    private final Thread inPipeThread;
     
     private final Object monitor = new Object();
     private boolean running;
@@ -27,8 +27,8 @@ public class ClientSocketHandler {
         this.socket = socket;
         in = socket.getInputStream();
         out = socket.getOutputStream();
-        outQueueThread = new Thread(this::runOutQueue);
-        inQueueThread = new Thread(this::runInQueue);
+        outPipeThread = new Thread(this::runOutPipe);
+        inPipeThread = new Thread(this::runInPipe);
     }
     
     public void start() {
@@ -40,8 +40,8 @@ public class ClientSocketHandler {
             running = true;
         }
         
-        outQueueThread.start();
-        inQueueThread.start();
+        outPipeThread.start();
+        inPipeThread.start();
     }
     
     public void stop() {
@@ -54,36 +54,50 @@ public class ClientSocketHandler {
         }
         
         closeSocket();
-        outQueueThread.interrupt();
-        inQueueThread.interrupt();
+        outPipeThread.interrupt();
+        inPipeThread.interrupt();
     }
     
     public void update() {
         
     }
     
-    private void runOutQueue() {
-        
-    }
-    
-    private void runInQueue() {
-        
+    private void runOutPipe() {
         try {
             while (true) {
-
                 synchronized (monitor) {
                     if (!running || cancelled) {
                         break;
                     }
-                }
-                
+                } 
                 try {
-                    final BytePipe pipe = inQueue.borrowWriter();
+                    final Buffer pipe = outPipe.getReader();
+                    out.write(pipe.getData(), pipe.getReadIndex(), pipe.getSize());
+                } catch (final InterruptedException ignored) {
+                } catch (final IOException ignored) {
+                    break;
+                }
+            }
+        } finally {
+            stop();
+        }                
+    }
+    
+    private void runInPipe() {        
+        try {
+            while (true) {
+                synchronized (monitor) {
+                    if (!running || cancelled) {
+                        break;
+                    }
+                }                
+                try {
+                    final Buffer pipe = inPipe.borrowWriter();
                     pipe.incrementWriteIndex(in.read(pipe.getData(), pipe.getWriteIndex(), pipe.getMaxWriteLength()));
                 } catch (final IOException ignored) {
                     break;
                 } finally {
-                    inQueue.returnWriter();
+                    inPipe.returnWriter();
                 }
             }
         } finally {

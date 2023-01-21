@@ -1,6 +1,6 @@
 package textrads.netplay;
 
-public class BytePipe {
+public class Buffer {
     
     public static final int DEFAULT_CAPACITY = 1024 * 1024;
     
@@ -9,11 +9,11 @@ public class BytePipe {
     private int readIndex;
     private int writeIndex;
     
-    public BytePipe() {
+    public Buffer() {
         this(DEFAULT_CAPACITY);
     }
     
-    public BytePipe(final int capacity) {
+    public Buffer(final int capacity) {
         data = new byte[capacity];
     }
        
