@@ -22,6 +22,7 @@ public class Textrads {
     private final Server server = new Server();
     private final Client client = new Client();
     private final PlayRenderer playRenderer = new PlayRenderer();
+    private final ByteList eventList = new ByteList();
     
     public void launch() throws Exception {
         
@@ -79,14 +80,10 @@ public class Textrads {
         server.update();
         
         final GameState state = GameStateSource.getState();
-        InputEventSource.update();
-        while (true) {
-            final Integer event = InputEventSource.poll();
-            if (event == null) {
-                break;
-            }
-            state.handleInputEvent(event, 0);
-        } 
+        InputEventSource.poll(eventList);
+        for (int i = 0; i < eventList.size(); ++i) {
+            state.handleInputEvent(eventList.get(i), 0);
+        }
         state.update();
     }
     

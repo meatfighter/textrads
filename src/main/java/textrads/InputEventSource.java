@@ -1,17 +1,15 @@
 package textrads;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class InputEventSource {
+
+    public static final int MAX_POLLS = 4;
     
     private static final long MAX_REPEAT_PERIOD = Textrads.FRAMES_PER_SECOND / 4;
-    private static final int MAX_POLLS = 32;
     
-    private static final List<Byte> events = new ArrayList<>();
     private static final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
     
     private static InputMap inputMap;
@@ -28,7 +26,8 @@ public final class InputEventSource {
         InputEventSource.inputMap = inputMap;        
     }
     
-    public static synchronized void update() {                
+    public static synchronized void poll(final ByteList list) {
+        list.clear();
         for (int i = 0; i < MAX_POLLS; ++i) {
             final KeyStroke keyStroke = InputSource.poll();
             if (keyStroke == null) {
@@ -45,17 +44,12 @@ public final class InputEventSource {
             
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
-            events.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
+            list.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
         }
         ++updates;
     }
        
     public static synchronized void clear() {
         InputSource.clear();
-        events.clear();
-    }
-
-    public static synchronized Byte poll() {
-        return events.isEmpty() ? null : events.remove(0);
     }    
 }

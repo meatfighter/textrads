@@ -19,7 +19,7 @@ public class GameState implements Serializable {
         states[1].init();
     }
     
-    public void handleInputEvent(final int event, final int player) {
+    public void handleInputEvent(final byte event, final int player) {
         states[player].handleInputEvent(event);
     }
     

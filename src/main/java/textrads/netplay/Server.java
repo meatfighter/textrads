@@ -18,9 +18,10 @@ import textrads.util.ThreadUtil;
 public class Server {
      
     public static final int DEFAULT_PORT = 8080;
+
+    public static final long HEARTBEAT_PERIOD = TimeUnit.SECONDS.toMillis(10);
     
     private static final int BACKLOG = 50;  
-    private static final long HEARTBEAT_PERIOD = TimeUnit.SECONDS.toMillis(10);
     
     public static enum Error {
         NETWORK_INTERFACE_ADDRESSES,

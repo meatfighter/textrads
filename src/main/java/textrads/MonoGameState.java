@@ -186,7 +186,7 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    public void handleInputEvent(final int event) {
+    public void handleInputEvent(final byte event) {
         if (mode != TETROMINO_FALLING_MODE) {
             return;
         }

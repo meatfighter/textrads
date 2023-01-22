@@ -1,38 +1,39 @@
 package textrads.netplay;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
-import textrads.InputEventSource;
+import textrads.ByteList;
 
 public class ClientSocketHandler {
            
     private final Client client;
     private final Socket socket;
-    private final InputStream in;
-    private final OutputStream out;
+    private final DataInputStream in;
+    private final DataOutputStream out;
 
-    private final Pipe outPipe = new Pipe();
-    private final Thread outPipeThread;
+    private final EventQueue outQueue = new EventQueue(1);
+    private final Thread outQueueThread;
     
-    private final Buffer inBuffer = new Buffer();
-    private final Pipe inPipe = new Pipe();
-    private final Thread inPipeThread;
+    private final EventQueue inQueue = new EventQueue();
+    private final Thread inQueueThread;
     
     private final Object monitor = new Object();
     private boolean running;
     private boolean cancelled;
     
-    private boolean handlingEvents;
-    
     public ClientSocketHandler(final Client client, final Socket socket) throws IOException {
         this.client = client;
         this.socket = socket;
-        in = socket.getInputStream();
-        out = socket.getOutputStream();
-        outPipeThread = new Thread(this::runOutPipe);
-        inPipeThread = new Thread(this::runInPipe);
+        in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        outQueueThread = new Thread(this::runOutQueue);
+        inQueueThread = new Thread(this::runInQueue);
     }
     
     public void start() {
@@ -44,8 +45,8 @@ public class ClientSocketHandler {
             running = true;
         }
         
-        outPipeThread.start();
-        inPipeThread.start();
+        outQueueThread.start();
+        inQueueThread.start();
     }
     
     public void stop() {
@@ -58,118 +59,16 @@ public class ClientSocketHandler {
         }
         
         closeSocket();
-        outPipeThread.interrupt();
-        inPipeThread.interrupt();
+        outQueueThread.interrupt();
+        inQueueThread.interrupt();
     }
     
     public void update() {
-        writeEvents();
-        readEvents();
+
     }
     
-    private void readEvents() {
-        try {
-            Buffer reader = null;
-            do {
-                synchronized (monitor) {
-                    if (!running || cancelled) {
-                        return;
-                    }
-                }
-                try {
-                    reader = inPipe.getReader();
-                } catch (final InterruptedException ignored) {                    
-                }
-            } while (reader == null);
-            
-            final byte[] data = reader.getData();
-            while (true) {
-                synchronized (monitor) {
-                    if (!running || cancelled) {
-                        return;
-                    }
-                }
-                
-                if (reader.isEmpty()) {
-                    break;
-                }
-                                
-                final int startIndex;
-                outer: {
-                    for (int i = reader.getReadIndex(), end = reader.getWriteIndex(); i < end; ++i) {
-                        if (data[i] != Command.HEARTBEAT) {
-                            startIndex = i;
-                            break outer;
-                        }
-                    }
-                    throw new IOException("No start.");
-                }
-                
-                final int endIndex;
-                outer: {
-                    for (int i = startIndex + 1, end = reader.getWriteIndex(); i < end; ++i) {
-                        if (data[i] == Command.END) {
-                            endIndex = i;
-                            break outer;
-                        }                   
-                    }
-                    throw new IOException("No end.");
-                }
-                
-                switch (data[startIndex]) {
-                    case Command.HEARTBEAT:
-                        break;
-                    case Command.EVENTS:
-                        break;
-                    default:
-                        throw new IOException("Invalid command.");
-                }
-            }
-        } catch (final IOException ignored) {
-            stop();
-        }
-    }
-    
-    private void writeEvents() {
-        Buffer buffer = null;
-        try {
-            do {
-                synchronized (monitor) {
-                    if (!running || cancelled) {
-                        return;
-                    }
-                } 
-                try {
-                    buffer = outPipe.borrowWriter();
-                } catch (final InterruptedException ignored) {
-                }
-            } while (buffer == null);
-            
-            boolean wroteEvents = false;
-            final OutputStream bufferOut = buffer.getOutputStream();
-            while (true) {
-                final Byte event = InputEventSource.poll();
-                if (event == null) {
-                    break;
-                }
-                if (!wroteEvents) {
-                    wroteEvents = true;
-                    bufferOut.write(Command.EVENTS);
-                }
-            }
-            if (wroteEvents) {
-                bufferOut.write(Command.END);
-            }            
-        } catch (final IOException ignored) {
-            stop();
-        } finally {
-            if (buffer != null) {
-                outPipe.returnWriter();
-            }
-        }
-    }
-    
-    private void runOutPipe() {
+        
+    private void runOutQueue() {
         try {
             while (true) {
                 synchronized (monitor) {
@@ -178,9 +77,14 @@ public class ClientSocketHandler {
                     }
                 } 
                 try {
-                    final Buffer buffer = outPipe.getReader();
-                    out.write(buffer.getData(), buffer.getReadIndex(), buffer.getSize());
-                    out.flush();
+                    if (outQueue.isEmpty()) {
+                        outQueue.waitForData(Server.HEARTBEAT_PERIOD);
+                    }
+                    if (outQueue.isEmpty()) {
+                        writeHeartbeat();
+                    } else {
+                        writeEvents();
+                    }
                 } catch (final InterruptedException ignored) {
                 } catch (final IOException ignored) {
                     break;
@@ -191,63 +95,58 @@ public class ClientSocketHandler {
         }                
     }
     
-    private void runInPipe() {        
+    private void writeHeartbeat() throws IOException {
+        out.write(Command.HEARTBEAT);
+        out.flush();
+    }
+    
+    private void writeEvents() throws IOException {
+        final ByteList list = outQueue.getReadElement().getEvents(0);
+        out.write(Command.EVENTS);
+        out.write(list.size());
+        out.write(list.getData(), 0, list.size());        
+        outQueue.incrementReadIndex();
+        out.flush();
+    }
+    
+    private void runInQueue() {        
         try {
-            outer: while (true) {
-                
+            while (true) {                
                 synchronized (monitor) {
                     if (!running || cancelled) {
                         break;
                     }
-                }       
-                
-                Buffer writer = null;
+                }                      
                 try {
-                    
-                    // If inBuffer is out of room, break the connection.
-                    final int maxLength = inBuffer.getMaxWriteLength();
-                    if (maxLength <= 0) {
-                        break;
-                    }
-                    
-                    // Read available bytes into inBuffer.
-                    final byte[] inBufferData = inBuffer.getData();
-                    final int writeIndex = inBuffer.getWriteIndex();
-                    inBuffer.incrementWriteIndex(in.read(inBufferData, writeIndex, maxLength));                    
-                    if (writeIndex == inBuffer.getWriteIndex()) {
-                        continue;
-                    }
-                    
-                    // If inBuffer contains an end of block marker, append the block to the inPipe, and remove it.
-                    for (int i = inBuffer.getWriteIndex() - 1; i >= writeIndex; --i) {
-                        if (inBufferData[i] == Command.END) {                            
-                            do {
-                                synchronized (monitor) {
-                                    if (!running || cancelled) {
-                                        break outer;
-                                    }
-                                } 
-                                try {
-                                    writer = inPipe.borrowWriter();
-                                } catch (final InterruptedException ignored) {                                    
-                                }
-                            } while (writer == null);
-                            writer.write(inBuffer, 0, i + 1);
-                            writer.shift();
-                            continue outer;
-                        }
-                    }
-                } catch (final IOException e) {
+                    switch ((byte) in.read()) {
+                        case Command.HEARTBEAT:
+                            break;
+                        case Command.STATE:
+                            readState();
+                            break;
+                        case Command.EVENTS:
+                            readEvents();
+                            break;
+                    }   
+                } catch (final IOException ignored) {
                     break;
-                } finally {
-                    if (writer != null) {
-                        inPipe.returnWriter();
-                    }
-                }
+                }                                
             }
         } finally {
             stop();
         }
+    }
+    
+    private void readState() throws IOException {
+        final byte[] data = new byte[in.readInt()];
+        in.readFully(data);
+        try (final ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
+            
+        }
+    }
+    
+    private void readEvents() throws IOException {
+        
     }
     
     private void closeSocket() {
