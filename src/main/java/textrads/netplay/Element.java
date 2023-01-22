@@ -1,5 +1,6 @@
 package textrads.netplay;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import textrads.InputEventList;
@@ -56,6 +57,16 @@ public class Element {
             for (int i = 0; i < inputEvents.length; ++i) {
                 inputEvents[i].write(out);
             }
+        }
+    }
+    
+    public void readGameState(final DataInputStream in) throws IOException {
+        data = IOUtil.readByteArray(in);
+    }
+    
+    public void readInputEvents(final DataInputStream in) throws IOException {
+        for (int i = 0; i < inputEvents.length; ++i) {
+            inputEvents[i].read(in);
         }
     }
 }
