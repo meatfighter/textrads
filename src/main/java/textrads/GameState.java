@@ -1,10 +1,20 @@
 package textrads;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class GameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
+    
+    private static final int MIN_OBJECT_SIZE = 64 * 1024;
+    private static final int MAX_OBJECT_LENGTH = 1024 * 1024;
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
@@ -43,5 +53,24 @@ public class GameState implements Serializable {
 
     public int getUpdates() {
         return updates;
+    }
+    
+    public byte[] toByteArray() throws IOException {
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(MIN_OBJECT_SIZE)) {
+            try (final ObjectOutputStream oos = new ObjectOutputStream(baos)) { // TODO MEASURE SIZE
+                oos.writeObject(this);
+            }
+            return baos.toByteArray();
+        }
+    }
+    
+    public static GameState fromByteArray(final byte[] data) throws IOException, ClassNotFoundException {
+        try (final ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
+            final Object obj = ois.readObject();
+            if (!(obj instanceof GameState)) {
+                throw new IOException("invalid object");
+            }
+            return (GameState) obj;
+        }
     }
 }

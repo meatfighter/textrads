@@ -9,9 +9,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import textrads.ByteList;
+import textrads.GameState;
+import textrads.GameStateSource;
+import textrads.InputEventSource;
+import textrads.util.IOUtil;
 
 public class ClientSocketHandler {
-           
+    
     private final Client client;
     private final Socket socket;
     private final DataInputStream in;
@@ -85,6 +89,7 @@ public class ClientSocketHandler {
                     } else {
                         writeEvents();
                     }
+                    out.flush();
                 } catch (final InterruptedException ignored) {
                 } catch (final IOException ignored) {
                     break;
@@ -96,22 +101,24 @@ public class ClientSocketHandler {
     }
     
     private void writeHeartbeat() throws IOException {
-        out.write(Command.HEARTBEAT);
-        out.flush();
+        out.write(Command.HEARTBEAT);        
     }
     
     private void writeEvents() throws IOException {
-        final ByteList list = outQueue.getReadElement().getEvents(0);
         out.write(Command.EVENTS);
-        out.write(list.size());
-        out.write(list.getData(), 0, list.size());        
+        final EventQueueElement element = outQueue.getReadElement();
+        final byte[] data = element.getData();
+        if (data == null) {
+            element.getEvents(0).write(out);
+        } else {
+            IOUtil.writeByteArray(out, data);
+        }        
         outQueue.incrementReadIndex();
-        out.flush();
     }
     
     private void runInQueue() {        
         try {
-            while (true) {                
+            outer: while (true) {                
                 synchronized (monitor) {
                     if (!running || cancelled) {
                         break;
@@ -127,8 +134,10 @@ public class ClientSocketHandler {
                         case Command.EVENTS:
                             readEvents();
                             break;
+                        default:
+                            break outer;
                     }   
-                } catch (final IOException ignored) {
+                } catch (final IOException | ClassNotFoundException ignored) {
                     break;
                 }                                
             }
@@ -137,16 +146,35 @@ public class ClientSocketHandler {
         }
     }
     
-    private void readState() throws IOException {
+    private void readState() throws IOException, ClassNotFoundException {
+        final int length = in.readInt();
+        if (length < 0 || length > MAX_OBJECT_LENGTH) {
+            throw new IOException("invalid object length");
+        }
         final byte[] data = new byte[in.readInt()];
         in.readFully(data);
         try (final ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
-            
+            final Object obj = ois.readObject();
+            if (!(obj instanceof GameState)) {
+                throw new IOException("invalid object");
+            }
+            GameStateSource.setState((GameState) obj);
         }
     }
     
     private void readEvents() throws IOException {
-        
+        final ByteList[] element = inQueue.getWriteElement();
+        readEvents(element[0]);
+        readEvents(element[1]);
+    }
+    
+    private void readEvents(final ByteList list) throws IOException {
+        final int length = in.read();
+        if (length < 0 || length > InputEventSource.MAX_POLLS) {
+            throw new IOException("invalid events length");
+        }        
+        in.readFully(list.getData(), 0, length);
+        list.setSize(length);
     }
     
     private void closeSocket() {

@@ -61,6 +61,7 @@ public class EventQueue {
     public synchronized void incrementReadIndex() {
         if (size > 0) {
             --size;
+            elements[readIndex].clear();
             if (++readIndex == elements.length) {
                 readIndex = 0;
             }
