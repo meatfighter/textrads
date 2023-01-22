@@ -8,7 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import textrads.ByteList;
+import textrads.InputEventList;
 import textrads.GameState;
 import textrads.GameStateSource;
 import textrads.InputEventSource;
@@ -21,10 +21,10 @@ public class ClientSocketHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
 
-    private final EventQueue outQueue = new EventQueue(1);
+    private final Queue outQueue = new Queue(1);
     private final Thread outQueueThread;
     
-    private final EventQueue inQueue = new EventQueue();
+    private final Queue inQueue = new Queue();
     private final Thread inQueueThread;
     
     private final Object monitor = new Object();
@@ -87,7 +87,7 @@ public class ClientSocketHandler {
                     if (outQueue.isEmpty()) {
                         writeHeartbeat();
                     } else {
-                        writeEvents();
+                        writeElement();
                     }
                     out.flush();
                 } catch (final InterruptedException ignored) {
@@ -104,15 +104,8 @@ public class ClientSocketHandler {
         out.write(Command.HEARTBEAT);        
     }
     
-    private void writeEvents() throws IOException {
-        out.write(Command.EVENTS);
-        final EventQueueElement element = outQueue.getReadElement();
-        final byte[] data = element.getData();
-        if (data == null) {
-            element.getEvents(0).write(out);
-        } else {
-            IOUtil.writeByteArray(out, data);
-        }        
+    private void writeElement() throws IOException {
+        outQueue.getReadElement().write(out);        
         outQueue.incrementReadIndex();
     }
     
@@ -163,12 +156,12 @@ public class ClientSocketHandler {
     }
     
     private void readEvents() throws IOException {
-        final ByteList[] element = inQueue.getWriteElement();
+        final InputEventList[] element = inQueue.getWriteElement();
         readEvents(element[0]);
         readEvents(element[1]);
     }
     
-    private void readEvents(final ByteList list) throws IOException {
+    private void readEvents(final InputEventList list) throws IOException {
         final int length = in.read();
         if (length < 0 || length > InputEventSource.MAX_POLLS) {
             throw new IOException("invalid events length");

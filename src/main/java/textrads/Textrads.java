@@ -22,7 +22,7 @@ public class Textrads {
     private final Server server = new Server();
     private final Client client = new Client();
     private final PlayRenderer playRenderer = new PlayRenderer();
-    private final ByteList eventList = new ByteList();
+    private final InputEventList eventList = new InputEventList();
     
     public void launch() throws Exception {
         

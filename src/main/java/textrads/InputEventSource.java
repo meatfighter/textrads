@@ -26,7 +26,7 @@ public final class InputEventSource {
         InputEventSource.inputMap = inputMap;        
     }
     
-    public static synchronized void poll(final ByteList list) {
+    public static synchronized void poll(final InputEventList list) {
         list.clear();
         for (int i = 0; i < MAX_POLLS; ++i) {
             final KeyStroke keyStroke = InputSource.poll();

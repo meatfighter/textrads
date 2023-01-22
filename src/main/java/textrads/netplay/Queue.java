@@ -2,33 +2,33 @@ package textrads.netplay;
 
 import textrads.Textrads;
 
-public class EventQueue {
+public class Queue {
     
     private static final int DEFAULT_PLAYERS = 2;
     private static final int DEFAULT_CAPACITY = 60 * Textrads.FRAMES_PER_SECOND;
 
-    private final EventQueueElement[] elements;
+    private final Element[] elements;
     
     private int readIndex;
     private int writeIndex;
     private int size;
     
-    public EventQueue() {
+    public Queue() {
         this(DEFAULT_PLAYERS, DEFAULT_CAPACITY);
     }
     
-    public EventQueue(final int players) {
+    public Queue(final int players) {
         this(players, DEFAULT_CAPACITY);
     }
     
-    public EventQueue(final int players, final int capacity) {
-        elements = new EventQueueElement[capacity];
+    public Queue(final int players, final int capacity) {
+        elements = new Element[capacity];
         for (int i = capacity - 1; i >= 0; --i) {
-            elements[i] = new EventQueueElement(players);
+            elements[i] = new Element(players);
         }
     }
     
-    public synchronized EventQueueElement getWriteElement() {
+    public synchronized Element getWriteElement() {
         return elements[writeIndex];
     }
     
@@ -54,7 +54,7 @@ public class EventQueue {
         }
     }
     
-    public synchronized EventQueueElement getReadElement() {
+    public synchronized Element getReadElement() {
         return elements[readIndex];
     }
     

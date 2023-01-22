@@ -4,17 +4,17 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ByteList {
+public class InputEventList {
     
     private final byte[] data;
     
     private int size;
     
-    public ByteList() {
+    public InputEventList() {
         this(InputEventSource.MAX_POLLS);
     }
     
-    public ByteList(final int capacity) {
+    public InputEventList(final int capacity) {
         data = new byte[capacity];
     }
     
