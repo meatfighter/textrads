@@ -6,89 +6,113 @@ import textrads.util.ThreadUtil;
 
 public class Client {
     
-    private String host;
-    private int port = Server.DEFAULT_PORT;
+    private static enum State {
+        NOT_STARTED,
+        RUNNING,
+        CANCELLED,
+    }
     
-    private final Object monitor = new Object();
-    private boolean running;
-    private boolean cancelled;
+    private volatile String host;
+    private volatile int port = Server.DEFAULT_PORT;
+    private volatile boolean player;
     
-    private volatile Thread listenerThread;
+    private final Object stateMonitor = new Object();
+    private State state = State.NOT_STARTED;    
+    private Thread listenerThread;    
+    private ClientSocketHandler handler;
     
-    public void start() {
-        
-        synchronized (monitor) {
-            if (running) {
+    public void start() {        
+        synchronized (stateMonitor) {
+            if (state != State.NOT_STARTED) {
                 return;
             }
-            running = true;
+            state = State.RUNNING;
+            listenerThread = new Thread(this::listen);
+            listenerThread.start();            
         }
-        
-        final Thread listThread = new Thread(this::listen);
-        listenerThread = listThread;
-        listThread.start();
     }
     
     private void listen() {
         try {
-            while (true) {
-                synchronized (monitor) {
-                    if (cancelled) {
+            outer: while (true) {
+                
+                ClientSocketHandler h;
+                synchronized (stateMonitor) {
+                    if (state != State.RUNNING) {
                         break;
                     }
-                }
-                closeSocket();
-                
-                try {
-                    socket = new Socket(host, port);
-                    in = socket.getInputStream();
-                    out = socket.getOutputStream();
-                } catch (final IOException ignored) {
-                    synchronized (monitor) {
-                        if (cancelled) {
-                            break;
+                    h = handler;
+                    while (h != null && h.isRunning()) {
+                        try {
+                            stateMonitor.wait();
+                        } catch (final InterruptedException ignored) {
+                            continue outer;
                         }
                     }
-                    ThreadUtil.sleepOneSecond();
-                    continue;
-                }                               
+                }
+                
+                if (h == null || h.isTerminated()) {
+                    try {
+                        h = new ClientSocketHandler(this, new Socket(host, port), player);
+                        h.start();
+                    } catch (final IOException ignored) {
+                        ThreadUtil.sleepOneSecond();
+                        continue;
+                    }
+                }
+                
+                synchronized (stateMonitor) {                    
+                    handler = h;                    
+                }
             }
         } finally {
-            closeSocket();
-            ThreadUtil.joinThread(heartbeatThread);
-            socket = null;
-            out = null;
-            in = null;            
-            listenerThread = null;
-            heartbeatThread = null;
-            synchronized (monitor) {
-                running = cancelled = false;
+            synchronized (stateMonitor) {
+                if (handler != null) {
+                    handler.stop();
+                }
             }
         }
     }
     
-    private void sendHeartbeats() {
-        while (true) {
-            
+    public void handleTerminatedConnection() {
+        synchronized (stateMonitor) {
+            stateMonitor.notifyAll();
         }
     }
-    
-    public void update() {
-        // TODO
+       
+    public void update() {   
+        final ClientSocketHandler h;
+        synchronized (stateMonitor) { 
+            h = handler;
+            switch (state) {
+                case NOT_STARTED:
+                    return;
+                case CANCELLED: 
+                    if ((listenerThread == null || !listenerThread.isAlive()) && (h == null || h.isTerminated())) {
+                        state = State.NOT_STARTED;
+                    }
+                    return;
+                default:
+                    if (h == null) {
+                        return;
+                    }
+                    break;
+            }
+        }
+        h.update();
     }    
     
-    public void stop() {
-        
-        synchronized (monitor) {
-            if (!running || cancelled) {
+    public void stop() {        
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
                 return;
             }
-            cancelled = true;
-        }
-    }
-    
-    public void removeHandler(final ClientSocketHandler handler) {
-        
+            state = State.CANCELLED;
+            ThreadUtil.interrupt(listenerThread);
+            if (handler != null) {
+                handler.stop();
+            }
+        }        
     }
 
     public String getHost() {
@@ -105,5 +129,13 @@ public class Client {
 
     public void setPort(final int port) {
         this.port = port;
+    }
+
+    public boolean isPlayer() {
+        return player;
+    }
+
+    public void setPlayer(final boolean player) {
+        this.player = player;
     }
 }

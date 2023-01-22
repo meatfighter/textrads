@@ -89,8 +89,8 @@ public class Server {
         }
                
         closeServerSocket();
-        ThreadUtil.interruptThread(listenerThread);
-        ThreadUtil.interruptThread(heartbeatThread);
+        ThreadUtil.interrupt(listenerThread);
+        ThreadUtil.interrupt(heartbeatThread);
     }
     
     private void sendHeartbeats() {
@@ -143,7 +143,7 @@ public class Server {
             }
         } finally {
             closeServerSocket();
-            ThreadUtil.joinThread(heartbeatThread);
+            ThreadUtil.join(heartbeatThread);
             serverSocket = null;
             listenerThread = null;
             heartbeatThread = null;

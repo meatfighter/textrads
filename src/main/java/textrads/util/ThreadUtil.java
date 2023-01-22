@@ -2,20 +2,22 @@ package textrads.util;
 
 public final class ThreadUtil {
     
-    public static void interruptThread(final Thread thread) {
-        if (thread != null) {
-            thread.interrupt();
+    public static void interrupt(final Thread thread) {
+        if (thread == null) {
+            return;
         }
+        thread.interrupt();
     }    
     
-    public static void joinThread(final Thread thread) {
-        if (thread != null) {
-            while (true) {
-                try {
-                    thread.join();
-                    return;
-                } catch (final InterruptedException ignored) {                
-                }
+    public static void join(final Thread thread) {
+        if (thread == null) {
+            return;
+        }
+        while (true) {
+            try {
+                thread.join();
+                return;
+            } catch (final InterruptedException ignored) {                
             }
         }
     }

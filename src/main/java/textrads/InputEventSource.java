@@ -26,8 +26,8 @@ public final class InputEventSource {
         InputEventSource.inputMap = inputMap;        
     }
     
-    public static synchronized void poll(final InputEventList list) {
-        list.clear();
+    public static synchronized void poll(final InputEventList events) {
+        events.clear();
         for (int i = 0; i < MAX_POLLS; ++i) {
             final KeyStroke keyStroke = InputSource.poll();
             if (keyStroke == null) {
@@ -44,7 +44,7 @@ public final class InputEventSource {
             
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
-            list.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
+            events.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));
         }
         ++updates;
     }
