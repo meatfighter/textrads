@@ -1,6 +1,7 @@
 package textrads;
 
 import java.io.Serializable;
+import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -162,11 +163,13 @@ public class MonoGameState implements Serializable {
         if (y < 0) {
             return false;
         }
-        for (final Offset offset : Tetromino.TETROMINOES[tetrominoType][rotation].offsets) {
-            final int bx = x + offset.x;
+        final Tetromino tetromino = Tetromino.TETROMINOES[tetrominoType][rotation];
+        if (!tetromino.validPosition[y][x]) {
+            return false;
+        }
+        for (final Offset offset : tetromino.offsets) {
             final int by = y + offset.y;            
-            if (bx < 0 || bx >= PLAYFIELD_WIDTH || by >= PLAYFIELD_HEIGHT 
-                    || (by >= 0 && playfield[by][bx] != EMPTY_BLOCK)) {
+            if (by >= 0 && playfield[by][x + offset.x] != EMPTY_BLOCK) {
                 return false;
             }
         }
@@ -174,9 +177,9 @@ public class MonoGameState implements Serializable {
     }
     
     private void findLines() {
-        final int maxY = Math.min(PLAYFIELD_HEIGHT - 1, tetrominoY + 1);
-        final int minY = Math.max(0, tetrominoY - 2);
-        outer: for (int y = minY; y <= maxY; ++y) {
+        final Tetromino tetromino = Tetromino.TETROMINOES[tetrominoType][tetrominoRotation];
+        final int maxY = tetrominoY + tetromino.maxOffsetY;
+        outer: for (int y = max(0, tetrominoY + tetromino.minOffsetY); y <= maxY; ++y) {
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
                 if (playfield[y][x] == EMPTY_BLOCK) {
                     continue outer;

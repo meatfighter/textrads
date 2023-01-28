@@ -69,16 +69,4 @@ public interface Playfield {
 
         return clearedLines;
     }
-
-    public static void printPlayfield(final boolean[][] playfield) {
-        final StringBuilder sb = new StringBuilder();
-        for (int y = 0; y < playfield.length; ++y) {
-            sb.setLength(0);
-            for (int x = 0; x < PLAYFIELD_WIDTH; ++x) {
-                sb.append(playfield[y][x] ? 'X' : '.');
-            }
-            System.out.println(sb);
-        }
-        System.out.println();
-    }
 }
