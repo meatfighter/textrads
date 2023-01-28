@@ -1,4 +1,4 @@
-package textrads.ai;
+package textrads;
 
 public class Offset {
 

@@ -91,7 +91,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         final List<Byte> nexts = state.getNexts();
         for (int i = 0; i < 5; ++i) {
             final byte type = nexts.get(i);
-            drawTetromino(g, x + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 27 : 28), 
+            drawTetromino(g, x + ((type == Tetromino.I_TYPE || type == Tetromino.O_TYPE) ? 27 : 28), 
                     y + 1 + 3 * i, type, 0);
         }
         
@@ -141,11 +141,9 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
             final int rotation, final TextColor color) {
         g.setBackgroundColor(color);
-        final int[][] blocks = Tetrominoes.TETROMINOES[type][rotation];
-        for (int i = blocks.length - 1; i >= 0; --i) {
-            final int[] coordinates = blocks[i];
-            final int bx = x + 2 * coordinates[0];
-            final int by = y + coordinates[1];
+        for (final Offset offset : Tetromino.TETROMINOES[type][rotation].offsets) {
+            final int bx = x + 2 * offset.x;
+            final int by = y + offset.y;
             g.putString(bx, by, "  ");            
         }
     }    

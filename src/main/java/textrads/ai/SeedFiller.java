@@ -27,7 +27,7 @@ public class SeedFiller {
 
     private int sp;     // Stack pointer
 
-    public SeedFiller(final int height) {
+    public SeedFiller() {
         playfield = createPlayfield();
         for (int i = stack.length - 1; i >= 0; --i) {
             stack[i] = new Segment();

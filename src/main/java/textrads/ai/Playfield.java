@@ -1,5 +1,6 @@
 package textrads.ai;
 
+import textrads.Offset;
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 

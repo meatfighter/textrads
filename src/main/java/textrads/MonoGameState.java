@@ -137,12 +137,12 @@ public class MonoGameState implements Serializable {
     }
     
     private void lockTetrimino() {
-        for (final int[] block : Tetrominoes.TETROMINOES[tetrominoType][tetrominoRotation]) {
-            final int by = tetrominoY + block[1];
+        for (final Offset offset : Tetromino.TETROMINOES[tetrominoType][tetrominoRotation].offsets) {
+            final int by = tetrominoY + offset.y;
             if (by < 0) {
                 continue;
             }
-            final int bx = tetrominoX + block[0];
+            final int bx = tetrominoX + offset.x;
             playfield[by][bx] = (byte) (tetrominoType + 1);
         }
         findLines();
@@ -162,9 +162,9 @@ public class MonoGameState implements Serializable {
         if (y < 0) {
             return false;
         }
-        for (final int[] block : Tetrominoes.TETROMINOES[tetrominoType][rotation]) {
-            final int bx = x + block[0];
-            final int by = y + block[1];            
+        for (final Offset offset : Tetromino.TETROMINOES[tetrominoType][rotation].offsets) {
+            final int bx = x + offset.x;
+            final int by = y + offset.y;            
             if (bx < 0 || bx >= PLAYFIELD_WIDTH || by >= PLAYFIELD_HEIGHT 
                     || (by >= 0 && playfield[by][bx] != EMPTY_BLOCK)) {
                 return false;
@@ -220,7 +220,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptRotateCCW() {
-        if (tetrominoType == Tetrominoes.O_TYPE) {
+        if (tetrominoType == Tetromino.O_TYPE) {
             return;
         }
 
@@ -230,9 +230,9 @@ public class MonoGameState implements Serializable {
             return;
         }
 
-        final int[] offsets = Tetrominoes.CCW[tetrominoRotation];
-        final int x = tetrominoX + offsets[0];
-        final int y = tetrominoY + offsets[1];
+        final Offset offset = Tetromino.CCW[tetrominoRotation];
+        final int x = tetrominoX + offset.x;
+        final int y = tetrominoY + offset.y;
         if (testPosition(rotation, x, y)) {
             tetrominoRotation = (byte) rotation;
             tetrominoX = (byte) x;
@@ -241,7 +241,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptRotateCW() {
-        if (tetrominoType == Tetrominoes.O_TYPE) {
+        if (tetrominoType == Tetromino.O_TYPE) {
             return;
         }
 
@@ -251,9 +251,9 @@ public class MonoGameState implements Serializable {
             return;
         }
 
-        final int[] offsets = Tetrominoes.CW[tetrominoRotation];
-        final int x = tetrominoX + offsets[0];
-        final int y = tetrominoY + offsets[1];
+        final Offset offset = Tetromino.CW[tetrominoRotation];
+        final int x = tetrominoX + offset.x;
+        final int y = tetrominoY + offset.y;
         if (testPosition(rotation, x, y)) {
             tetrominoRotation = (byte) rotation;
             tetrominoX = (byte) x;
