@@ -2,62 +2,54 @@ package textrads.ai;
 
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
+import textrads.Tetromino;
 
 public class Coordinate {
 
-    // depth, y, x, orientation
-    public static Coordinate[][][][] createMatrix() {
-        final Coordinate[][][][] matrix 
-                = new Coordinate[2][PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH][4];
-        for (int k = 1; k >= 0; --k) {
-            for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                    for (int o = 3; o >= 0; --o) {
-                        matrix[k][y][x][o] = new Coordinate(k, x, y, o);
-                    }
+    public static Coordinate[][][] createMatrix() {
+        final Coordinate[][][] matrix = new Coordinate[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH][4];
+        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                for (int rotation = 3; rotation >= 0; --rotation) {
+                    matrix[y][x][rotation] = new Coordinate(x, y, rotation);
                 }
             }
         }
         return matrix;
     }
 
-    public static void resetMatrix(final Coordinate[][][][] matrix, int orientations) {
+    public static void resetMatrix(final Coordinate[][][] matrix, final int type) {
 
-        --orientations;
+        final int rotationMax = type == Tetromino.O_TYPE ? 3 : 0;
 
-        for (int k = 1; k >= 0; --k) {
-            final Coordinate[][][] ck = matrix[k];
-            for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                final Coordinate[][] cy = ck[y];
-                for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                    final Coordinate[] cx = cy[x];
-                    for (int o = orientations; o >= 0; --o) {
-                        final Coordinate c = cx[o];
-                        c.previous = c.next = null;
-                    }
+        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+            final Coordinate[][] cy = matrix[y];
+            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                final Coordinate[] cx = cy[x];
+                for (int rotation = rotationMax; rotation >= 0; --rotation) {
+                    final Coordinate c = cx[rotation];
+                    c.previous = c.next = null;
                 }
             }
         }
     }
 
-    public final boolean keyPressed;
     public final int x;
     public final int y;
-    public final int orientation;
+    public final int rotation;
 
-    public Coordinate previous;
+    public Coordinate previous;      // visted marker
     public Coordinate next;
 
-    public boolean down;
-    public boolean left;
-    public boolean right;
-    public boolean A;
-    public boolean B;
+    public byte inputEvent;          // input that got the tetromino here
+    public float gravityDropTimer;   // when the tetromino arrived here
+    public byte lockTimer;           // when the tetromino arrived here
+    public boolean dropFailed;       // when the tetromino arrived here
+    public float moveTimer;          // when the tetromino arrived here
 
-    public Coordinate(final int k, final int x, final int y, final int orientation) {
-        this.keyPressed = (k != 0);
+    public Coordinate(final int x, final int y, final int rotation) {
         this.x = x;
         this.y = y;
-        this.orientation = orientation;
+        this.rotation = rotation;
     }
 }

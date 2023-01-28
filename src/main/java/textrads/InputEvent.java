@@ -2,31 +2,33 @@ package textrads;
 
 public interface InputEvent {
     
-    byte ROTATE_CCW_PRESSED = 0;
-    byte ROTATE_CCW_REPEATED = 1;
+    byte NOTHING_PRESSED = 0;
     
-    byte ROTATE_CW_PRESSED = 2;
-    byte ROTATE_CW_REPEATED = 3;
+    byte ROTATE_CCW_PRESSED = 1;
+    byte ROTATE_CCW_REPEATED = 2;
     
-    byte SHIFT_LEFT_PRESSED = 4;
-    byte SHIFT_LEFT_REPEATED = 5;
+    byte ROTATE_CW_PRESSED = 3;
+    byte ROTATE_CW_REPEATED = 4;
     
-    byte SHIFT_RIGHT_PRESSED = 6;
-    byte SHIFT_RIGHT_REPEATED = 7;
+    byte SHIFT_LEFT_PRESSED = 5;
+    byte SHIFT_LEFT_REPEATED = 6;
     
-    byte SOFT_DROP_PRESSED = 8;
-    byte SOFT_DROP_REPEATED = 9;
+    byte SHIFT_RIGHT_PRESSED = 7;
+    byte SHIFT_RIGHT_REPEATED = 8;
     
-    byte START_PAUSE_PRESSED = 10;
-    byte START_PAUSE_REPEATED = 11;
+    byte SOFT_DROP_PRESSED = 9;
+    byte SOFT_DROP_REPEATED = 10;
     
-    byte QUIT_PRESSED = 12;
-    byte QUIT_REPEATED = 13;
+    byte START_PAUSE_PRESSED = 11;
+    byte START_PAUSE_REPEATED = 12;
+    
+    byte QUIT_PRESSED = 13;
+    byte QUIT_REPEATED = 14;
     
     static Byte fromInputType(final InputType inputType, final boolean repeated) {
         
         if (inputType == null) {
-            return null;
+            return NOTHING_PRESSED;
         }
         
         if (repeated) {
@@ -46,7 +48,7 @@ public interface InputEvent {
                 case QUIT:
                     return QUIT_REPEATED;
                 default:
-                    return null;
+                    return NOTHING_PRESSED;
             }
         }
         
@@ -66,7 +68,7 @@ public interface InputEvent {
             case QUIT:
                 return QUIT_PRESSED;    
             default:
-                return null;
+                return NOTHING_PRESSED;
         }
     }
 }

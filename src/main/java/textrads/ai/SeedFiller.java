@@ -2,7 +2,10 @@ package textrads.ai;
 
 // Flood fills the playfield starting from the Tetrimino seed point to
 
-import textrads.MonoGameState;
+import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.MonoGameState.SPAWN_X;
+import static textrads.MonoGameState.SPAWN_Y;
 import static textrads.ai.Playfield.copy;
 import static textrads.ai.Playfield.createPlayfield;
 
@@ -37,7 +40,7 @@ public class SeedFiller {
     private boolean push(final int y, final int xl, final int xr, final int dy) {
 
         // Halt early if a full row of the playfield is filled.
-        if (xr - xl + 1 == MonoGameState.PLAYFIELD_WIDTH) {
+        if (xr - xl + 1 == PLAYFIELD_WIDTH) {
             return true;
         }
 
@@ -69,7 +72,7 @@ public class SeedFiller {
 
         // Do the flood fill.
         copy(playfield, this.playfield);
-        if (fill(MonoGameState.SPAWN_X, MonoGameState.SPAWN_Y)) {
+        if (fill(SPAWN_X, SPAWN_Y)) {
             return true; // The fill halted early after detecting a full row.
         }
 
@@ -77,7 +80,7 @@ public class SeedFiller {
         outer:
         for (int y = 0; y < playfield.length; ++y) {
             final boolean[] row = this.playfield[y];
-            for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
                 if (!row[x]) {
                     continue outer;
                 }
@@ -90,7 +93,7 @@ public class SeedFiller {
 
     private boolean isFirstRowEmpty(final boolean[][] playfield) {
         final boolean[] row = playfield[0];
-        for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+        for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
             if (row[x]) {
                 return false;
             }
@@ -101,8 +104,7 @@ public class SeedFiller {
     // Halts early and returns true if it filled a full row (see push).
     private boolean fill(int x, int y) {
 
-        if (playfield[y][x] || x < 0 || x >= MonoGameState.PLAYFIELD_WIDTH || y < 0 
-                || y >= MonoGameState.PLAYFIELD_HEIGHT) {
+        if (playfield[y][x] || x < 0 || x >= PLAYFIELD_WIDTH || y < 0 || y >= PLAYFIELD_HEIGHT) {
             return false;
         }
 
@@ -145,7 +147,7 @@ public class SeedFiller {
             }
 
             do {
-                while (x < MonoGameState.PLAYFIELD_WIDTH && !row[x]) {
+                while (x < PLAYFIELD_WIDTH && !row[x]) {
                     playfield[y][x++] = true;
                 }
 

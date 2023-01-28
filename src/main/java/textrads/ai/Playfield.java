@@ -1,9 +1,10 @@
 package textrads.ai;
 
 import textrads.Offset;
+import textrads.Tetromino;
+
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
-import textrads.Tetromino;
 import static textrads.Tetromino.TETROMINOES;
 
 public interface Playfield {
@@ -21,7 +22,6 @@ public interface Playfield {
     }
 
     static void copy(final boolean[][] sourcePlayfield, final boolean[][] destinationPlayfield) {
-
         if (sourcePlayfield != destinationPlayfield) {
             for (int i = PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
                 System.arraycopy(sourcePlayfield[i], 0, destinationPlayfield[i], 0, PLAYFIELD_WIDTH);
@@ -29,19 +29,18 @@ public interface Playfield {
         }
     }
 
-    static int lock(final boolean[][] playfield, final int type, final int x,
-            final int y, final int orientation) {
-        return lock(playfield, playfield, type, x, y, orientation);
+    static int lock(final boolean[][] playfield, final int type, final int x, final int y, final int rotation) {
+        return lock(playfield, playfield, type, x, y, rotation);
     }
 
     static int lock(final boolean[][] sourcePlayfield, final boolean[][] destinationPlayfield, final int type, 
-            final int x, final int y, final int orientation) {
+            final int x, final int y, final int rotation) {
 
         int clearedLines = 0;
 
         copy(sourcePlayfield, destinationPlayfield);
 
-        final Tetromino tetromino = TETROMINOES[type][orientation];
+        final Tetromino tetromino = TETROMINOES[type][rotation];
         final Offset[] offsets = tetromino.offsets;
         for (int i = 3; i >= 0; --i) {
             final Offset offset = offsets[i];
@@ -50,8 +49,8 @@ public interface Playfield {
                 destinationPlayfield[Y][x + offset.x] = true;
             }
         }
-        outer:
-        for (int i = tetromino.minOffsetY; i <= tetromino.maxOffsetY; ++i) {
+        
+        outer: for (int i = tetromino.minOffsetY; i <= tetromino.maxOffsetY; ++i) {
             final int Y = y + i;
             if (Y >= 0) {
                 for (int j = PLAYFIELD_WIDTH - 1; j >= 0; --j) {
