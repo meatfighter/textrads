@@ -8,12 +8,14 @@ import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 import static textrads.MonoGameState.SPAWN_ROTATION;
 import static textrads.MonoGameState.SPAWN_X;
 import static textrads.MonoGameState.SPAWN_Y;
+import textrads.Tetromino;
+import static textrads.Tetromino.TETROMINOES;
 
 public class Searcher {
 
     private final Coordinate[][][][] matrix = Coordinate.createMatrix();
 
-    private Tetrimino[] tetriminos;
+    private Tetromino[] tetrominoes;
     private SearchListener listener;
 
     public void setSearchListener(final SearchListener listener) {
@@ -48,8 +50,8 @@ public class Searcher {
 
     public void search(final int type, final boolean[][] playfield) {
 
-        tetriminos = Tetrimino.TETRIMINOS[playfield.length][type];
-        Coordinate.resetMatrix(matrix, tetriminos.length);
+        tetrominoes = TETROMINOES[type];
+        Coordinate.resetMatrix(matrix, tetrominoes.length);
         Coordinate front = matrix[1][SPAWN_Y][SPAWN_X][SPAWN_ROTATION];
         if (!test(playfield, front, front, true, false, false, false, false)) {
             return;
@@ -66,7 +68,7 @@ public class Searcher {
                     }
                 }
                 final Coordinate p = front.previous;
-                if (!(level29 && (p.left || p.right || p.A || p.B))) {
+                if (!(p.left || p.right || p.A || p.B)) {
                     if (front.x != 0) { // left
                         Coordinate neighbor = matrix[1][front.y][front.x - 1][front.orientation];
                         if (test(playfield, neighbor, front, false, true, false, false,
@@ -82,7 +84,7 @@ public class Searcher {
                         }
                     }
                     { // rotate right
-                        final Coordinate neighbor = matrix[1][front.y][front.x][(front.orientation == tetriminos.length - 1) ? 0
+                        final Coordinate neighbor = matrix[1][front.y][front.x][(front.orientation == tetrominoes.length - 1) ? 0
                                 : (front.orientation + 1)];
                         if (test(playfield, neighbor, front, false, false, false, true,
                                 false)) {
@@ -90,7 +92,7 @@ public class Searcher {
                         }
                     }
                     { // rotate left
-                        final Coordinate neighbor = matrix[1][front.y][front.x][(front.orientation == 0) ? (tetriminos.length - 1)
+                        final Coordinate neighbor = matrix[1][front.y][front.x][(front.orientation == 0) ? (tetrominoes.length - 1)
                                 : (front.orientation - 1)];
                         if (test(playfield, neighbor, front, false, false, false, false,
                                 true)) {
@@ -136,12 +138,12 @@ public class Searcher {
         final int y = coordinate.y;
         final int orientation = coordinate.orientation;
 
-        final Tetrimino tetrimino = tetriminos[orientation];
-        if (!tetrimino.validPosition[y][x]) {
+        final Tetromino tetromino = tetrominoes[orientation];
+        if (!tetromino.validPosition[y + 2][x + 2]) {
             return false;
         }
 
-        final Offset[] offsets = tetrimino.offsets;
+        final Offset[] offsets = tetromino.offsets;
         for (int i = 3; i >= 0; --i) {
             final Offset offset = offsets[i];
             final int X = x + offset.x;

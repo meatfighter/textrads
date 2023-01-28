@@ -3,6 +3,8 @@ package textrads.ai;
 import textrads.Offset;
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
+import textrads.Tetromino;
+import static textrads.Tetromino.TETROMINOES;
 
 public interface Playfield {
 
@@ -39,8 +41,8 @@ public interface Playfield {
 
         copy(sourcePlayfield, destinationPlayfield);
 
-        final Tetrimino tetrimino = TETRIMINOS[PLAYFIELD_HEIGHT][type][orientation];
-        final Offset[] offsets = tetrimino.offsets;
+        final Tetromino tetromino = TETROMINOES[type][orientation];
+        final Offset[] offsets = tetromino.offsets;
         for (int i = 3; i >= 0; --i) {
             final Offset offset = offsets[i];
             final int Y = y + offset.y;
@@ -49,7 +51,7 @@ public interface Playfield {
             }
         }
         outer:
-        for (int i = tetrimino.minOffsetY; i <= tetrimino.maxOffsetY; ++i) {
+        for (int i = tetromino.minOffsetY; i <= tetromino.maxOffsetY; ++i) {
             final int Y = y + i;
             if (Y >= 0) {
                 for (int j = PLAYFIELD_WIDTH - 1; j >= 0; --j) {

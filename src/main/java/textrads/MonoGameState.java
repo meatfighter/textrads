@@ -164,7 +164,7 @@ public class MonoGameState implements Serializable {
             return false;
         }
         final Tetromino tetromino = Tetromino.TETROMINOES[tetrominoType][rotation];
-        if (!tetromino.validPosition[y][x]) {
+        if (!tetromino.validPosition[y + 2][x + 2]) {
             return false;
         }
         for (final Offset offset : tetromino.offsets) {

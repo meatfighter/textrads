@@ -9,6 +9,7 @@ import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 import static textrads.MonoGameState.SPAWN_X;
 import static textrads.MonoGameState.SPAWN_Y;
+import static textrads.Tetromino.TETROMINOES;
 import static textrads.ai.Playfield.createPlayfield;
 import static textrads.ai.Playfield.lock;
 
@@ -57,7 +58,7 @@ public class SearchChain {
             this.x1 = x;
             this.y1 = y;
             this.o1 = o;
-            lockHeight1 = TETRIMINOS[height][type1][o].getLockHeight(y);
+            lockHeight1 = TETROMINOES[type1][o].getLockHeight(y);
             linesCleared1 = lock(playfield, playfield1, type1, x, y, o);
             if (seedFiller.canClearMoreLines(playfield1)) {
                 searcher2.search(type2, playfield1);
@@ -65,7 +66,7 @@ public class SearchChain {
         });
 
         searcher2.setSearchListener((x, y, o) -> {
-            lockHeight2 = TETRIMINOS[height][type2][o].getLockHeight(y);
+            lockHeight2 = TETROMINOES[type2][o].getLockHeight(y);
             linesCleared2 = lock(playfield1, playfield2, type2, x, y, o);
             if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {
                 evaluate();
@@ -114,7 +115,7 @@ public class SearchChain {
 
     private boolean canAllTypesSpawn(final boolean[][] playfield) {
         for (int i = 6; i >= 0; --i) {
-            final Offset[] offsets = TETRIMINOS[playfield.length][i][0].offsets;
+            final Offset[] offsets = TETROMINOES[i][0].offsets;
             for (int j = 3; j >= 0; --j) {
                 final Offset o = offsets[j];
                 if (playfield[SPAWN_Y + o.y][SPAWN_X + o.x]) {
