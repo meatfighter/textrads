@@ -1,5 +1,6 @@
 package textrads;
 
+import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
@@ -7,104 +8,98 @@ import textrads.util.RenderUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
 
-    private final Dimensions DIMENSIONS_WITH_ATTACK_BAR = new Dimensions(64, 42);
-    private final Dimensions DIMENSIONS_WITHOUT_ATTACK_BAR = new Dimensions(61, 42);
+    private final Dimensions DIMENSIONS = new Dimensions(64, 42);
     
     @Override
-    public Dimensions getDimensions(final boolean attackBar) {
-        return attackBar ? DIMENSIONS_WITH_ATTACK_BAR : DIMENSIONS_WITHOUT_ATTACK_BAR;
+    public Dimensions getDimensions() {
+        return DIMENSIONS;
     }
 
     @Override
     public void render(final TextGraphics g, final MonoGameState state, final int x, final int y, 
-            final boolean attackBar) {
+            final boolean showWins) {
         
         g.setBackgroundColor(EMPTY_COLOR);
         g.setForegroundColor(LINE_COLOR);
-        
-        int ox = x;
-        if (attackBar) {            
-            for (int i = 1; i < 41; ++i) {
-                g.putString(ox, y + i, "\u2503");            
-            }
-            g.putString(ox, y, "\u257B");
-            g.putString(ox, y + 41, "\u2517");
-            g.putString(ox + 1, y + 41, "\u2501");
-            g.putString(ox + 2, y + 41, "\u2501");
-            
-            g.setBackgroundColor(ATTACK_COLOR);
-            for (int i = state.getAttackRows() - 1; i >= 0; --i) {
-                g.putString(ox + 1, y + 40 - 2 * i, "  ");
-                g.putString(ox + 1, y + 39 - 2 * i, "  ");
-            }
-            
-            g.setBackgroundColor(EMPTY_COLOR);
-            ox += 3;
-        }
-        
+                  
         for (int i = 1; i < 41; ++i) {
-            g.putString(ox, y + i, "\u2503");            
+            g.setCharacter(x, y + i, Symbols.SINGLE_LINE_VERTICAL);            
+        }
+        g.setCharacter(x, y, Symbols.SINGLE_LINE_TOP_LEFT_CORNER);
+        g.putString(x + 1, y, "\u2500\u2500");
+        g.setCharacter(x, y + 41, Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER);
+        g.putString(x + 1, y + 41, "\u2500\u2500");
+
+        g.setBackgroundColor(ATTACK_COLOR);
+        for (int i = state.getAttackRows() - 1; i >= 0; --i) {
+            g.putString(x + 1, y + 40 - 2 * i, "  ");
+            g.putString(x + 1, y + 39 - 2 * i, "  ");
+        }
+
+        g.setBackgroundColor(EMPTY_COLOR);        
+        for (int i = 1; i < 41; ++i) {
+            g.setCharacter(x + 3, y + i, Symbols.SINGLE_LINE_VERTICAL);            
         }
         for (int i = 0; i < 40; ++i) {
-            g.putString(ox + i + 1, y + 41, "\u2501");
+            g.setCharacter(x + i + 4, y + 41, Symbols.SINGLE_LINE_HORIZONTAL);
         }
         for (int i = 1; i < 29; ++i) {
-            g.putString(ox + 41, y + i, "\u2503");
-            g.putString(ox + 60, y + i, "\u2503");
+            g.setCharacter(x + 44, y + i, Symbols.SINGLE_LINE_VERTICAL);
+            g.setCharacter(x + 63, y + i, Symbols.SINGLE_LINE_VERTICAL);
         }
         for (int i = 30; i < 42; ++i) {
-            g.putString(ox + 41, y + i, "\u2503");
+            g.setCharacter(x + 44, y + i, Symbols.SINGLE_LINE_VERTICAL);
         }
         for (int i = 42; i < 60; ++i) {
-            g.putString(ox + i, y, "\u2501");
-            g.putString(ox + i, y + 29, "\u2501");
+            g.setCharacter(x + i + 3, y, Symbols.SINGLE_LINE_HORIZONTAL);
+            g.setCharacter(x + i + 3, y + 29, Symbols.SINGLE_LINE_HORIZONTAL);
         }
-        g.putString(ox, y, "\u257B");
-        g.putString(ox, y + 41, attackBar ? "\u253B" : "\u2517");
-        g.putString(ox + 41, y + 41, "\u251B");
-        g.putString(ox + 41, y, "\u250F");
-        g.putString(ox + 60, y, "\u2513");
-        g.putString(ox + 41, y + 29, "\u2523");
-        g.putString(ox + 60, y + 29, "\u251B");
+        g.setCharacter(x + 3, y, Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
+        g.setCharacter(x + 3, y + 41, Symbols.SINGLE_LINE_T_UP);
+        g.setCharacter(x + 44, y + 41, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);
+        g.setCharacter(x + 44, y, Symbols.SINGLE_LINE_TOP_LEFT_CORNER);
+        g.setCharacter(x + 63, y, Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
+        g.setCharacter(x + 44, y + 29, Symbols.SINGLE_LINE_T_RIGHT);
+        g.setCharacter(x + 63, y + 29, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);      
         
         g.setForegroundColor(LABEL_COLOR);
-        final int oy = y + (attackBar ? 31 : 32);
-        g.putString(ox + 43, oy, "Score");
-        g.putString(ox + 43, oy + 2, "Time");
-        g.putString(ox + 43, oy + 4, "Level");
-        g.putString(ox + 43, oy + 6, "Lines");
-        if (attackBar) {
-            g.putString(ox + 43, oy + 8, "Wins");
+        final int oy = y + (showWins ? 31 : 32);
+        g.putString(x + 46, oy, "Score");
+        g.putString(x + 46, oy + 2, "Time");
+        g.putString(x + 46, oy + 4, "Level");
+        g.putString(x + 46, oy + 6, "Lines");
+        if (showWins) {
+            g.putString(x + 46, oy + 8, "Wins");
         }
 
         g.setForegroundColor(VALUE_COLOR);
-        g.putString(ox + 49, oy, Integer.toString(state.getScore()));
-        g.putString(ox + 48, oy + 2, RenderUtil.formatTime(state.getGameState().getUpdates()));
-        g.putString(ox + 49, oy + 4, Integer.toString(state.getLevel()));
-        g.putString(ox + 49, oy + 6, Integer.toString(state.getLines()));
-        if (attackBar) {
-            g.putString(ox + 49, oy + 8, Integer.toString(state.getWins()));
+        g.putString(x + 52, oy, Integer.toString(state.getScore()));
+        g.putString(x + 51, oy + 2, RenderUtil.formatTime(state.getGameState().getUpdates()));
+        g.putString(x + 52, oy + 4, Integer.toString(state.getLevel()));
+        g.putString(x + 52, oy + 6, Integer.toString(state.getLines()));
+        if (showWins) {
+            g.putString(x + 52, oy + 8, Integer.toString(state.getWins()));
         }        
                 
         final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                 g.setBackgroundColor(BLOCK_COLORS[playfield[i][j]]);
-                g.putString(ox + 1 + 4 * j, y + 1 + 2 * i, "    ");
-                g.putString(ox + 1 + 4 * j, y + 2 + 2 * i, "    ");
+                g.putString(x + 4 + 4 * j, y + 1 + 2 * i, "    ");
+                g.putString(x + 4 + 4 * j, y + 2 + 2 * i, "    ");
             }
         }
         
         final List<Byte> nexts = state.getNexts();
         for (int i = 0; i < 5; ++i) {
             final int type = nexts.get(i);
-            drawTetromino(g, ox + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 47 : 49), 
+            drawTetromino(g, x + ((type == Tetrominoes.I_TYPE || type == Tetrominoes.O_TYPE) ? 50 : 52), 
                     y + 1 + 6 * i, type, 0);
         }
         
         switch (state.getMode()) {
             case MonoGameState.TETROMINO_FALLING_MODE:
-                drawTetromino(g, ox + 1 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
+                drawTetromino(g, x + 4 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),
                         state.getLockTimer() < 2 ? FLASH_COLOR : BLOCK_COLORS[state.getTetrominoType() + 1]);                
                 break;
@@ -114,8 +109,8 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                     g.setBackgroundColor(FLASH_COLOR);
                     for (final int lineY : state.getLineYs()) {
                         for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
-                            g.putString(ox + 1 + 4 * j, y + 2 * lineY + 1, "    ");
-                            g.putString(ox + 1 + 4 * j, y + 2 * lineY + 2, "    ");
+                            g.putString(x + 4 + 4 * j, y + 2 * lineY + 1, "    ");
+                            g.putString(x + 4 + 4 * j, y + 2 * lineY + 2, "    ");
                         }
                     }
                 }
@@ -124,7 +119,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
             case MonoGameState.GAME_OVER_MODE: {
                 final int t = state.getGameOverTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
-                    drawTetromino(g, ox + 1 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
+                    drawTetromino(g, x + 4 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
                             state.getTetrominoType(), state.getTetrominoRotation(),
                             BLOCK_COLORS[state.getTetrominoType() + 1]);                    
                 } else if (t >= 90) {
@@ -132,8 +127,8 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                     final int start = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89));
                     for (int i = start; i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
                         for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {                            
-                            g.putString(ox + 1 + 4 * j, y + 1 + 2 * i, "    ");
-                            g.putString(ox + 1 + 4 * j, y + 2 + 2 * i, "    ");
+                            g.putString(x + 4 + 4 * j, y + 1 + 2 * i, "    ");
+                            g.putString(x + 4 + 4 * j, y + 2 + 2 * i, "    ");
                         }
                     }
                 }

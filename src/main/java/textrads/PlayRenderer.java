@@ -16,15 +16,14 @@ public class PlayRenderer {
         g.setBackgroundColor(BACKGROUND_COLOR);
         g.fill(' ');
         
-        final boolean showAttackBar = true;
         MonoGameRenderer renderer = bigRenderer;
-        Dimensions dims = renderer.getDimensions(showAttackBar);
+        Dimensions dims = renderer.getDimensions();
         if (dims.getWidth() > size.getColumns() || dims.getHeight() > size.getRows()) {
             renderer = smallRenderer;
-            dims = renderer.getDimensions(showAttackBar);            
+            dims = renderer.getDimensions();            
         }
               
-        renderer.render(g, state, (size.getColumns() - dims.getWidth()) / 2, (size.getRows() - dims.getHeight()) / 2, 
-                true);
+        renderer.render(g, state, (size.getColumns() - dims.getWidth()) / 2, (size.getRows() - dims.getHeight()) / 2,
+                false);
     }
 }

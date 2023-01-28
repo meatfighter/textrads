@@ -35,6 +35,6 @@ public abstract class MonoGameRenderer {
         GARBAGE_COLOR, // 8
     };    
     
-    public abstract Dimensions getDimensions(boolean attackBar);
-    public abstract void render(TextGraphics g, MonoGameState state, int x, int y, boolean attackBar);    
+    public abstract Dimensions getDimensions();
+    public abstract void render(TextGraphics g, MonoGameState state, int x, int y, boolean showWins);    
 }
