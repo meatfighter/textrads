@@ -25,9 +25,9 @@ public class MonoGameState implements Serializable {
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20; 
     
-    private static final int SPAWN_X = 4;
-    private static final int SPAWN_Y = 0;
-    private static final int SPAWN_ROTATION = 0;
+    public static final int SPAWN_X = 4;
+    public static final int SPAWN_Y = 0;
+    public static final int SPAWN_ROTATION = 0;
     
     private static final byte EMPTY_BLOCK = 0;
     private static final byte GARBAGE_BLOCK = 8;

@@ -12,7 +12,6 @@ public class GameState implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private static final int MIN_OBJECT_SIZE = 64 * 1024;
-    private static final int MAX_OBJECT_LENGTH = 1024 * 1024;
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
