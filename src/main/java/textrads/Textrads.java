@@ -5,7 +5,10 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import textrads.ai.SearchChain;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
 
@@ -23,6 +26,12 @@ public class Textrads {
     private final Client client = new Client();
     private final PlayRenderer playRenderer = new PlayRenderer();
     private final InputEventList eventList = new InputEventList();
+    
+    private final SearchChain searchChain = new SearchChain();
+    private byte lastMode = MonoGameState.DISABLED_MODE;
+    private final boolean[][] playfield = new boolean[MonoGameState.PLAYFIELD_HEIGHT][MonoGameState.PLAYFIELD_WIDTH];
+    private final List<Byte> moves = new ArrayList<>();
+    private float moveTimer;
     
     public void launch() throws Exception {
         
@@ -76,14 +85,49 @@ public class Textrads {
     }
     
     private void update() {
-        client.update();
-        server.update();
-        
-        final GameState state = GameStateSource.getState();
-        InputEventSource.poll(eventList);
-        for (int i = 0; i < eventList.size(); ++i) {
-            state.handleInputEvent(eventList.get(i), 0);
+//        client.update();
+//        server.update();
+//        
+//        final GameState state = GameStateSource.getState();
+//        InputEventSource.poll(eventList);
+//        for (int i = 0; i < eventList.size(); ++i) {
+//            state.handleInputEvent(eventList.get(i), 0);
+//        }
+//        state.update();
+
+        final MonoGameState state = GameStateSource.getState().getStates()[0];
+        if (lastMode != MonoGameState.TETROMINO_FALLING_MODE 
+                && state.getMode() == MonoGameState.TETROMINO_FALLING_MODE) { 
+            System.out.println("--1");
+            final byte[][] p = state.getPlayfield();
+            for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                    playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
+                }
+            }                        
+            searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
+                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
+            if (searchChain.isBestFound()) {
+                searchChain.getMoves(moves);
+                System.out.println(moves);
+            } else {
+                moves.clear();
+            }
+            moveTimer = 1;
+            System.out.println("--2");
         }
+        lastMode = state.getMode();
+        
+        if (state.getMode() == MonoGameState.TETROMINO_FALLING_MODE) {
+            if (--moveTimer <= 0) {
+                moveTimer += state.getFramesPerGravityDrop() / 2;
+                if (!moves.isEmpty()) {
+                    System.out.format("Apply: %s%n", moves.get(0));
+                    state.handleInputEvent(moves.remove(0));
+                }
+            }          
+        }
+        
         state.update();
     }
     

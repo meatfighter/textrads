@@ -7,11 +7,11 @@ import textrads.Tetromino;
 public class Coordinate {
 
     public static Coordinate[][][] createMatrix() {
-        final Coordinate[][][] matrix = new Coordinate[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH][4];
-        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+        final Coordinate[][][] matrix = new Coordinate[PLAYFIELD_HEIGHT + 4][PLAYFIELD_WIDTH + 4][4];
+        for (int y = PLAYFIELD_HEIGHT + 3; y >= 0; --y) {
+            for (int x = PLAYFIELD_WIDTH + 3; x >= 0; --x) {
                 for (int rotation = 3; rotation >= 0; --rotation) {
-                    matrix[y][x][rotation] = new Coordinate(x, y, rotation);
+                    matrix[y][x][rotation] = new Coordinate(x - 2, y - 2, rotation);
                 }
             }
         }
@@ -22,9 +22,9 @@ public class Coordinate {
 
         final int rotationMax = type == Tetromino.O_TYPE ? 3 : 0;
 
-        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+        for (int y = PLAYFIELD_HEIGHT + 3; y >= 0; --y) {
             final Coordinate[][] cy = matrix[y];
-            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+            for (int x = PLAYFIELD_WIDTH + 3; x >= 0; --x) {
                 final Coordinate[] cx = cy[x];
                 for (int rotation = rotationMax; rotation >= 0; --rotation) {
                     final Coordinate c = cx[rotation];

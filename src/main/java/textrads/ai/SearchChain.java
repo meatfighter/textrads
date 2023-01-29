@@ -1,5 +1,8 @@
 package textrads.ai;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import textrads.Offset;
 import java.util.List;
 
@@ -14,6 +17,19 @@ import static textrads.ai.Playfield.createPlayfield;
 import static textrads.ai.Playfield.lock;
 
 public class SearchChain {
+    
+    private static final double[] WEIGHTS = new double[17];
+    
+    static {
+        try (final DataInputStream in = new DataInputStream(new BufferedInputStream(
+                SearchChain.class.getResourceAsStream("/weights.dat")))) {
+            for (int i = 0; i < WEIGHTS.length; ++i) {
+                WEIGHTS[i] = in.readDouble();
+            }
+        } catch (final IOException ignored) {
+            ignored.printStackTrace(); // TODO REMOVE
+        }
+    }
 
     private final boolean[][] playfield1;
     private final boolean[][] playfield2;
@@ -23,8 +39,6 @@ public class SearchChain {
     private final SeedFiller seedFiller;
 
     private final int[] columnMinY = new int[PLAYFIELD_WIDTH];
-
-    private double[] weights;
 
     private boolean[][] playfield;
     private int type1;
@@ -38,13 +52,13 @@ public class SearchChain {
 
     private int x1;
     private int y1;
-    private int o1;
+    private int rotation1;
 
     private boolean bestFound;
     private double bestScore;
     private int bestX;
     private int bestY;
-    private int bestO;
+    private int bestRotation;
 
     public SearchChain() {
 
@@ -58,7 +72,7 @@ public class SearchChain {
                 framesPerMove) -> {
             this.x1 = tetrominoX;
             this.y1 = tetrominoY;
-            this.o1 = tetrominoRotation;
+            this.rotation1 = tetrominoRotation;
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
             if (seedFiller.canClearMoreLines(playfield1)) {
@@ -76,10 +90,6 @@ public class SearchChain {
         });
     }
 
-    public void setWeights(final double[] weights) {
-        this.weights = weights;
-    }
-
     public boolean isBestFound() {
         return bestFound;
     }
@@ -92,12 +102,12 @@ public class SearchChain {
         return bestY;
     }
 
-    public int getOrientation() {
-        return bestO;
+    public int getRotation() {
+        return bestRotation;
     }
 
     public void getMoves(final List<Byte> moves) {
-        searcher1.getMoves(bestX, bestY, bestO, moves);
+        searcher1.getMoves(bestX, bestY, bestRotation, moves);
     }
 
     public void search(final int currentType, final int nextType, final boolean[][] playfield, 
@@ -262,23 +272,23 @@ public class SearchChain {
         }
 
         double score
-                = weights[0] * totalLinesCleared
-                + weights[1] * totalLockHeight
-                + weights[2] * totalWellCells
-                + weights[3] * totalDeepWells
-                + weights[4] * totalColumnHoles
-                + weights[5] * totalWeightedColumnHoles
-                + weights[6] * totalColumnHoleDepths
-                + weights[7] * minColumnHoleDepth
-                + weights[8] * maxColumnHoleDepth
-                + weights[9] * totalColumnTransitions
-                + weights[10] * totalRowTransitions
-                + weights[11] * totalColumnHeights
-                + weights[12] * pileHeight
-                + weights[13] * columnHeightSpread
-                + weights[14] * totalSolidCells
-                + weights[15] * totalWeightedSolidCells
-                + weights[16] * columnHeightVariance;
+                = WEIGHTS[0] * totalLinesCleared
+                + WEIGHTS[1] * totalLockHeight
+                + WEIGHTS[2] * totalWellCells
+                + WEIGHTS[3] * totalDeepWells
+                + WEIGHTS[4] * totalColumnHoles
+                + WEIGHTS[5] * totalWeightedColumnHoles
+                + WEIGHTS[6] * totalColumnHoleDepths
+                + WEIGHTS[7] * minColumnHoleDepth
+                + WEIGHTS[8] * maxColumnHoleDepth
+                + WEIGHTS[9] * totalColumnTransitions
+                + WEIGHTS[10] * totalRowTransitions
+                + WEIGHTS[11] * totalColumnHeights
+                + WEIGHTS[12] * pileHeight
+                + WEIGHTS[13] * columnHeightSpread
+                + WEIGHTS[14] * totalSolidCells
+                + WEIGHTS[15] * totalWeightedSolidCells
+                + WEIGHTS[16] * columnHeightVariance;
 
         for (int y = min(6, PLAYFIELD_HEIGHT - 1); y >= minColumnY; --y) {
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
@@ -297,7 +307,7 @@ public class SearchChain {
             bestScore = score;
             bestX = x1;
             bestY = y1;
-            bestO = o1;
+            bestRotation = rotation1;
         }
     }
 }
