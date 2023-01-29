@@ -501,4 +501,12 @@ public class MonoGameState implements Serializable {
     public GameState getGameState() {
         return gameState;
     }
+
+    public float getFramesPerGravityDrop() {
+        return framesPerGravityDrop;
+    }
+
+    public byte getFramesPerLock() {
+        return framesPerLock;
+    }
 }

@@ -187,7 +187,8 @@ public final class Searcher {
                             }
                         } else {
                             if (listener != null) {
-                                listener.locked(tetrominoX, y, tetrominoRotation);
+                                listener.locked(tetrominoX, y, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
+                                        framesPerMove);
                             }
                             break inner;
                         }
@@ -200,7 +201,8 @@ public final class Searcher {
                         c.moveTimer = front.moveTimer + framesPerMove - timePassed;
                     } else {
                         if (listener != null) {
-                            listener.locked(tetrominoX, tetrominoY, tetrominoRotation);
+                            listener.locked(tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, 
+                                    framesPerLock, framesPerMove);
                         }
                     }
                     
@@ -242,7 +244,8 @@ public final class Searcher {
                 case LOCK:
                     
                     if (listener != null) {
-                        listener.locked(tetrominoX, tetrominoY, tetrominoRotation);
+                        listener.locked(tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
+                                framesPerMove);
                     }
                     
                     break;

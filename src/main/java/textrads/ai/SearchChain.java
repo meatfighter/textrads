@@ -54,20 +54,22 @@ public class SearchChain {
         searcher2 = new Searcher();
         seedFiller = new SeedFiller();
 
-        searcher1.setSearchListener((x, y, o) -> {
-            this.x1 = x;
-            this.y1 = y;
-            this.o1 = o;
-            lockHeight1 = TETROMINOES[type1][o].getLockHeight(y);
-            linesCleared1 = lock(playfield, playfield1, type1, x, y, o);
+        searcher1.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
+                framesPerMove) -> {
+            this.x1 = tetrominoX;
+            this.y1 = tetrominoY;
+            this.o1 = tetrominoRotation;
+            lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
+            linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
             if (seedFiller.canClearMoreLines(playfield1)) {
-                searcher2.search(type2, playfield1);
+                searcher2.search(type2, playfield1, framesPerGravityDrop, framesPerLock, framesPerMove);
             }
         });
 
-        searcher2.setSearchListener((x, y, o) -> {
-            lockHeight2 = TETROMINOES[type2][o].getLockHeight(y);
-            linesCleared2 = lock(playfield1, playfield2, type2, x, y, o);
+        searcher2.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
+                framesPerMove) -> {
+            lockHeight2 = TETROMINOES[type2][tetrominoRotation].getLockHeight(tetrominoY);
+            linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);
             if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {
                 evaluate();
             }
@@ -94,12 +96,12 @@ public class SearchChain {
         return bestO;
     }
 
-    public void getMoves(final List<Coordinate> moves) {
+    public void getMoves(final List<Byte> moves) {
         searcher1.getMoves(bestX, bestY, bestO, moves);
     }
 
-    public void search(final int currentType, final int nextType,
-            final boolean[][] playfield) {
+    public void search(final int currentType, final int nextType, final boolean[][] playfield, 
+            final float framesPerGravityDrop, final byte framesPerLock, final float framesPerMove) {
 
         if (seedFiller.canClearMoreLines(playfield)) {
             this.playfield = playfield;
@@ -109,7 +111,7 @@ public class SearchChain {
             bestFound = false;
             bestScore = Double.MAX_VALUE;
 
-            searcher1.search(currentType, playfield);
+            searcher1.search(currentType, playfield, framesPerGravityDrop, framesPerLock, framesPerMove);
         }
     }
 
