@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import textrads.InputEvent;
+import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 
 import textrads.Tetromino;
 
@@ -79,18 +80,130 @@ public class Searcher {
 //        coordinate.inputEvent = inputEvent;
 
         do {
-            outer: {
-                if (front.dropFailed) {
-                    if (front.lockTimer <= front.moveTimer) {
-                        // TODO LOCK
-                        break outer;
-                    } 
-                } else if (front.gravityDropTimer <= front.moveTimer) {
-                    // TODO DROP
-                    break outer;
+            
+            final int tetrominoX = front.x;
+            final int tetrominoY = front.y;
+            final int tetrominoRotation = front.rotation;            
+            float gravityDropTimer = front.gravityDropTimer;
+            int lockTimer = front.lockTimer;
+            boolean dropFailed = front.dropFailed;
+            float moveTimer = front.moveTimer;
+            
+            outer: while (true) {
+                if (moveTimer <= 0) {
+                    
+                    moveTimer += framesPerMove;
+                    
+                    // shift left
+                    inner: if (tetrominoX != 0) { 
+                        final Coordinate c = matrix[tetrominoY][tetrominoX - 1][tetrominoRotation];
+                        if (!(c.previous == null && testPosition(playfield, c))) {
+                            break inner;
+                        }
+                        c.previous = front;
+                        rear = rear.next = c;                         
+                        c.inputEvent = InputEvent.SHIFT_LEFT_PRESSED;                         
+                        c.gravityDropTimer = gravityDropTimer;
+                        c.lockTimer = lockTimer;
+                        c.dropFailed = dropFailed;
+                        c.moveTimer = moveTimer;                         
+                    }
+                    
+                    // shift right
+                    inner: if (tetrominoX != PLAYFIELD_WIDTH - 1) { 
+                        final Coordinate c = matrix[tetrominoY][tetrominoX + 1][tetrominoRotation];
+                        if (!(c.previous == null && testPosition(playfield, c))) {
+                            break inner;
+                        }
+                        c.previous = front;
+                        rear = rear.next = c;                         
+                        c.inputEvent = InputEvent.SHIFT_RIGHT_PRESSED;                         
+                        c.gravityDropTimer = gravityDropTimer;
+                        c.lockTimer = lockTimer;
+                        c.dropFailed = dropFailed;
+                        c.moveTimer = moveTimer;                         
+                    }
+
+                    if (type != Tetromino.O_TYPE) {
+                        
+                        // rotate CCW
+                        inner: {
+                            final int rotation = (tetrominoRotation == 0) ? 3 : tetrominoRotation - 1;
+                            Coordinate c = matrix[tetrominoY][tetrominoX][rotation];
+                            if (testPosition(playfield, c)) {
+                                if (c.previous != null) {
+                                    break inner;
+                                }
+                            } else {
+                                final Offset o = Tetromino.CCW[tetrominoRotation];
+                                c = matrix[tetrominoY + o.y][tetrominoX + o.x][rotation];
+                                if (!(c.previous == null && testPosition(playfield, c))) {
+                                    break inner;
+                                }
+                            }
+                            c.previous = front;
+                            rear = rear.next = c;                         
+                            c.inputEvent = InputEvent.ROTATE_CCW_PRESSED;                         
+                            c.gravityDropTimer = gravityDropTimer;
+                            c.lockTimer = lockTimer;
+                            c.dropFailed = dropFailed;
+                            c.moveTimer = moveTimer;
+                        }
+                        
+                        // rotate CW
+                        inner: {
+                            final int rotation = (tetrominoRotation == 3) ? 0 : tetrominoRotation + 1;
+                            Coordinate c = matrix[tetrominoY][tetrominoX][rotation];
+                            if (testPosition(playfield, c)) {
+                                if (c.previous != null) {
+                                    break inner;
+                                }
+                            } else {
+                                final Offset o = Tetromino.CW[tetrominoRotation];
+                                c = matrix[tetrominoY + o.y][tetrominoX + o.x][rotation];
+                                if (!(c.previous == null && testPosition(playfield, c))) {
+                                    break inner;
+                                }
+                            }
+                            c.previous = front;
+                            rear = rear.next = c;                         
+                            c.inputEvent = InputEvent.ROTATE_CW_PRESSED;                         
+                            c.gravityDropTimer = gravityDropTimer;
+                            c.lockTimer = lockTimer;
+                            c.dropFailed = dropFailed;
+                            c.moveTimer = moveTimer;
+                        }                        
+                    }
+                    
+                    // soft drop
+                    inner: if (tetrominoY != PLAYFIELD_HEIGHT - 1) {
+                        final int y = tetrominoY + 1;
+                        final Coordinate c = matrix[y][tetrominoX][tetrominoRotation];
+                        if (testPosition(playfield, c)) {
+                            if (c.previous != null) {
+                                break inner;
+                            }
+                        } else {
+                            if (listener != null) {
+                                listener.locked(tetrominoX, y, tetrominoRotation);
+                            }
+                            break inner;
+                        }
+                        c.previous = front;
+                        rear = rear.next = c;                         
+                        c.inputEvent = InputEvent.SOFT_DROP_PRESSED;                         
+                        c.gravityDropTimer = framesPerGravityDrop;
+                        c.lockTimer = framesPerLock;
+                        c.dropFailed = false;
+                        c.moveTimer = moveTimer;
+                    } else {
+                        if (listener != null) {
+                            listener.locked(tetrominoX, tetrominoY, tetrominoRotation);
+                        }
+                    }
+                    
+                    break;
                 }
-                
-                // TODO MOVE
             }
             
             front = front.next;
@@ -144,7 +257,7 @@ public class Searcher {
                     }
                 }
                 if (locked && listener != null) {
-                    listener.placed(front.x, front.y, front.rotation);
+                    listener.locked(front.x, front.y, front.rotation);
                 }
             }
 
@@ -154,11 +267,13 @@ public class Searcher {
 
     private boolean testPosition(final boolean[][] playfield, final Coordinate coordinate) {
 
-        final int x = coordinate.x;
         final int y = coordinate.y;
-        final int orientation = coordinate.rotation;
-
-        final Tetromino tetromino = tetrominoes[orientation];
+        if (y < 0) {
+            return false;
+        }
+                       
+        final Tetromino tetromino = tetrominoes[coordinate.rotation];
+        final int x = coordinate.x; 
         if (!tetromino.validPosition[y + 2][x + 2]) {
             return false;
         }
@@ -166,9 +281,8 @@ public class Searcher {
         final Offset[] offsets = tetromino.offsets;
         for (int i = 3; i >= 0; --i) {
             final Offset offset = offsets[i];
-            final int X = x + offset.x;
-            final int Y = y + offset.y;
-            if (Y >= 0 && playfield[Y][X]) {
+            final int by = y + offset.y;
+            if (by >= 0 && playfield[by][x + offset.x]) {
                 return false;
             }
         }

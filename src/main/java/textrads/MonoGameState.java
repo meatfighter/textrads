@@ -282,6 +282,7 @@ public class MonoGameState implements Serializable {
         final int y = tetrominoY + 1;
         if (testPosition(tetrominoRotation, tetrominoX, y)) {
             tetrominoY = (byte) y;
+            dropFailed = false;
             gravityDropTimer = framesPerGravityDrop;
             lockTimer = framesPerLock;
             incrementScore(1);

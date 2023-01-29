@@ -43,7 +43,7 @@ public class Coordinate {
 
     public byte inputEvent;          // input that got the tetromino here
     public float gravityDropTimer;   // when the tetromino arrived here
-    public byte lockTimer;           // when the tetromino arrived here
+    public int lockTimer;            // when the tetromino arrived here
     public boolean dropFailed;       // when the tetromino arrived here
     public float moveTimer;          // when the tetromino arrived here
 
