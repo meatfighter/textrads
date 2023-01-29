@@ -103,14 +103,14 @@ public class SearchChain {
     public void search(final int currentType, final int nextType, final boolean[][] playfield, 
             final float framesPerGravityDrop, final byte framesPerLock, final float framesPerMove) {
 
+        this.playfield = playfield;
+        this.type1 = currentType;
+        this.type2 = nextType;
+
+        bestFound = false;
+        bestScore = Double.MAX_VALUE;        
+        
         if (seedFiller.canClearMoreLines(playfield)) {
-            this.playfield = playfield;
-            this.type1 = currentType;
-            this.type2 = nextType;
-
-            bestFound = false;
-            bestScore = Double.MAX_VALUE;
-
             searcher1.search(currentType, playfield, framesPerGravityDrop, framesPerLock, framesPerMove);
         }
     }
