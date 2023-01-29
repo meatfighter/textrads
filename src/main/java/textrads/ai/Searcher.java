@@ -204,6 +204,8 @@ public class Searcher {
                     
                     break;
                 }
+                
+                
             }
             
             front = front.next;
