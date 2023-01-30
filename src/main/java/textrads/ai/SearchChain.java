@@ -53,12 +53,14 @@ public class SearchChain {
     private int x1;
     private int y1;
     private int rotation1;
+    private int dropFailed1;
 
     private boolean bestFound;
     private double bestScore;
     private int bestX;
     private int bestY;
     private int bestRotation;
+    private int bestDropFailed;
 
     public SearchChain() {
 

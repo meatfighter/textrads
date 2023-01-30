@@ -70,4 +70,22 @@ public interface Playfield {
 
         return clearedLines;
     }
+    
+    static void print(final boolean[][] playfield) {
+        System.out.println(toString(playfield));
+    }
+    
+    static String toString(final boolean[][] playfield) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("    0 1 2 3 4 5 6 7 8 9").append(System.lineSeparator());
+        for (int y = 0; y < PLAYFIELD_HEIGHT; ++y) {
+            sb.append(String.format("%02d ", y));
+            for (int x = 0; x < PLAYFIELD_WIDTH; ++x) {
+                sb.append(playfield[y][x] ? "XX" : " .");
+            }
+            sb.append(String.format(" %02d%n", y));
+        }    
+        sb.append("    0 1 2 3 4 5 6 7 8 9").append(System.lineSeparator());
+        return sb.toString();
+    }
 }
