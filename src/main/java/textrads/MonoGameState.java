@@ -73,7 +73,8 @@ public class MonoGameState implements Serializable {
     private byte lineClearTimer;
     private byte gameOverTimer;
     
-    private boolean newlySpawened;
+    private boolean justSpawned;
+    private boolean rejectSoftDropRepeated;
     
     private byte garbageX;
     private byte garbageCounter;
@@ -89,7 +90,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 0;
+        level = 25; // TODO
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -102,7 +103,8 @@ public class MonoGameState implements Serializable {
         dropFailed = false;
         lineClearTimer = 0;
         gameOverTimer = 0;
-        newlySpawened = false;
+        justSpawned = false;
+        rejectSoftDropRepeated = false;
         garbageX = 0;
         garbageCounter = 0;
         mode = TETROMINO_FALLING_MODE;
@@ -211,11 +213,11 @@ public class MonoGameState implements Serializable {
                 attemptShiftRight();
                 break;
             case InputEvent.SOFT_DROP_PRESSED:
-                newlySpawened = false;
+                rejectSoftDropRepeated = false;
                 attemptSoftDrop();
                 break;
             case InputEvent.SOFT_DROP_REPEATED:
-                if (!newlySpawened) {
+                if (!rejectSoftDropRepeated) {
                     attemptSoftDrop();
                 }
                 break;
@@ -307,6 +309,7 @@ public class MonoGameState implements Serializable {
     }
     
     public void update() {
+        justSpawned = false;
         switch (mode) {
             case TETROMINO_FALLING_MODE:
                 updateFallingTetromino();
@@ -403,7 +406,8 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptSpawn() {
-        newlySpawened = true;
+        justSpawned = true;
+        rejectSoftDropRepeated = true;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;
         lockTimer = framesPerLock;
@@ -412,8 +416,7 @@ public class MonoGameState implements Serializable {
         tetrominoX = SPAWN_X;
         tetrominoY = SPAWN_Y;
         tetrominoRotation = SPAWN_ROTATION;
-        gameOverTimer = 0;
-        
+        gameOverTimer = 0;        
         mode = testPosition(tetrominoRotation, tetrominoX, tetrominoY) ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
     }
     
@@ -508,5 +511,9 @@ public class MonoGameState implements Serializable {
 
     public byte getFramesPerLock() {
         return framesPerLock;
+    }
+
+    public boolean isJustSpawned() {
+        return justSpawned;
     }
 }

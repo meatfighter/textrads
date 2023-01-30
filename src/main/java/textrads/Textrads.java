@@ -28,7 +28,6 @@ public class Textrads {
     private final InputEventList eventList = new InputEventList();
     
     private final SearchChain searchChain = new SearchChain();
-    private byte lastMode = MonoGameState.DISABLED_MODE;
     private final boolean[][] playfield = new boolean[MonoGameState.PLAYFIELD_HEIGHT][MonoGameState.PLAYFIELD_WIDTH];
     private final List<Byte> moves = new ArrayList<>();
     private float moveTimer;
@@ -96,35 +95,28 @@ public class Textrads {
 //        state.update();
 
         final MonoGameState state = GameStateSource.getState().getStates()[0];
-        if (lastMode != MonoGameState.TETROMINO_FALLING_MODE 
-                && state.getMode() == MonoGameState.TETROMINO_FALLING_MODE) { 
-            System.out.println("--1");
-            final byte[][] p = state.getPlayfield();
-            for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                    playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
-                }
-            }                     
-            System.out.format("%d %d%n", state.getTetrominoType(), state.getNexts().get(0));
-            searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
-                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
-            System.out.println("--1.5");
-            if (searchChain.isBestFound()) {
-                searchChain.getMoves(moves);
-                System.out.println(moves);
-            } else {
-                moves.clear();
-            }
-            moveTimer = 1;
-            System.out.println("--2");
-        }
-        lastMode = state.getMode();
         
         if (state.getMode() == MonoGameState.TETROMINO_FALLING_MODE) {
+            if (state.isJustSpawned()) { 
+                final byte[][] p = state.getPlayfield();
+                for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                    for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                        playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
+                    }
+                }                     
+                searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
+                        state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
+                if (searchChain.isBestFound()) {
+                    searchChain.getMoves(moves);
+                    System.out.println(moves);
+                } else {
+                    moves.clear();
+                }
+                moveTimer = 1;
+            }
             if (--moveTimer <= 0) {
                 moveTimer += state.getFramesPerGravityDrop() / 2;
                 if (!moves.isEmpty()) {
-                    System.out.format("Apply: %s%n", moves.get(0));
                     state.handleInputEvent(moves.remove(0));
                 }
             }          
