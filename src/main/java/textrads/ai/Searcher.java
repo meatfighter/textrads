@@ -182,6 +182,7 @@ public final class Searcher {
                             }
                         } else {
                             if (listener != null) {
+                                System.out.println("--2");
                                 listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
                                         framesPerGravityDrop, framesPerLock, framesPerMove);
                             }
@@ -227,6 +228,7 @@ public final class Searcher {
                 case LOCK:
                     
                     if (listener != null) {
+                        System.out.println("--1");
                         listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
                                 framesPerLock, framesPerMove);
                     }

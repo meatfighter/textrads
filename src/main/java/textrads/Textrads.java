@@ -8,6 +8,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import textrads.ai.Playfield;
 import textrads.ai.SearchChain;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
@@ -107,6 +108,9 @@ public class Textrads {
                 searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
                         state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
                 if (searchChain.isBestFound()) {
+                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
+                            searchChain.getRotation());
+                    Playfield.print(playfield);
                     searchChain.getMoves(moves);
                     System.out.println(moves);
                 } else {

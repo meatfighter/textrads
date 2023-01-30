@@ -25,6 +25,7 @@ public class SearchChain {
                 SearchChain.class.getResourceAsStream("/weights.dat")))) {
             for (int i = 0; i < WEIGHTS.length; ++i) {
                 WEIGHTS[i] = in.readDouble();
+                System.out.println(WEIGHTS[i]);
             }
         } catch (final IOException ignored) {
             ignored.printStackTrace(); // TODO REMOVE
