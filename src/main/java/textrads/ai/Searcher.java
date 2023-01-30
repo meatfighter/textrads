@@ -29,17 +29,16 @@ public final class Searcher {
         this.listener = listener;
     }
 
-    public void getMoves(final int x, final int y, final int rotation, final boolean dropFailed, 
-            final List<Byte> moves) {
+    public void getMoves(final int x, final int y, final int rotation, final int dropFailed, final List<Byte> moves) {
         
         moves.clear();
-        Coordinate coordinate = matrix[dropFailed ? 1 : 0][rotation][y + 2][x + 2];
+        Coordinate coordinate = matrix[dropFailed][rotation][y + 2][x + 2];
         do {
             if (coordinate.inputEvent != InputEvent.NOTHING_PRESSED) {
                 moves.add(coordinate.inputEvent);
             }
             coordinate = coordinate.previous;
-        } while (coordinate != null);        
+        } while (coordinate != coordinate.previous);        
         Collections.reverse(moves);
     }
 
@@ -58,6 +57,7 @@ public final class Searcher {
         front.gravityDropTimer = framesPerGravityDrop;
         front.lockTimer = framesPerLock;
         front.moveTimer = framesPerMove;
+        front.previous = front;
         
         Coordinate rear = front;
 
@@ -102,7 +102,6 @@ public final class Searcher {
                         if (!(c.previous == null && testPosition(playfield, c))) {
                             break inner;
                         }
-                        System.out.println(c);
                         c.previous = front;
                         rear = rear.next = c; 
                         c.inputEvent = InputEvent.SHIFT_LEFT_PRESSED;                         
@@ -117,7 +116,6 @@ public final class Searcher {
                         if (!(c.previous == null && testPosition(playfield, c))) {
                             break inner;
                         }
-                        System.out.println(c);
                         c.previous = front;
                         rear = rear.next = c;
                         c.inputEvent = InputEvent.SHIFT_RIGHT_PRESSED;                         
@@ -143,7 +141,6 @@ public final class Searcher {
                                     break inner;
                                 }
                             }
-                            System.out.println(c);
                             c.previous = front;
                             rear = rear.next = c; 
                             c.inputEvent = InputEvent.ROTATE_CCW_PRESSED;                         
@@ -167,7 +164,6 @@ public final class Searcher {
                                     break inner;
                                 }
                             }
-                            System.out.println(c);
                             c.previous = front;
                             rear = rear.next = c;
                             c.inputEvent = InputEvent.ROTATE_CW_PRESSED;                         
@@ -186,12 +182,11 @@ public final class Searcher {
                             }
                         } else {
                             if (listener != null) {
-                                listener.locked(tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, 
-                                        framesPerLock, framesPerMove);
+                                listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
+                                        framesPerGravityDrop, framesPerLock, framesPerMove);
                             }
                             break inner;
                         }
-                        System.out.println(c);
                         c.previous = front;
                         rear = rear.next = c; 
                         c.inputEvent = InputEvent.SOFT_DROP_PRESSED;                         
@@ -210,13 +205,15 @@ public final class Searcher {
                             if (c.previous != null) {
                                 break inner;
                             }       
-                            System.out.println(c);
                             c.previous = front;
                             rear = rear.next = c;
                             c.gravityDropTimer = front.gravityDropTimer + framesPerGravityDrop - timePassed;
                         } else {
-                            c = matrix[0][tetrominoRotation][tetrominoY + 2][tetrominoX + 2];
-                            System.out.println("Repeat: " + c);
+                            c = matrix[1][tetrominoRotation][tetrominoY + 2][tetrominoX + 2];
+                            if (c.previous != null) {
+                                break inner;
+                            }
+                            c.previous = front;
                             rear = rear.next = c;                        
                             c.gravityDropTimer = front.gravityDropTimer - timePassed;
                         }
@@ -230,8 +227,8 @@ public final class Searcher {
                 case LOCK:
                     
                     if (listener != null) {
-                        listener.locked(tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
-                                framesPerMove);
+                        listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
+                                framesPerLock, framesPerMove);
                     }
                     
                     break;

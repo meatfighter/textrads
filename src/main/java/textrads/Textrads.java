@@ -104,9 +104,11 @@ public class Textrads {
                 for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
                     playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
                 }
-            }                        
+            }                     
+            System.out.format("%d %d%n", state.getTetrominoType(), state.getNexts().get(0));
             searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
                     state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
+            System.out.println("--1.5");
             if (searchChain.isBestFound()) {
                 searchChain.getMoves(moves);
                 System.out.println(moves);

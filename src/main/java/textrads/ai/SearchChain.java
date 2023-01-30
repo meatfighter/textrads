@@ -70,11 +70,12 @@ public class SearchChain {
         searcher2 = new Searcher();
         seedFiller = new SeedFiller();
 
-        searcher1.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
-                framesPerMove) -> {
+        searcher1.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
+                framesPerLock, framesPerMove) -> {
             this.x1 = tetrominoX;
             this.y1 = tetrominoY;
             this.rotation1 = tetrominoRotation;
+            this.dropFailed1 = dropFailed;
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
             if (seedFiller.canClearMoreLines(playfield1)) {
@@ -82,8 +83,8 @@ public class SearchChain {
             }
         });
 
-        searcher2.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, framesPerGravityDrop, framesPerLock, 
-                framesPerMove) -> {
+        searcher2.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
+                framesPerLock, framesPerMove) -> {
             lockHeight2 = TETROMINOES[type2][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);
             if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {
@@ -107,9 +108,13 @@ public class SearchChain {
     public int getRotation() {
         return bestRotation;
     }
+    
+    public int getDropFailed() {
+        return bestDropFailed;
+    }
 
     public void getMoves(final List<Byte> moves) {
-        searcher1.getMoves(bestX, bestY, bestRotation, moves);
+        searcher1.getMoves(bestX, bestY, bestRotation, bestDropFailed, moves);
     }
 
     public void search(final int currentType, final int nextType, final boolean[][] playfield, 
@@ -310,6 +315,7 @@ public class SearchChain {
             bestX = x1;
             bestY = y1;
             bestRotation = rotation1;
+            bestDropFailed = dropFailed1;
         }
     }
 }
