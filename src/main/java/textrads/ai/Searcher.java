@@ -63,6 +63,7 @@ public final class Searcher {
 
         do {
             
+            // TODO ARE THESE FINALS REQUIRED
             final int tetrominoX = front.x; // TODO REMOVE +2 AND -2's
             final int tetrominoY = front.y;
             final int tetrominoRotation = front.rotation;
@@ -182,7 +183,6 @@ public final class Searcher {
                             }
                         } else {
                             if (listener != null) {
-                                System.out.println("--2");
                                 listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
                                         framesPerGravityDrop, framesPerLock, framesPerMove);
                             }
@@ -228,7 +228,6 @@ public final class Searcher {
                 case LOCK:
                     
                     if (listener != null) {
-                        System.out.println("--1");
                         listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
                                 framesPerLock, framesPerMove);
                     }
