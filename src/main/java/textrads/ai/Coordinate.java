@@ -61,6 +61,6 @@ public class Coordinate {
     
     @Override
     public String toString() {
-        return String.format("%d %d %d %b", x, y, rotation, dropFailed);
+        return String.format("%d %d %d %d", x, y, rotation, dropFailed);
     }
 }

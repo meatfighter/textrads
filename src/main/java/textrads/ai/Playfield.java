@@ -81,7 +81,7 @@ public interface Playfield {
         for (int y = 0; y < PLAYFIELD_HEIGHT; ++y) {
             sb.append(String.format("%02d ", y));
             for (int x = 0; x < PLAYFIELD_WIDTH; ++x) {
-                sb.append(playfield[y][x] ? "XX" : " .");
+                sb.append(playfield[y][x] ? "[]" : " .");
             }
             sb.append(String.format(" %02d%n", y));
         }    

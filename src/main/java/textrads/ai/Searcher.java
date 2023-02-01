@@ -205,19 +205,22 @@ public final class Searcher {
                         if (testPosition(playfield, c)) {
                             if (c.previous != null) {
                                 break inner;
-                            }       
-                            c.previous = front;
-                            rear = rear.next = c;
+                            }                                   
                             c.gravityDropTimer = front.gravityDropTimer + framesPerGravityDrop - timePassed;
                         } else {
                             c = matrix[1][tetrominoRotation][tetrominoY + 2][tetrominoX + 2];
                             if (c.previous != null) {
                                 break inner;
                             }
-                            c.previous = front;
-                            rear = rear.next = c;                        
+                            if (tetrominoX == 7 && tetrominoY == 18) {
+                                System.out.format("*** %d %d %d %d%n", tetrominoX, tetrominoY, tetrominoRotation, 
+                                        dropFailed);
+                                System.out.format("--- %d %d %d %d%n", c.x, c.y, c.rotation, c.dropFailed);
+                            }
                             c.gravityDropTimer = front.gravityDropTimer - timePassed;
                         }
+                        c.previous = front;
+                        rear = rear.next = c;
                         c.inputEvent = InputEvent.NOTHING_PRESSED; 
                         c.lockTimer = framesPerLock;
                         c.moveTimer = front.moveTimer - timePassed;

@@ -89,7 +89,7 @@ public final class Tetromino {
         int minY = Integer.MAX_VALUE;
         int maxY = Integer.MIN_VALUE;
         for (int i = blocks.length - 1; i >= 0; --i) {
-            final Offset offset = this.offsets[i] = new Offset(blocks[i]);
+            final Offset offset = offsets[i] = new Offset(blocks[i]);
             minY = min(minY, offset.y);
             maxY = max(maxY, offset.y);
         }
@@ -99,7 +99,7 @@ public final class Tetromino {
         for (int y = PLAYFIELD_HEIGHT + 1; y >= -2; --y) {
             for (int x = PLAYFIELD_WIDTH + 1; x >= -2; --x) {
                 validPosition[y + 2][x + 2] = true;
-                for (final Offset offset : this.offsets) {
+                for (final Offset offset : offsets) {
                     final int X = offset.x + x;
                     final int Y = offset.y + y;
                     if (X < 0 || X >= PLAYFIELD_WIDTH || Y >= PLAYFIELD_HEIGHT) {

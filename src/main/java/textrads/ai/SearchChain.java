@@ -89,6 +89,10 @@ public class SearchChain {
             lockHeight2 = TETROMINOES[type2][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);
             if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {
+                System.out.format("%d %d %d %d%n", x1, y1, rotation1, dropFailed1);
+                System.out.format("%d %d %d %d%n", tetrominoX, tetrominoY, tetrominoRotation, dropFailed);
+                Playfield.print(playfield2);
+                
                 evaluate();
             }
         });
