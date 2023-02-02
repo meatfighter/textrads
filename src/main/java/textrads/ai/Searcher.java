@@ -111,7 +111,8 @@ public final class Searcher {
                         c.previous = front;
                         rear = rear.next = c; 
                         c.inputEvent = InputEvent.SHIFT_LEFT_PRESSED;                         
-                        c.gravityDropTimer = front.gravityDropTimer - timePassed;
+                        c.gravityDropTimer = dropFailed == 1 
+                                ? front.gravityDropTimer : front.gravityDropTimer - timePassed;
                         c.lockTimer = c.dropFailed == 1 ? front.lockTimer - timePassed : framesPerLock;
                         c.moveTimer = front.moveTimer + framesPerMove - timePassed;
                     }
@@ -130,7 +131,8 @@ public final class Searcher {
                         c.previous = front;
                         rear = rear.next = c;
                         c.inputEvent = InputEvent.SHIFT_RIGHT_PRESSED;                         
-                        c.gravityDropTimer = front.gravityDropTimer - timePassed;
+                        c.gravityDropTimer = dropFailed == 1 
+                                ? front.gravityDropTimer : front.gravityDropTimer - timePassed;
                         c.lockTimer = c.dropFailed == 1 ? front.lockTimer - timePassed : framesPerLock;
                         c.moveTimer = front.moveTimer + framesPerMove - timePassed;                         
                     }
@@ -159,7 +161,8 @@ public final class Searcher {
                             c.previous = front;
                             rear = rear.next = c; 
                             c.inputEvent = InputEvent.ROTATE_CCW_PRESSED;                         
-                            c.gravityDropTimer = front.gravityDropTimer - timePassed;
+                            c.gravityDropTimer = dropFailed == 1 
+                                ? front.gravityDropTimer : front.gravityDropTimer - timePassed;
                             c.lockTimer = c.dropFailed == 1 ? front.lockTimer - timePassed : framesPerLock;
                             c.moveTimer = front.moveTimer + framesPerMove - timePassed;
                         }
@@ -186,7 +189,8 @@ public final class Searcher {
                             c.previous = front;
                             rear = rear.next = c;
                             c.inputEvent = InputEvent.ROTATE_CW_PRESSED;                         
-                            c.gravityDropTimer = front.gravityDropTimer - timePassed;
+                            c.gravityDropTimer = dropFailed == 1 
+                                ? front.gravityDropTimer : front.gravityDropTimer - timePassed;
                             c.lockTimer = c.dropFailed == 1 ? front.lockTimer - timePassed : framesPerLock;
                             c.moveTimer = front.moveTimer + framesPerMove - timePassed;
                         }                        
