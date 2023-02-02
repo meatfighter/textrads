@@ -16,8 +16,44 @@ public class TestAI {
         
         final boolean[][] playfield = Playfield.createPlayfield();        
         final SearchChain searchChain = new SearchChain();
+  
+//        final boolean[][] playfield = {  
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { false, false, false, false, false, false, false, false, false, false, }, 
+//            { true, true, true, false, false, false, false, false, false, false, }, 
+//            { true, true, true, false, false, false, false, false, false, false, }, 
+//            { true, true, true, false, false, true, true, false, false, false, }, 
+//            { true, true, true, true, true, true, true, true, false, false, }, 
+//            { true, true, true, true, true, true, true, true, true, false, },            
+//        };
         
-//        searchChain.search(0, 6, playfield, 52, (byte) 25, 20);
+        
+//        final int[] sequence = { 5, 0, 6, 4, 2, 2, 1, 6 };      
+//        for (int i = 0; i < sequence.length - 1; ++i) {
+//            searchChain.search(sequence[i], sequence[i + 1], playfield, 52, (byte) 25, 20);
+//            Playfield.lock(playfield, sequence[i], searchChain.getX(), searchChain.getY(), searchChain.getRotation());
+//            Playfield.print(playfield);
+//        }
+        //System.out.println(Playfield.toBooleanString(playfield));
+        
+        //searchChain = new SearchChain();
+//        searchChain.testing = true;
+//        searchChain.search(6, 5, playfield, 52, (byte) 25, 20);
+        
+        
         
         final Random random = ThreadLocalRandom.current();
         int current = random.nextInt(7);

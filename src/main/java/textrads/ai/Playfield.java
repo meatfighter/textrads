@@ -88,4 +88,17 @@ public interface Playfield {
         sb.append("    0 1 2 3 4 5 6 7 8 9").append(System.lineSeparator());
         return sb.toString();
     }
+    
+    static String toBooleanString(final boolean[][] playfield) {
+        final StringBuilder sb = new StringBuilder("final boolean[][] playfield = { ");
+        for (int y = 0; y < PLAYFIELD_HEIGHT; ++y) {
+            sb.append("                                 { ");
+            for (int x = 0; x < PLAYFIELD_WIDTH; ++x) {
+                sb.append(playfield[y][x]).append(", ");
+            }
+            sb.append("}, ").append(System.lineSeparator());
+        }    
+        sb.append("};");
+        return sb.toString();
+    }
 }

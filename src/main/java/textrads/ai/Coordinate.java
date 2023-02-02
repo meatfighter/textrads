@@ -21,9 +21,7 @@ public class Coordinate {
     }
 
     public static void resetMatrix(final Coordinate[][][][] matrix, final int type) {
-
-        final int rotationMax = type == Tetromino.O_TYPE ? 3 : 0;
-
+        final int rotationMax = (type == Tetromino.O_TYPE) ? 0 : 3;
         for (int dropFailed = 1; dropFailed >= 0; --dropFailed) {
             final Coordinate[][][] cd = matrix[dropFailed];
             for (int rotation = rotationMax; rotation >= 0; --rotation) {

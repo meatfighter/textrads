@@ -79,6 +79,11 @@ public class SearchChain {
             this.dropFailed1 = dropFailed;
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
+            
+            if (testing) {
+                Playfield.print(playfield1);
+            }            
+            
             if (seedFiller.canClearMoreLines(playfield1)) {
                 searcher2.search(type2, playfield1, framesPerGravityDrop, framesPerLock, framesPerMove);
             }
@@ -146,8 +151,10 @@ public class SearchChain {
         return true;
     }
 
+    public boolean testing;
+    
     private void evaluate() {
-
+        
         final int totalLinesCleared = linesCleared1 + linesCleared2;
 
         final int totalLockHeight = lockHeight1 + lockHeight2;
