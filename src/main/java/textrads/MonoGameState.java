@@ -329,13 +329,13 @@ public class MonoGameState implements Serializable {
     private void updateFallingTetromino() {
         if (dropFailed) {
             attemptGravityDrop();            
-            if (dropFailed && --lockTimer < 0) {                
+            if (dropFailed && --lockTimer < 0) {
                 lockTetrimino();                
             }
             return;
         } 
         
-        while (--gravityDropTimer <= 0 && !dropFailed) {            
+        while (!dropFailed && --gravityDropTimer <= 0) {
             attemptGravityDrop();
         }
     }  

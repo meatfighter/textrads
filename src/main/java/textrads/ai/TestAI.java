@@ -17,32 +17,32 @@ public class TestAI {
         final boolean[][] playfield = Playfield.createPlayfield();        
         final SearchChain searchChain = new SearchChain();
         
-        searchChain.search(0, 6, playfield, 52, (byte) 25, 20);
+//        searchChain.search(0, 6, playfield, 52, (byte) 25, 20);
         
-//        final Random random = ThreadLocalRandom.current();
-//        int current = random.nextInt(7);
-//        int next = random.nextInt(7);
-//        
-//        while (true) {          
-//            System.out.format("%d %d%n", current, next);
-//            Playfield.print(playfield);
-//            searchChain.search(current, next, playfield, 52, (byte) 25, 20);
-//
-//            if (searchChain.isBestFound()) {
-//                Playfield.lock(playfield, current, searchChain.getX(), searchChain.getY(), searchChain.getRotation());
-//                Playfield.print(playfield);
-//                current = next;
-//                next = random.nextInt(7);
-//                
-//    //            System.out.format("%d %d %d%n", searchChain.getX(), searchChain.getY(), searchChain.getRotation());
-//    //            
-//    //            final List<Byte> moves = new ArrayList<>();
-//    //            searchChain.getMoves(moves);
-//    //            System.out.println(moves);
-//            } else {
-//                break;
-//            }
-//        }
+        final Random random = ThreadLocalRandom.current();
+        int current = random.nextInt(7);
+        int next = random.nextInt(7);
+        
+        while (true) {          
+            System.out.format("%d %d%n", current, next);
+            Playfield.print(playfield);
+            searchChain.search(current, next, playfield, 52, (byte) 25, 1);
+
+            if (searchChain.isBestFound()) {
+                Playfield.lock(playfield, current, searchChain.getX(), searchChain.getY(), searchChain.getRotation());
+                Playfield.print(playfield);
+                current = next;
+                next = random.nextInt(7);
+                
+    //            System.out.format("%d %d %d%n", searchChain.getX(), searchChain.getY(), searchChain.getRotation());
+    //            
+    //            final List<Byte> moves = new ArrayList<>();
+    //            searchChain.getMoves(moves);
+    //            System.out.println(moves);
+            } else {
+                break;
+            }
+        }
     }
     
     public static void main(final String... args) throws Exception {

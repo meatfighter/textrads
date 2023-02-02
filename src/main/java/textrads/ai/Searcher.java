@@ -99,8 +99,13 @@ public final class Searcher {
                     
                     // shift left
                     inner: { 
-                        final Coordinate c = matrix[dropFailed][tetrominoRotation][tetrominoY + 2][tetrominoX + 1];
-                        if (!(c.previous == null && testPosition(playfield, c))) {
+                        if (!testPosition(playfield, tetrominoX - 1, tetrominoY, tetrominoRotation)) {
+                            break inner;
+                        }                       
+                        final Coordinate c = matrix[(dropFailed == 1) 
+                                ? (testPosition(playfield, tetrominoX - 1, tetrominoY + 1, tetrominoRotation) ? 0 : 1) 
+                                : 0][tetrominoRotation][tetrominoY + 2][tetrominoX + 1];
+                        if (c.previous != null) {
                             break inner;
                         }
                         c.previous = front;
@@ -108,13 +113,18 @@ public final class Searcher {
                         c.inputEvent = InputEvent.SHIFT_LEFT_PRESSED;                         
                         c.gravityDropTimer = front.gravityDropTimer - timePassed;
                         c.lockTimer = dropFailed == 1 ? front.lockTimer - timePassed : framesPerLock;
-                        c.moveTimer = front.moveTimer + framesPerMove - timePassed;                         
+                        c.moveTimer = front.moveTimer + framesPerMove - timePassed;
                     }
                     
                     // shift right
                     inner: { 
-                        final Coordinate c = matrix[dropFailed][tetrominoRotation][tetrominoY + 2][tetrominoX + 3];
-                        if (!(c.previous == null && testPosition(playfield, c))) {
+                        if (!testPosition(playfield, tetrominoX + 1, tetrominoY, tetrominoRotation)) {
+                            break inner;
+                        }                       
+                        final Coordinate c = matrix[(dropFailed == 1) 
+                                ? (testPosition(playfield, tetrominoX + 1, tetrominoY + 1, tetrominoRotation) ? 0 : 1) 
+                                : 0][tetrominoRotation][tetrominoY + 2][tetrominoX + 3];
+                        if (c.previous != null) {
                             break inner;
                         }
                         c.previous = front;
@@ -130,17 +140,21 @@ public final class Searcher {
                         // rotate CCW
                         inner: {
                             final int rotation = (tetrominoRotation == 0) ? 3 : tetrominoRotation - 1;
-                            Coordinate c = matrix[dropFailed][rotation][tetrominoY + 2][tetrominoX + 2];
-                            if (testPosition(playfield, c)) {
-                                if (c.previous != null) {
-                                    break inner;
-                                }
+                            final Coordinate c;
+                            if (testPosition(playfield, tetrominoX, tetrominoY, rotation)) {
+                                c = matrix[(dropFailed == 1) ? (testPosition(playfield, tetrominoX, tetrominoY + 1, 
+                                        rotation) ? 0 : 1) : 0][rotation][tetrominoY + 2][tetrominoX + 2];                                
                             } else {
                                 final Offset o = Tetromino.CCW[tetrominoRotation];
-                                c = matrix[dropFailed][rotation][tetrominoY + o.y + 2][tetrominoX + o.x + 2];
-                                if (!(c.previous == null && testPosition(playfield, c))) {
+                                if (!testPosition(playfield, tetrominoX + o.x, tetrominoY + o.y, rotation)) {
                                     break inner;
                                 }
+                                c = matrix[(dropFailed == 1) ? (testPosition(playfield, tetrominoX + o.x, 
+                                        tetrominoY + o.y + 1, rotation) ? 0 : 1) : 0][rotation][tetrominoY + o.y + 2]
+                                        [tetrominoX + o.x + 2];
+                            }
+                            if (c.previous != null) {
+                                break inner;
                             }
                             c.previous = front;
                             rear = rear.next = c; 
@@ -153,17 +167,21 @@ public final class Searcher {
                         // rotate CW
                         inner: {
                             final int rotation = (tetrominoRotation == 3) ? 0 : tetrominoRotation + 1;
-                            Coordinate c = matrix[dropFailed][rotation][tetrominoY + 2][tetrominoX + 2];
-                            if (testPosition(playfield, c)) {
-                                if (c.previous != null) {
-                                    break inner;
-                                }
+                            final Coordinate c;
+                            if (testPosition(playfield, tetrominoX, tetrominoY, rotation)) {
+                                c = matrix[(dropFailed == 1) ? (testPosition(playfield, tetrominoX, tetrominoY + 1, 
+                                        rotation) ? 0 : 1) : 0][rotation][tetrominoY + 2][tetrominoX + 2];                                
                             } else {
                                 final Offset o = Tetromino.CW[tetrominoRotation];
-                                c = matrix[dropFailed][rotation][tetrominoY + o.y + 2][tetrominoX + o.x + 2];
-                                if (!(c.previous == null && testPosition(playfield, c))) {
+                                if (!testPosition(playfield, tetrominoX + o.x, tetrominoY + o.y, rotation)) {
                                     break inner;
                                 }
+                                c = matrix[(dropFailed == 1) ? (testPosition(playfield, tetrominoX + o.x, 
+                                        tetrominoY + o.y + 1, rotation) ? 0 : 1) : 0][rotation][tetrominoY + o.y + 2]
+                                        [tetrominoX + o.x + 2];
+                            }
+                            if (c.previous != null) {
+                                break inner;
                             }
                             c.previous = front;
                             rear = rear.next = c;
@@ -212,11 +230,6 @@ public final class Searcher {
                             if (c.previous != null) {
                                 break inner;
                             }
-                            if (tetrominoX == 7 && tetrominoY == 18) {
-                                System.out.format("*** %d %d %d %d%n", tetrominoX, tetrominoY, tetrominoRotation, 
-                                        dropFailed);
-                                System.out.format("--- %d %d %d %d%n", c.x, c.y, c.rotation, c.dropFailed);
-                            }
                             c.gravityDropTimer = front.gravityDropTimer - timePassed;
                         }
                         c.previous = front;
@@ -241,29 +254,32 @@ public final class Searcher {
             front = front.next;
         } while (front != null);
     }
+    
+    private boolean testPosition(final boolean[][] playfield, final int tetrominoX, final int tetrominoY, 
+            final int tetrominoRotation) {
 
-    private boolean testPosition(final boolean[][] playfield, final Coordinate coordinate) {
-
-        final int y = coordinate.y;
-        if (y < 0) {
+        if (tetrominoY < 0) {
             return false;
         }
                        
-        final Tetromino tetromino = tetrominoes[coordinate.rotation];
-        final int x = coordinate.x; 
-        if (!tetromino.validPosition[y + 2][x + 2]) {
+        final Tetromino tetromino = tetrominoes[tetrominoRotation];
+        if (!tetromino.validPosition[tetrominoY + 2][tetrominoX + 2]) {
             return false;
         }
 
         final Offset[] offsets = tetromino.offsets;
         for (int i = 3; i >= 0; --i) {
             final Offset offset = offsets[i];
-            final int by = y + offset.y;
-            if (by >= 0 && playfield[by][x + offset.x]) {
+            final int by = tetrominoY + offset.y;
+            if (by >= 0 && playfield[by][tetrominoX + offset.x]) {
                 return false;
             }
         }
 
         return true;
+    }    
+
+    private boolean testPosition(final boolean[][] playfield, final Coordinate coordinate) {
+        return testPosition(playfield, coordinate.x, coordinate.y, coordinate.rotation);
     }
 }
