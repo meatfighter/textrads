@@ -89,6 +89,7 @@ public interface Playfield {
         return sb.toString();
     }
     
+    // TODO REMOVE:
     static String toBooleanString(final boolean[][] playfield) {
         final StringBuilder sb = new StringBuilder("final boolean[][] playfield = { ");
         for (int y = 0; y < PLAYFIELD_HEIGHT; ++y) {

@@ -59,14 +59,16 @@ public class TestAI {
         int current = random.nextInt(7);
         int next = random.nextInt(7);
         
+        int lines = 0;
         while (true) {          
-            System.out.format("%d %d%n", current, next);
-            Playfield.print(playfield);
+            //System.out.format("%d %d%n", current, next);
+            //Playfield.print(playfield);
             searchChain.search(current, next, playfield, 52, (byte) 25, 1);
 
             if (searchChain.isBestFound()) {
-                Playfield.lock(playfield, current, searchChain.getX(), searchChain.getY(), searchChain.getRotation());
-                Playfield.print(playfield);
+                lines += Playfield.lock(playfield, current, searchChain.getX(), searchChain.getY(), searchChain.getRotation());
+                //Playfield.print(playfield);
+                System.out.println(lines);
                 current = next;
                 next = random.nextInt(7);
                 
@@ -76,6 +78,7 @@ public class TestAI {
     //            searchChain.getMoves(moves);
     //            System.out.println(moves);
             } else {
+                System.out.println("game over");
                 break;
             }
         }
