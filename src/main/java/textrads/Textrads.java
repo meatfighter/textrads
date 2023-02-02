@@ -97,34 +97,32 @@ public class Textrads {
 
         final MonoGameState state = GameStateSource.getState().getStates()[0];
         
-        if (state.getMode() == MonoGameState.TETROMINO_FALLING_MODE) {
-            if (state.isJustSpawned()) { 
-                final byte[][] p = state.getPlayfield();
-                for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                    for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                        playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
-                    }
-                }                     
-                searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
-                        state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
-                if (searchChain.isBestFound()) {
-                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
-                            searchChain.getRotation());
-                    Playfield.print(playfield);
-                    searchChain.getMoves(moves);
-                    System.out.println(moves);
-                } else {
-                    System.out.println("--- game over ---");
-                    moves.clear();
+        if (state.isJustSpawned()) { 
+            final byte[][] p = state.getPlayfield();
+            for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                    playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
                 }
-                moveTimer = 0;
+            }                     
+            searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
+                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
+            if (searchChain.isBestFound()) {
+                Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
+                        searchChain.getRotation());
+                Playfield.print(playfield);
+                searchChain.getMoves(moves);
+                System.out.println(moves);
+            } else {
+                System.out.println("--- game over ---");
+                moves.clear();
             }
-            if (!moves.isEmpty() && --moveTimer <= 0) {
-                moveTimer += state.getFramesPerGravityDrop() / 2;
-                //System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
-                state.handleInputEvent(moves.remove(0));
-            }        
-        }
+            moveTimer = 0;
+        } 
+        if (!moves.isEmpty() && --moveTimer <= 0) {
+            moveTimer += state.getFramesPerGravityDrop() / 2;
+            //System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
+            state.handleInputEvent(moves.remove(0));
+        }     
         
         state.update();
     }
