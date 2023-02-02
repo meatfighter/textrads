@@ -105,6 +105,8 @@ public class Textrads {
                         playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
                     }
                 }                     
+                System.out.format("%f %d %f%n", state.getFramesPerGravityDrop(), state.getFramesPerLock(), 
+                        state.getFramesPerGravityDrop() / 2);
                 searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
                         state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
                 if (searchChain.isBestFound()) {
@@ -114,13 +116,15 @@ public class Textrads {
                     searchChain.getMoves(moves);
                     System.out.println(moves);
                 } else {
+                    System.out.println("--- !!!!!!!");
                     moves.clear();
                 }
-                moveTimer = 1;
+                moveTimer = 0;
             }
             if (--moveTimer <= 0) {
                 moveTimer += state.getFramesPerGravityDrop() / 2;
                 if (!moves.isEmpty()) {
+                    System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
                     state.handleInputEvent(moves.remove(0));
                 }
             }          
