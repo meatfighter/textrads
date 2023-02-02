@@ -18,10 +18,11 @@ public class MonoGameState implements Serializable {
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
     public static final byte DISABLED_MODE = 0;
-    public static final byte TETROMINO_FALLING_MODE = 1;
-    public static final byte CLEARING_LINES_MODE = 2;
-    public static final byte ADDING_GARBAGE_MODE = 3;
-    public static final byte GAME_OVER_MODE = 4;
+    public static final byte SPAWN_MODE = 1;
+    public static final byte TETROMINO_FALLING_MODE = 2;
+    public static final byte CLEARING_LINES_MODE = 3;
+    public static final byte ADDING_GARBAGE_MODE = 4;
+    public static final byte GAME_OVER_MODE = 5;
 
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20; 
@@ -90,7 +91,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 25; // TODO
+        level = 0;
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -107,7 +108,7 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = 0;
         garbageCounter = 0;
-        mode = TETROMINO_FALLING_MODE;
+        mode = SPAWN_MODE;
         
         for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
             Arrays.fill(playfield[y], (byte) 0);
@@ -116,8 +117,7 @@ public class MonoGameState implements Serializable {
         lineYs.clear();
     }
     
-    public void init() {
-        attemptSpawn();
+    public void init() {        
         updateFramesPerConstants();
     }
     
@@ -153,7 +153,7 @@ public class MonoGameState implements Serializable {
             if (attackRows > 0) {
                 mode = ADDING_GARBAGE_MODE;
             } else {
-                attemptSpawn();
+                mode = SPAWN_MODE;
             }
         } else {
             mode = CLEARING_LINES_MODE;
@@ -308,9 +308,11 @@ public class MonoGameState implements Serializable {
         } 
     }
     
-    public void update() {
-        justSpawned = false;
+    public void update() {     
         switch (mode) {
+            case SPAWN_MODE:
+                attemptSpawn();
+                break;
             case TETROMINO_FALLING_MODE:
                 updateFallingTetromino();
                 break;
@@ -327,6 +329,8 @@ public class MonoGameState implements Serializable {
     }
         
     private void updateFallingTetromino() {
+        justSpawned = false;
+        
         if (dropFailed) {
             attemptGravityDrop();            
             if (dropFailed && --lockTimer < 0) {
@@ -346,14 +350,14 @@ public class MonoGameState implements Serializable {
             if (attackRows > 0) {
                 mode = ADDING_GARBAGE_MODE;
             } else {
-                attemptSpawn();
+                mode = SPAWN_MODE;
             }
         }
     }
     
     private void updateAddingGarbage() {
         if (attackRows == 0) {
-            attemptSpawn();
+            mode = SPAWN_MODE;
             return;
         }
         
@@ -390,12 +394,14 @@ public class MonoGameState implements Serializable {
         }
         incrementScore(CLEAR_POINTS[lineYs.size()] * (level + 1));
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
-        lines += lineYs.size(); 
+        
         final int lev = lines / 10;
-        if (level != lev) {
-            level = (short) lev;
+        lines += lineYs.size(); 
+        if (lines / 10 != lev) {
+            ++level;
             updateFramesPerConstants();
         }
+        
         for (final int lineY : lineYs) {
             for (int y = lineY; y > 0; --y) {
                 System.arraycopy(playfield[y - 1], 0, playfield[y], 0, PLAYFIELD_WIDTH);
