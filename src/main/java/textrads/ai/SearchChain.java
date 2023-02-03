@@ -112,7 +112,7 @@ public class SearchChain {
         return bestDropFailed;
     }
 
-    public void getMoves(final List<Byte> moves) {
+    public void getMoves(final List<Coordinate> moves) {
         searcher1.getMoves(bestX, bestY, bestRotation, bestDropFailed, moves);
     }
 

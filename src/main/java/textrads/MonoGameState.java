@@ -471,6 +471,10 @@ public class MonoGameState implements Serializable {
         return tetrominoY;
     }
 
+    public float getGravityDropTimer() {
+        return gravityDropTimer;
+    }
+
     public byte getLockTimer() {
         return lockTimer;
     }

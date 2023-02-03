@@ -29,13 +29,14 @@ public final class Searcher {
         this.listener = listener;
     }
 
-    public void getMoves(final int x, final int y, final int rotation, final int dropFailed, final List<Byte> moves) {
+    public void getMoves(final int x, final int y, final int rotation, final int dropFailed, 
+            final List<Coordinate> moves) {
         
         moves.clear();
         Coordinate coordinate = matrix[dropFailed][rotation][y + 2][x + 2];
         do {
             if (coordinate.inputEvent != InputEvent.NOTHING_PRESSED) {
-                moves.add(coordinate.inputEvent);
+                moves.add(coordinate);
             }
             coordinate = coordinate.previous;
         } while (coordinate != coordinate.previous);        

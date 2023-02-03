@@ -8,6 +8,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import textrads.ai.Coordinate;
 import textrads.ai.Playfield;
 import textrads.ai.SearchChain;
 import textrads.netplay.Client;
@@ -30,7 +31,7 @@ public class Textrads {
     
     private final SearchChain searchChain = new SearchChain();
     private final boolean[][] playfield = new boolean[MonoGameState.PLAYFIELD_HEIGHT][MonoGameState.PLAYFIELD_WIDTH];
-    private final List<Byte> moves = new ArrayList<>();
+    private final List<Coordinate> moves = new ArrayList<>();
     private float moveTimer;
     
     public void launch() throws Exception {
@@ -116,12 +117,16 @@ public class Textrads {
                 System.out.println("--- game over ---");
                 moves.clear();
             }
-            moveTimer = 0;
+            moveTimer = state.getFramesPerGravityDrop() / 2;
         } 
         if (!moves.isEmpty() && --moveTimer <= 0) {
             moveTimer += state.getFramesPerGravityDrop() / 2;
+            final Coordinate coordinate = moves.remove(0);
+            System.out.format("Move %d %f %f, %f %f, %d %d%n", coordinate.inputEvent, moveTimer, coordinate.moveTimer, 
+                    state.getGravityDropTimer(), coordinate.gravityDropTimer, state.getLockTimer(), 
+                    coordinate.lockTimer);            
             //System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
-            state.handleInputEvent(moves.remove(0));
+            state.handleInputEvent(coordinate.inputEvent);
         }     
         
         state.update();
