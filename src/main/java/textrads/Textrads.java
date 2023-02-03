@@ -98,6 +98,9 @@ public class Textrads {
 
         final MonoGameState state = GameStateSource.getState().getStates()[0];
         
+//        System.out.format("%f %d %f%n", state.getFramesPerGravityDrop(), state.getFramesPerLock(), 
+//                state.getFramesPerGravityDrop() / 2);
+        
         if (state.isJustSpawned()) { 
             final byte[][] p = state.getPlayfield();
             for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
@@ -117,7 +120,8 @@ public class Textrads {
                 System.out.println("--- game over ---");
                 moves.clear();
             }
-            moveTimer = state.getFramesPerGravityDrop() / 2;
+            moveTimer = state.getFramesPerGravityDrop() / 2 + 1;
+            System.out.format("moveTimer = %f%n", moveTimer);
         } 
         if (!moves.isEmpty() && --moveTimer <= 0) {
             moveTimer += state.getFramesPerGravityDrop() / 2;
@@ -129,6 +133,7 @@ public class Textrads {
             state.handleInputEvent(coordinate.inputEvent);
         }     
         
+        System.out.format("State %f %f %d%n", moveTimer, state.getGravityDropTimer(), state.getLockTimer());
         state.update();
     }
     
