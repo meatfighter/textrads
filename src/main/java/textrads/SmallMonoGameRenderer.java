@@ -96,6 +96,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         switch (state.getMode()) {
+            case MonoGameState.SPAWN_MODE:
             case MonoGameState.TETROMINO_FALLING_MODE:
                 drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),

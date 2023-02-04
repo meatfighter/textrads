@@ -67,7 +67,40 @@ public final class Searcher {
             int lockTimer = front.lockTimer;
             float moveTimer = front.moveTimer;
             
-            while (true) {
+            do {
+                
+                // update falling tetromino
+                if (dropFailed == 1) {
+                    final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
+                    if (testPosition(playfield, c)) {
+                        if (c.previous == null) {                       
+                            c.previous = front;
+                            rear = rear.next = c; 
+                            c.inputEvent = InputEvent.NOTHING_PRESSED;                         
+                            c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
+                            c.lockTimer = framesPerLock;
+                            c.moveTimer = moveTimer;
+                        }
+                    } else if (--lockTimer < 0) {
+                        if (listener != null) {
+                            listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
+                                    framesPerGravityDrop, framesPerLock, framesPerMove);
+                        }
+                    }
+                } else if (--gravityDropTimer <= 0) {
+                    final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
+                    if (testPosition(playfield, c)) {
+                        if (c.previous == null) {
+                            c.previous = front;
+                            rear = rear.next = c; 
+                            c.inputEvent = InputEvent.NOTHING_PRESSED;                         
+                            c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
+                            c.lockTimer = framesPerLock;
+                            c.moveTimer = moveTimer;
+                        }
+                    }
+                }                
+                
                 if (--moveTimer <= 0) {
                     moveTimer += framesPerMove;
                     
@@ -162,35 +195,13 @@ public final class Searcher {
                         c.previous = front;
                         rear = rear.next = c; 
                         c.inputEvent = InputEvent.SOFT_DROP_PRESSED;                         
-                        c.gravityDropTimer = gravityDropTimer;
+                        c.gravityDropTimer = framesPerGravityDrop;
                         c.lockTimer = framesPerLock;
                         c.moveTimer = moveTimer; 
                     } 
-                    
-                    break;
                 }
 
-                if (dropFailed == 1) {
-                    final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
-                    if (testPosition(playfield, c)) {
-                        c.previous = front;
-                        rear = rear.next = c; 
-                        c.inputEvent = InputEvent.NOTHING_PRESSED;                         
-                        c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
-                        c.lockTimer = framesPerLock;
-                        c.moveTimer = moveTimer;                        
-                    } else if (--lockTimer < 0) {
-                        if (listener != null) {
-                            listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
-                                    framesPerGravityDrop, framesPerLock, framesPerMove);
-                        }
-                    }
-                } else {
-                    while (--gravityDropTimer <= 0) {
-                        
-                    }
-                }
-            }
+            } while (moveTimer > 0 && gravityDropTimer > 0 && lockTimer > -1);
                                     
             front = front.next;
         } while (front != null);
