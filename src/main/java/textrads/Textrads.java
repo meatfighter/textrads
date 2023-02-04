@@ -101,6 +101,7 @@ public class Textrads {
 //        System.out.format("%f %d %f%n", state.getFramesPerGravityDrop(), state.getFramesPerLock(), 
 //                state.getFramesPerGravityDrop() / 2);
         
+        System.out.format("State %f %f %d%n", moveTimer, state.getGravityDropTimer(), state.getLockTimer());
         if (state.isJustSpawned()) { 
             final byte[][] p = state.getPlayfield();
             for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
@@ -120,10 +121,9 @@ public class Textrads {
                 System.out.println("--- game over ---");
                 moves.clear();
             }
-            moveTimer = state.getFramesPerGravityDrop() / 2 + 1;
+            moveTimer = state.getFramesPerGravityDrop() / 2;
             System.out.format("moveTimer = %f%n", moveTimer);
-        } 
-        if (!moves.isEmpty() && --moveTimer <= 0) {
+        } else if (!moves.isEmpty() && --moveTimer <= 0) {           
             moveTimer += state.getFramesPerGravityDrop() / 2;
             final Coordinate coordinate = moves.remove(0);
             System.out.format("Move %d %f %f, %f %f, %d %d%n", coordinate.inputEvent, moveTimer, coordinate.moveTimer, 
@@ -132,8 +132,7 @@ public class Textrads {
             //System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
             state.handleInputEvent(coordinate.inputEvent);
         }     
-        
-        System.out.format("State %f %f %d%n", moveTimer, state.getGravityDropTimer(), state.getLockTimer());
+                
         state.update();
     }
     

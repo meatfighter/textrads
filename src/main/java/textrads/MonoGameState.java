@@ -91,7 +91,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 25; // TODO TESTING
+        level = 0; // TODO TESTING
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -412,7 +412,6 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptSpawn() {
-        justSpawned = true;
         rejectSoftDropRepeated = true;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;
@@ -422,8 +421,9 @@ public class MonoGameState implements Serializable {
         tetrominoX = SPAWN_X;
         tetrominoY = SPAWN_Y;
         tetrominoRotation = SPAWN_ROTATION;
-        gameOverTimer = 0;        
-        mode = testPosition(tetrominoRotation, tetrominoX, tetrominoY) ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
+        gameOverTimer = 0; 
+        justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
+        mode = justSpawned ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
     }
     
     public void setSeed(final long seed) {
