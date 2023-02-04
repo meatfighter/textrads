@@ -17,7 +17,7 @@ public final class Searcher {
     private final Coordinate[][][][] matrix = Coordinate.createMatrix();
 
     private Tetromino[] tetrominoes;
-    private SearchListener listener;
+    private SearchListener listener;    
 
     public void setSearchListener(final SearchListener listener) {
         this.listener = listener;
@@ -36,36 +36,36 @@ public final class Searcher {
         } while (coordinate != coordinate.previous);        
         Collections.reverse(moves);
     }
-
+    
     public void search(final int type, final boolean[][] playfield, final float framesPerGravityDrop, 
             final byte framesPerLock, final float framesPerMove) {
 
         tetrominoes = TETROMINOES[type];
-        Coordinate.resetMatrix(matrix, type);
-        Coordinate front = matrix[0][SPAWN_ROTATION][SPAWN_Y + 2][SPAWN_X + 2];
-        
-        if (!testPosition(playfield, front)) {
+        Coordinate.resetMatrix(matrix, type);        
+
+        Coordinate head = matrix[0][SPAWN_ROTATION][SPAWN_Y + 2][SPAWN_X + 2];
+        if (!testPosition(playfield, head)) {
             return; // failed to spawn
         }
         
-        front.inputEvent = InputEvent.NOTHING_PRESSED;
-        front.gravityDropTimer = framesPerGravityDrop;
-        front.lockTimer = framesPerLock;
-        front.moveTimer = framesPerMove;
-        front.previous = front;
+        head.inputEvent = InputEvent.NOTHING_PRESSED;
+        head.gravityDropTimer = framesPerGravityDrop;
+        head.lockTimer = framesPerLock;
+        head.moveTimer = framesPerMove;
+        head.previous = head;
+                
+        Coordinate tail = head;
         
-        Coordinate rear = front;
-
         do {
             
-            final int tetrominoX = front.x;
-            final int tetrominoY = front.y;
-            final int tetrominoRotation = front.rotation;
-            final int dropFailed = front.dropFailed;
+            final int tetrominoX = tail.x;
+            final int tetrominoY = tail.y;
+            final int tetrominoRotation = tail.rotation;
+            final int dropFailed = tail.dropFailed;
             
-            float gravityDropTimer = front.gravityDropTimer;
-            int lockTimer = front.lockTimer;
-            float moveTimer = front.moveTimer;
+            float gravityDropTimer = tail.gravityDropTimer;
+            int lockTimer = tail.lockTimer;
+            float moveTimer = tail.moveTimer;
             
             do {
                 
@@ -74,8 +74,8 @@ public final class Searcher {
                     final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
                     if (testPosition(playfield, c)) {
                         if (c.previous == null) {                       
-                            c.previous = front;
-                            rear = rear.next = c; 
+                            c.previous = tail;
+                            head = head.next = c; 
                             c.inputEvent = InputEvent.NOTHING_PRESSED;                         
                             c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
                             c.lockTimer = framesPerLock;
@@ -91,8 +91,8 @@ public final class Searcher {
                     final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
                     if (testPosition(playfield, c)) {
                         if (c.previous == null) {
-                            c.previous = front;
-                            rear = rear.next = c; 
+                            c.previous = tail;
+                            head = head.next = c;
                             c.inputEvent = InputEvent.NOTHING_PRESSED;                         
                             c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
                             c.lockTimer = framesPerLock;
@@ -110,8 +110,8 @@ public final class Searcher {
                         if (c.previous != null || !testPosition(playfield, c)) {
                             break inner;
                         }
-                        c.previous = front;
-                        rear = rear.next = c; 
+                        c.previous = tail;
+                        head = head.next = c;
                         c.inputEvent = InputEvent.SHIFT_LEFT_PRESSED;                         
                         c.gravityDropTimer = gravityDropTimer;
                         c.lockTimer = lockTimer;
@@ -124,8 +124,8 @@ public final class Searcher {
                         if (c.previous != null || !testPosition(playfield, c)) {
                             break inner;
                         }
-                        c.previous = front;
-                        rear = rear.next = c; 
+                        c.previous = tail;
+                        head = head.next = c;
                         c.inputEvent = InputEvent.SHIFT_RIGHT_PRESSED;                         
                         c.gravityDropTimer = gravityDropTimer;
                         c.lockTimer = lockTimer;
@@ -148,8 +148,8 @@ public final class Searcher {
                             if (c.previous != null) {
                                 break inner;
                             }
-                            c.previous = front;
-                            rear = rear.next = c; 
+                            c.previous = tail;
+                            head = head.next = c;
                             c.inputEvent = InputEvent.ROTATE_CCW_PRESSED;                         
                             c.gravityDropTimer = gravityDropTimer;
                             c.lockTimer = lockTimer;
@@ -170,8 +170,8 @@ public final class Searcher {
                             if (c.previous != null) {
                                 break inner;
                             }
-                            c.previous = front;
-                            rear = rear.next = c; 
+                            c.previous = tail;
+                            head = head.next = c;
                             c.inputEvent = InputEvent.ROTATE_CW_PRESSED;                         
                             c.gravityDropTimer = gravityDropTimer;
                             c.lockTimer = lockTimer;
@@ -192,8 +192,8 @@ public final class Searcher {
                         if (c.previous != null) {
                             break inner;
                         }
-                        c.previous = front;
-                        rear = rear.next = c; 
+                        c.previous = tail;
+                        head = head.next = c;
                         c.inputEvent = InputEvent.SOFT_DROP_PRESSED;                         
                         c.gravityDropTimer = framesPerGravityDrop;
                         c.lockTimer = framesPerLock;
@@ -202,9 +202,10 @@ public final class Searcher {
                 }
 
             } while (moveTimer > 0 && gravityDropTimer > 0 && lockTimer > -1);
-                                    
-            front = front.next;
-        } while (front != null);
+            
+            tail = tail.next;
+            
+        } while (tail != null);
     }
     
     private boolean testPosition(final boolean[][] playfield, final int tetrominoX, final int tetrominoY, 

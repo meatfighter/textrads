@@ -91,7 +91,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 25; // TODO TESTING
+        level = 20; // TODO TESTING
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;

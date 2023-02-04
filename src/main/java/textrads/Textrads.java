@@ -110,7 +110,7 @@ public class Textrads {
                 }
             }                     
             searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
-                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), 0/*state.getFramesPerGravityDrop() / 2*/);
+                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
             if (searchChain.isBestFound()) {
                 Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
                         searchChain.getRotation());
@@ -121,13 +121,13 @@ public class Textrads {
                 System.out.println("--- game over ---");
                 moves.clear();
             }
-            moveTimer = 0;//state.getFramesPerGravityDrop() / 2;
+            moveTimer = state.getFramesPerGravityDrop() / 2;
 //            System.out.format("moveTimer = %f%n", moveTimer);
         } else if (--moveTimer <= 0) {
             if (moves.isEmpty()) {
                 state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
             } else {
-                moveTimer += 0;//state.getFramesPerGravityDrop() / 2;
+                moveTimer += state.getFramesPerGravityDrop() / 2;
 //                System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
                 final Coordinate coordinate = moves.remove(0);
 //                System.out.format("Move %s %f %f, %f %f, %d %d%n", InputEvent.toString(coordinate.inputEvent), moveTimer, coordinate.moveTimer, 
