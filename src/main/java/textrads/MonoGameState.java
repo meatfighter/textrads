@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MonoGameState implements Serializable {
     
@@ -91,7 +92,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 20; // TODO TESTING
+        level = 10; // TODO TESTING
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -308,7 +309,13 @@ public class MonoGameState implements Serializable {
         } 
     }
     
-    public void update() {     
+    public void update() {
+        
+        final Random random = ThreadLocalRandom.current();
+        if (random.nextInt(500) == 0) {
+            addAttackRows(random.nextInt(4) + 1);
+        }
+        
         switch (mode) {
             case SPAWN_MODE:
                 attemptSpawn();
