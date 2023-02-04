@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MonoGameState implements Serializable {
     
@@ -310,12 +309,6 @@ public class MonoGameState implements Serializable {
     }
     
     public void update() {
-        
-        final Random random = ThreadLocalRandom.current();
-        if (random.nextInt(500) == 0) {
-            addAttackRows(random.nextInt(4) + 1);
-        }
-        
         switch (mode) {
             case SPAWN_MODE:
                 attemptSpawn();

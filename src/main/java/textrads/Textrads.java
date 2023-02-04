@@ -7,6 +7,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import textrads.ai.Coordinate;
 import textrads.ai.Playfield;
@@ -37,6 +38,11 @@ public class Textrads {
     public void launch() throws Exception {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
+        
+        GameStateSource.getState().setPlayers((byte) 2); // TODO TESTING AI
+        GameStateSource.getState().setSeed(ThreadLocalRandom.current().nextLong());
+                
+                
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -96,52 +102,53 @@ public class Textrads {
 //        }
 //        state.update();
 
-        final MonoGameState state = GameStateSource.getState().getStates()[0];
-        
-//        System.out.format("%f %d %f%n", state.getFramesPerGravityDrop(), state.getFramesPerLock(), 
-//                state.getFramesPerGravityDrop() / 2);
-        
-//        System.out.format("State: %d %f %f %d%n", state.getMode(), moveTimer, state.getGravityDropTimer(), state.getLockTimer());
-        if (state.isJustSpawned()) { 
-            final byte[][] p = state.getPlayfield();
-            for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                    playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
+        {
+            final GameState state = GameStateSource.getState();
+            InputEventSource.poll(eventList);
+            for (int i = 0; i < eventList.size(); ++i) {
+                state.handleInputEvent(eventList.get(i), 0);
+            }
+        }
+
+        {
+            final MonoGameState state = GameStateSource.getState().getStates()[1];
+
+            if (state.isJustSpawned()) { 
+                final byte[][] p = state.getPlayfield();
+                for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                    for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                        playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
+                    }
+                }                     
+                searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
+                        state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
+                if (searchChain.isBestFound()) {
+                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
+                            searchChain.getRotation());
+                    Playfield.print(playfield);
+                    searchChain.getMoves(moves);
+                    System.out.println(moves);
+                } else {
+                    System.out.println("--- game over ---");
+                    moves.clear();
                 }
-            }                     
-            searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
-                    state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
-            if (searchChain.isBestFound()) {
-                Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
-                        searchChain.getRotation());
-                Playfield.print(playfield);
-                searchChain.getMoves(moves);
-                System.out.println(moves);
-            } else {
-                System.out.println("--- game over ---");
-                moves.clear();
+                moveTimer = state.getFramesPerGravityDrop() / 2;
+            } else if (--moveTimer <= 0) {
+                if (moves.isEmpty()) {
+                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {
+                    moveTimer += state.getFramesPerGravityDrop() / 2;
+                    final Coordinate coordinate = moves.remove(0);
+                    state.handleInputEvent(coordinate.inputEvent);
+                }
             }
-            moveTimer = state.getFramesPerGravityDrop() / 2;
-//            System.out.format("moveTimer = %f%n", moveTimer);
-        } else if (--moveTimer <= 0) {
-            if (moves.isEmpty()) {
-                state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-            } else {
-                moveTimer += state.getFramesPerGravityDrop() / 2;
-//                System.out.println("move: " + moves.get(0) + " " + state.getFramesPerGravityDrop() / 2);
-                final Coordinate coordinate = moves.remove(0);
-//                System.out.format("Move %s %f %f, %f %f, %d %d%n", InputEvent.toString(coordinate.inputEvent), moveTimer, coordinate.moveTimer, 
-//                        state.getGravityDropTimer(), coordinate.gravityDropTimer, state.getLockTimer(), 
-//                        coordinate.lockTimer);                        
-                state.handleInputEvent(coordinate.inputEvent);
-            }
-        }     
+        }
                 
-        state.update();
+        GameStateSource.getState().update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        playRenderer.render(g, size, GameStateSource.getState().getStates()[0]);
+        playRenderer.render(g, size, GameStateSource.getState());
     }
     
     public static void main(final String... args) throws Exception {

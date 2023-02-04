@@ -16,6 +16,7 @@ public class GameState implements Serializable {
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
     private int updates;
+    private byte players;
     private boolean paused;
     
     public GameState() {
@@ -50,6 +51,19 @@ public class GameState implements Serializable {
 
     public int getUpdates() {
         return updates;
+    }
+
+    public byte getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(final byte players) {
+        this.players = players;
+    }
+    
+    public void setSeed(final long seed) {
+        states[0].setSeed(seed);
+        states[1].setSeed(seed);
     }
     
     public byte[] toByteArray() throws IOException {
