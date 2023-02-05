@@ -5,6 +5,13 @@ import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 import textrads.Tetromino;
 
 public class Coordinate {
+    
+    public static enum State {
+        START_MOVE,
+        CONTINUE_MOVE,
+        START_UPDATE,
+        CONTINUE_UPDATE,
+    }
 
     public static Coordinate[][][][] createMatrix() {
         final Coordinate[][][][] matrix = new Coordinate[2][4][PLAYFIELD_HEIGHT + 4][PLAYFIELD_WIDTH + 4];
@@ -48,7 +55,8 @@ public class Coordinate {
     public byte inputEvent;          // input that got the tetromino here
     public float gravityDropTimer;   // when the tetromino arrived here
     public int lockTimer;            // when the tetromino arrived here
-    public float moveTimer;          // when the tetromino arrived here
+    public float moveTimer;          // when the tetromino arrived here    
+    public State state;              // when the tetromino arrived here
 
     public Coordinate(final int x, final int y, final int rotation, final int dropFailed) {
         this.x = x;

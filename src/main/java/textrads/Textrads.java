@@ -32,7 +32,7 @@ public class Textrads {
     
     private final SearchChain searchChain = new SearchChain();
     private final boolean[][] playfield = new boolean[MonoGameState.PLAYFIELD_HEIGHT][MonoGameState.PLAYFIELD_WIDTH];
-    private final List<Coordinate> moves = new ArrayList<>();
+    private final List<Coordinate> moves = new ArrayList<>(1024);
     private float moveTimer;
     
     public void launch() throws Exception {
@@ -114,6 +114,7 @@ public class Textrads {
             final MonoGameState state = GameStateSource.getState().getStates()[1];
 
             if (state.isJustSpawned()) { 
+                final long startTime = System.nanoTime();
                 final byte[][] p = state.getPlayfield();
                 for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
                     for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
@@ -123,23 +124,29 @@ public class Textrads {
                 searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
                         state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
                 if (searchChain.isBestFound()) {
-                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
-                            searchChain.getRotation());
-                    Playfield.print(playfield);
+//                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
+//                            searchChain.getRotation());
+                    //Playfield.print(playfield);
                     searchChain.getMoves(moves);
-                    System.out.println(moves);
+//                    System.out.println(moves);
                 } else {
-                    System.out.println("--- game over ---");
+//                    System.out.println("--- game over ---");
                     moves.clear();
                 }
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-            } else if (--moveTimer <= 0) {
+                final long endTime = System.nanoTime();
+                
+                System.out.format("%f%n", (endTime - startTime) / 1.0E6);
+            } 
+            
+            --moveTimer;
+            
+            while (moveTimer <= 0) {
+                moveTimer += state.getFramesPerGravityDrop() / 2;
                 if (moves.isEmpty()) {
                     state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-                } else {
-                    moveTimer += state.getFramesPerGravityDrop() / 2;
-                    final Coordinate coordinate = moves.remove(0);
-                    state.handleInputEvent(coordinate.inputEvent);
+                } else {                    
+                    state.handleInputEvent(moves.remove(0).inputEvent);
                 }
             }
         }
