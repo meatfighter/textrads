@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import textrads.ai.AsyncSearchChain;
 import textrads.ai.Coordinate;
 import textrads.ai.Playfield;
 import textrads.ai.SearchChain;
@@ -22,18 +23,17 @@ public class Textrads {
     private static final int MAX_FRAME_SKIPS = 3;
     private static final int MIN_SLEEP_MICROS = 1500;
     
-    private static final long NANOS_PER_FRAME = Math.round(1.0E9 / FRAMES_PER_SECOND);
+    public static final long NANOS_PER_FRAME = Math.round(1.0E9 / FRAMES_PER_SECOND);
     private static final long MIN_SLEEP_NANOS = TimeUnit.MICROSECONDS.toNanos(MIN_SLEEP_MICROS);
     
     private final Server server = new Server();
     private final Client client = new Client();
     private final PlayRenderer playRenderer = new PlayRenderer();
     private final InputEventList eventList = new InputEventList();
-    
-    private final SearchChain searchChain = new SearchChain();
-    private final boolean[][] playfield = new boolean[MonoGameState.PLAYFIELD_HEIGHT][MonoGameState.PLAYFIELD_WIDTH];
-    private final List<Coordinate> moves = new ArrayList<>(1024);
+        
+    private final AsyncSearchChain asyncSearchChain = new AsyncSearchChain();
     private float moveTimer;
+    private List<Coordinate> moves;
     
     public void launch() throws Exception {
         
@@ -42,7 +42,7 @@ public class Textrads {
         GameStateSource.getState().setPlayers((byte) 2); // TODO TESTING AI
         GameStateSource.getState().setSeed(ThreadLocalRandom.current().nextLong());
                 
-                
+        asyncSearchChain.init();                
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -88,7 +88,7 @@ public class Textrads {
             }            
         } 
         
-
+        System.exit(0);
     }
     
     private void update() {
@@ -110,47 +110,45 @@ public class Textrads {
             }
         }
 
+        boolean blockUpdate = false;
         {
             final MonoGameState state = GameStateSource.getState().getStates()[1];
-
-            if (state.isJustSpawned()) { 
-                final long startTime = System.nanoTime();
-                final byte[][] p = state.getPlayfield();
-                for (int y = MonoGameState.PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                    for (int x = MonoGameState.PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                        playfield[y][x] = p[y][x] != MonoGameState.EMPTY_BLOCK;
-                    }
-                }                     
-                searchChain.search(state.getTetrominoType(), state.getNexts().get(0), playfield, 
-                        state.getFramesPerGravityDrop(), state.getFramesPerLock(), state.getFramesPerGravityDrop() / 2);
-                if (searchChain.isBestFound()) {
-//                    Playfield.lock(playfield, state.getTetrominoType(), searchChain.getX(), searchChain.getY(), 
-//                            searchChain.getRotation());
-                    //Playfield.print(playfield);
-                    searchChain.getMoves(moves);
-//                    System.out.println(moves);
-                } else {
-//                    System.out.println("--- game over ---");
-                    moves.clear();
+            
+            if (asyncSearchChain.isSearching()) {
+                moves = asyncSearchChain.getMoves();
+                if (moves == null) {
+                    blockUpdate = true;
                 }
+            } else if (state.isJustSpawned()) {                 
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-                final long endTime = System.nanoTime();
-                
-                System.out.format("%f%n", (endTime - startTime) / 1.0E6);
+                final long startTime = System.nanoTime();
+                asyncSearchChain.search(state, moveTimer);
+                moves = asyncSearchChain.getMoves();                
+                if (moves == null) {
+                    blockUpdate = true;
+                }
+                System.out.println((System.nanoTime() - startTime) / 1.0E6);
             } 
             
-            --moveTimer;
-            
-            while (moveTimer <= 0) {
-                moveTimer += state.getFramesPerGravityDrop() / 2;
-                if (moves.isEmpty()) {
-                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-                } else {                    
-                    state.handleInputEvent(moves.remove(0).inputEvent);
-                }
+            if (moves != null) {
+                --moveTimer;            
+                while (moveTimer <= 0) {
+                    moveTimer += state.getFramesPerGravityDrop() / 2;
+                    if (moves.isEmpty()) {
+                        state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                    } else {                    
+                        state.handleInputEvent(moves.remove(0).inputEvent);
+                    }
+                }                
             }
         }
                 
+        GameStateSource.getState().getStates()[0].update();
+        if (!blockUpdate) {
+            GameStateSource.getState().getStates()[1].update();
+        } else {
+            System.out.println("blocked!!!");
+        }
         GameStateSource.getState().update();
     }
     
