@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 import textrads.MonoGameState;
 import textrads.Textrads;
 
+// TODO REPLACE THIS WITH A REAL ASYNC SEARCHER
+
 public class AsyncSearchChain {
     
     private static final long DEFAULT_TIMEOUT = Textrads.NANOS_PER_FRAME / 2;

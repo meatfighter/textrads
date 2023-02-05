@@ -113,7 +113,11 @@ public class SearchChain {
     }
 
     public void getMoves(final List<Coordinate> moves) {
-        searcher1.getMoves(bestX, bestY, bestRotation, bestDropFailed, moves);
+        if (bestFound) {
+            searcher1.getMoves(bestX, bestY, bestRotation, bestDropFailed, moves);
+        } else {
+            moves.clear();
+        }
     }
 
     public void search(final int currentType, final int nextType, final boolean[][] playfield, 

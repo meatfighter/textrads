@@ -34,13 +34,30 @@ public class MonoGameState implements Serializable {
     public static final byte EMPTY_BLOCK = 0;
     public static final byte GARBAGE_BLOCK = 8;
     
-    private static final int MOVES_PER_GARBAGE_ROW = 8;
+    public static final int MOVES_PER_GARBAGE_ROW = 8;
     
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
     private static final double LEVEL_THIRTY_FRAMES_PER_DROP = 2.0;
     
     private static final double DROP_DECAY_CONSTANT 
             = Math.log(LEVEL_THIRTY_FRAMES_PER_DROP / LEVEL_ZERO_FRAMES_PER_DROP) / 30.0;
+    private static final float[] FRAMES_PER_GRAVITY_DROP = new float[256];
+    private static final byte[] FRAMES_PER_LOCK = new byte[256];
+    
+    static {
+        for (int i = FRAMES_PER_GRAVITY_DROP.length - 1; i >= 0; --i) {
+            FRAMES_PER_GRAVITY_DROP[i] = (float) (LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * i));
+            FRAMES_PER_LOCK[i] = (byte) Math.round(Math.max(32f, FRAMES_PER_GRAVITY_DROP[i] + 4f));
+        }
+    }
+    
+    public static float getFramesPerGravityDrop(final int level) {
+        return FRAMES_PER_GRAVITY_DROP[Math.min(FRAMES_PER_GRAVITY_DROP.length - 1, level)];
+    }
+    
+    public static byte getFramesPerLock(final int level) {
+        return FRAMES_PER_LOCK[Math.min(FRAMES_PER_LOCK.length - 1, level)];
+    }    
     
     private final byte[][] playfield = new byte[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private final List<Byte> nexts = new ArrayList<>();
@@ -91,7 +108,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 0; // TODO TESTING
+        level = 10; // TODO TESTING
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -118,7 +135,8 @@ public class MonoGameState implements Serializable {
     }
     
     public void init() {        
-        updateFramesPerConstants();
+        framesPerGravityDrop = getFramesPerGravityDrop(level);
+        framesPerLock = getFramesPerLock(level);
     }
     
     private void resetLineClearTimer() {
@@ -132,11 +150,6 @@ public class MonoGameState implements Serializable {
             }
             Collections.shuffle(nexts.subList(nexts.size() - 7, nexts.size()), tetrominoRandomizer);
         }
-    }
-    
-    private void updateFramesPerConstants() {
-        framesPerGravityDrop = (float) (LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * level));
-        framesPerLock = (byte) Math.round(Math.max(32.0, framesPerGravityDrop + 4.0));
     }
     
     private void lockTetrimino() {
@@ -401,7 +414,8 @@ public class MonoGameState implements Serializable {
         lines += lineYs.size(); 
         if (lines / 10 != lev) {
             ++level;
-            updateFramesPerConstants();
+            framesPerGravityDrop = getFramesPerGravityDrop(level);
+            framesPerLock = getFramesPerLock(level);
         }
         
         for (final int lineY : lineYs) {
