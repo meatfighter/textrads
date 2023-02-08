@@ -28,20 +28,21 @@ public class Ai {
     private final List<Byte> nexts = new ArrayList<>();
     private final List<Byte> garbageXs = new ArrayList<>();
         
-    private byte garbageX = -1;
+    private byte garbageX;
     private byte garbageCounter;
     
     private boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
-    private volatile short currentLevel;
+    private short currentLevel;
     private short currentLines;
     
     private final Solution[] solutions = new Solution[PLAYFIELD_HEIGHT + 1];
 
+    private final Object solutionsMonitor = new Object();
     private final Object searchMonitor = new Object();
     private int requestedAttackRows;
     private boolean searching;
     
-    private volatile int difficulty; // TODO USE THIS
+    private int difficulty; // TODO USE THIS
     
     public Ai() {
         for (int i = solutions.length - 1; i >= 0; --i) {
@@ -51,16 +52,35 @@ public class Ai {
     
     public void init(final short level, final long seed, final int difficulty) {
         
-        this.difficulty = difficulty;
-        tetrominoRandomizer.setSeed(seed);
-        garbageRandomizer.setSeed(seed);
-
-        currentLevel = level;
+        synchronized (searchMonitor) {
+            while (searching) {                                                
+                try {
+                    searchMonitor.wait();
+                } catch (final InterruptedException e) {                    
+                }
+            } 
+        }
         
-        updateGarbageXs();
-        updateNexts();
+        synchronized (solutionsMonitor) {
+            this.difficulty = difficulty;
+            tetrominoRandomizer.setSeed(seed);
+            garbageRandomizer.setSeed(seed);
+            Playfield.clearPlayfield(currentPlayfield);
+            currentLevel = level;
+            currentLines = 0;
+            garbageX = -1;
+            garbageCounter = 0;
+            garbageXs.clear();
+            updateGarbageXs();
+            nexts.clear();
+            updateNexts();
+        } 
         
-
+        synchronized (searchMonitor) {
+            requestedAttackRows = -1;
+            searching = true;
+            searchMonitor.notifyAll();
+        }        
     }
     
     public void getMoves(final List<Coordinate> moves, final int attackRows) {
@@ -72,23 +92,30 @@ public class Ai {
                     searchMonitor.wait();
                 } catch (final InterruptedException e) {                    
                 }
-            }
-            requestedAttackRows = -1;
+            }            
         }
         
-        final Solution solution = solutions[attackRows];
-        currentLevel = solution.level;
-        currentLines = solution.lines;
-        moves.clear();
-        moves.addAll(solution.moves);
-        Playfield.copy(solution.playfield, currentPlayfield);
-        nexts.remove(0);
-        updateNexts();
-        if (attackRows > 0) {
-            for (int i = 0; i < attackRows; ++i) {
-                garbageXs.remove(0);
+        synchronized (solutionsMonitor) {
+            final Solution solution = solutions[attackRows];
+            currentLevel = solution.level;
+            currentLines = solution.lines;
+            moves.clear();
+            moves.addAll(solution.moves);
+            Playfield.copy(solution.playfield, currentPlayfield);
+            nexts.remove(0);
+            updateNexts();
+            if (attackRows > 0) {
+                for (int i = 0; i < attackRows; ++i) {
+                    garbageXs.remove(0);
+                }
+                updateGarbageXs();
             }
-            updateGarbageXs();
+        }
+        
+        synchronized (searchMonitor) {
+            requestedAttackRows = -1;
+            searching = true;
+            searchMonitor.notifyAll();
         }
     }
     
@@ -111,8 +138,10 @@ public class Ai {
                         }
                         attackRows = requestedAttackRows;
                     }
-                }                
-                computeMoves(attackRows);
+                }     
+                synchronized (solutionsMonitor) {
+                    computeMoves(attackRows);
+                }
             }
 
             synchronized (searchMonitor) {
