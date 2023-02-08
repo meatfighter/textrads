@@ -12,41 +12,50 @@ import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 
 public class Ai {
     
+    private static final class Solution {
+        final boolean[][] playfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
+        final List<Coordinate> moves = new ArrayList<>(1024);
+        short level;
+        short lines;
+    }
+    
     private final Thread thread = new Thread(this::loop);
     
     private final Random tetrominoRandomizer = new Random();
     private final Random garbageRandomizer = new Random();
     private final SearchChain searchChain = new SearchChain();
         
-    private final boolean[][][] playfields = new boolean[2][PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private final List<Byte> nexts = new ArrayList<>();
     private final List<Byte> garbageXs = new ArrayList<>();
-    
-    private final List<Coordinate>[] moves = new ArrayList[PLAYFIELD_HEIGHT + 1];
-    
-    private short level;
-    private short lines;
-    private byte attackRows;
-    
+        
     private byte garbageX = -1;
-    private byte garbageCounter;    
+    private byte garbageCounter;
+    
+    private boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
+    private volatile short currentLevel;
+    private short currentLines;
+    
+    private final Solution[] solutions = new Solution[PLAYFIELD_HEIGHT + 1];
 
+    private final Object searchMonitor = new Object();
+    private int requestedAttackRows;
+    private boolean searching;
+    
     private volatile int difficulty; // TODO USE THIS
-    private volatile boolean running;
     
     public Ai() {
-        for (int i = moves.length - 1; i >= 0; --i) {
-            moves[i] = new ArrayList<>(1024);
+        for (int i = solutions.length - 1; i >= 0; --i) {
+            solutions[i] = new Solution();
         }
     }
     
-    public void init(final MonoGameState monoGameState, final long seed, final int difficulty) {
+    public void init(final short level, final long seed, final int difficulty) {
         
         this.difficulty = difficulty;
         tetrominoRandomizer.setSeed(seed);
         garbageRandomizer.setSeed(seed);
 
-        level = monoGameState.getLevel();
+        currentLevel = level;
         
         updateGarbageXs();
         updateNexts();
@@ -54,33 +63,86 @@ public class Ai {
 
     }
     
-    private void computeMoves() {
+    public void getMoves(final List<Coordinate> moves, final int attackRows) {
         
-        for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {
-            
+        synchronized (searchMonitor) {
+            requestedAttackRows = attackRows;
+            while (searching) {                                                
+                try {
+                    searchMonitor.wait();
+                } catch (final InterruptedException e) {                    
+                }
+            }
+            requestedAttackRows = -1;
+        }
+        
+        final Solution solution = solutions[attackRows];
+        currentLevel = solution.level;
+        currentLines = solution.lines;
+        moves.clear();
+        moves.addAll(solution.moves);
+        Playfield.copy(solution.playfield, currentPlayfield);
+        nexts.remove(0);
+        updateNexts();
+        if (attackRows > 0) {
+            for (int i = 0; i < attackRows; ++i) {
+                garbageXs.remove(0);
+            }
+            updateGarbageXs();
         }
     }
     
+    private void loop() {        
+        while (true) {
+            synchronized (searchMonitor) {
+                while (!searching) {
+                    try {
+                        searchMonitor.wait();
+                    } catch (final InterruptedException e) {                    
+                    }                    
+                }
+            }
+            
+            for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {                
+                synchronized (searchMonitor) {                    
+                    if (requestedAttackRows >= 0) {
+                        if (attackRows < requestedAttackRows) {
+                            break;
+                        }
+                        attackRows = requestedAttackRows;
+                    }
+                }                
+                computeMoves(attackRows);
+            }
+
+            synchronized (searchMonitor) {
+                searching = false;
+                searchMonitor.notifyAll();
+            }
+        }
+    }    
+    
     private void computeMoves(final int attackRows) {
         
-        Playfield.copy(playfields[0], playfields[1]);
-        addGarbage(playfields[1], attackRows);
+        final Solution solution = solutions[attackRows];        
+        solution.level = currentLevel;
+        solution.lines = currentLines;
+        solution.moves.clear();
+        Playfield.copy(currentPlayfield, solution.playfield);
+        addGarbage(solution.playfield, attackRows);
         
-        // TODO NEED TO RETAIN IS_BEST_FOUND, X, Y, ROTATION, and MOVES
-        
-        searchChain.search(nexts.get(0), nexts.get(1), playfields[1], MonoGameState.getFramesPerGravityDrop(level),
-                MonoGameState.getFramesPerLock(level), getFramesPerMove());                
+        searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, 
+                MonoGameState.getFramesPerGravityDrop(solution.level),
+                MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
         if (searchChain.isBestFound()) {            
-            searchChain.getMoves(moves[attackRows]);
-            final int lev = lines / 10;
-            final int lns = Playfield.lock(playfields[1], nexts.get(0), searchChain.getX(), searchChain.getY(), 
+            searchChain.getMoves(solution.moves);
+            final int lev = solution.lines / 10;
+            solution.lines += Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
                     searchChain.getRotation());            
-            if ((lines + lns) / 10 != lev) {
-                ++level;
+            if (solution.lines / 10 != lev) {
+                ++solution.level;
             }
-        } else {
-            moves[attackRows].clear();
-        }        
+        }       
     }
     
     private void addGarbage(final boolean[][] playfield, final int attackRows) {
@@ -102,7 +164,7 @@ public class Ai {
         }
     }
     
-    private float getFramesPerMove() {
+    private float getFramesPerMove(final int level) { // TODO ENHANCE
         return MonoGameState.getFramesPerGravityDrop(level) / 2;
     }
     
@@ -128,9 +190,5 @@ public class Ai {
                 --garbageCounter;
             }
         }
-    }
-    
-    private void loop() {
-        
     }
 }
