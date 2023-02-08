@@ -53,6 +53,9 @@ public class Ai {
     public void init(final short level, final long seed, final int difficulty) {
         
         synchronized (searchMonitor) {
+            if (thread.getState() == Thread.State.NEW) {
+                thread.start();
+            }
             while (searching) {                                                
                 try {
                     searchMonitor.wait();
@@ -84,6 +87,8 @@ public class Ai {
     }
     
     public void getMoves(final List<Coordinate> moves, final int attackRows) {
+        
+        // TODO FOR TESTING VERIFY PLAYFIELDS ALWAYS MATCH!!!
         
         synchronized (searchMonitor) {
             requestedAttackRows = attackRows;
