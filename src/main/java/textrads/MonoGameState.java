@@ -123,7 +123,7 @@ public class MonoGameState implements Serializable {
         gameOverTimer = 0;
         justSpawned = false;
         rejectSoftDropRepeated = false;
-        garbageX = 0;
+        garbageX = -1;
         garbageCounter = 0;
         mode = SPAWN_MODE;
         
