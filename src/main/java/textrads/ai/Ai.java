@@ -14,7 +14,7 @@ public class Ai {
     
     private static final class Solution {
         final boolean[][] playfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
-        final List<Coordinate> moves = new ArrayList<>(1024);
+        final List<Byte> moves = new ArrayList<>(1024);
         short level;
         short lines;
     }
@@ -30,6 +30,7 @@ public class Ai {
         
     private byte garbageCounter;
     
+    private final List<Coordinate> moves = new ArrayList<>(1024);
     private final boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private short currentLevel;
     private short currentLines;
@@ -85,7 +86,9 @@ public class Ai {
         }        
     }
     
-    public void getMoves(final List<Coordinate> moves, final int attackRows) {
+    public void getMoves(final List<Byte> moves, final int attackRows,
+            
+            final MonoGameState state) { // TODO TESTING
         
         // TODO FOR TESTING VERIFY PLAYFIELDS ALWAYS MATCH!!!
         
@@ -100,6 +103,26 @@ public class Ai {
         }
         
         synchronized (solutionsMonitor) {
+            
+            // TODO TESTING
+            outer: {
+                final byte[][] pf = state.getPlayfield();
+                for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                    for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                        if ((pf[y][x] != MonoGameState.EMPTY_BLOCK) != currentPlayfield[y][x]) {
+                            System.out.println("*** mismatch :( ***");
+                            Playfield.print(currentPlayfield);
+                            try {
+                                Thread.sleep(30_000L);
+                            } catch (final InterruptedException ignored) {                                
+                            }
+                            break outer;
+                        }
+                    }
+                }
+                System.out.println("matches :)");
+            }
+            
             final Solution solution = solutions[attackRows];
             currentLevel = solution.level;
             currentLines = solution.lines;
@@ -125,6 +148,7 @@ public class Ai {
     
     private void loop() {        
         while (true) {
+            System.out.println("STATE: WAITING");
             synchronized (searchMonitor) {
                 while (!searching) {
                     try {
@@ -134,6 +158,7 @@ public class Ai {
                 }
             }
             
+            System.out.println("STATE: SEARCHING");
             for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {                
                 synchronized (searchMonitor) {                    
                     if (requestedAttackRows >= 0) {
@@ -168,14 +193,20 @@ public class Ai {
                 MonoGameState.getFramesPerGravityDrop(solution.level),
                 MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
         if (searchChain.isBestFound()) {            
-            searchChain.getMoves(solution.moves);
+            searchChain.getMoves(moves);
+            for (final Coordinate move : moves) {
+                solution.moves.add(move.inputEvent);
+            }
             final int lev = solution.lines / 10;
             solution.lines += Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
                     searchChain.getRotation());            
             if (solution.lines / 10 != lev) {
                 ++solution.level;
             }
-        }       
+            System.out.format("solution: %d%n", attackRows);
+        } else {
+            System.out.format("no solution: %d%n", attackRows);
+        }      
     }
     
     private void addGarbage(final boolean[][] playfield, final int attackRows) {

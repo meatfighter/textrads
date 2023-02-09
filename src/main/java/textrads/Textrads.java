@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
-import textrads.ai.Coordinate;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
 
@@ -31,7 +30,7 @@ public class Textrads {
         
     private final Ai ai = new Ai();
     private float moveTimer;
-    private List<Coordinate> moves = new ArrayList<>(1024);
+    private List<Byte> moves = new ArrayList<>(1024);
     
     public void launch() throws Exception {
         
@@ -113,20 +112,19 @@ public class Textrads {
             
             if (state.isJustSpawned()) {                 
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-                ai.getMoves(moves, state.getAttackRows());                          
+                ai.getMoves(moves, state.getAttackRows(), GameStateSource.getState().getStates()[1]);                          
+                System.out.println(moves);
             } 
-            
-            if (moves != null) {
-                --moveTimer;            
-                while (moveTimer <= 0) {
-                    moveTimer += state.getFramesPerGravityDrop() / 2;
-                    if (moves.isEmpty()) {
-                        state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-                    } else {                    
-                        state.handleInputEvent(moves.remove(0).inputEvent);
-                    }
-                }                
-            }
+                        
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += state.getFramesPerGravityDrop() / 2;
+                if (moves.isEmpty()) {
+                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    state.handleInputEvent(moves.remove(0));
+                }
+            }                
         }
                 
         GameStateSource.getState().update();
