@@ -189,6 +189,10 @@ public class Ai {
         Playfield.copy(currentPlayfield, solution.playfield);
         addGarbage(solution.playfield, attackRows);
         
+        // TODO TESTING
+        System.out.println("attackRows: " + attackRows);
+        Playfield.print(solution.playfield);
+        
         searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, 
                 MonoGameState.getFramesPerGravityDrop(solution.level),
                 MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
