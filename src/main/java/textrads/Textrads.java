@@ -9,10 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import textrads.ai.AsyncSearchChain;
+import textrads.ai.Ai;
 import textrads.ai.Coordinate;
-import textrads.ai.Playfield;
-import textrads.ai.SearchChain;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
 
@@ -31,18 +29,18 @@ public class Textrads {
     private final PlayRenderer playRenderer = new PlayRenderer();
     private final InputEventList eventList = new InputEventList();
         
-    private final AsyncSearchChain asyncSearchChain = new AsyncSearchChain();
+    private final Ai ai = new Ai();
     private float moveTimer;
-    private List<Coordinate> moves;
+    private List<Coordinate> moves = new ArrayList<>(1024);
     
     public void launch() throws Exception {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
         
         GameStateSource.getState().setPlayers((byte) 2); // TODO TESTING AI
-        GameStateSource.getState().setSeed(ThreadLocalRandom.current().nextLong());
-                
-        asyncSearchChain.init();                
+        final long seed = ThreadLocalRandom.current().nextLong();
+        GameStateSource.getState().setSeed(seed);                
+        ai.reset((short) 10, seed, 0); // TODO DIFFICULTY
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -110,24 +108,12 @@ public class Textrads {
             }
         }
 
-        boolean blockUpdate = false;
         {
             final MonoGameState state = GameStateSource.getState().getStates()[1];
             
-            if (asyncSearchChain.isSearching()) {
-                moves = asyncSearchChain.getMoves();
-                if (moves == null) {
-                    blockUpdate = true;
-                }
-            } else if (state.isJustSpawned()) {                 
+            if (state.isJustSpawned()) {                 
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-                final long startTime = System.nanoTime();
-                asyncSearchChain.search(state, moveTimer);
-                moves = asyncSearchChain.getMoves();                
-                if (moves == null) {
-                    blockUpdate = true;
-                }
-                System.out.println((System.nanoTime() - startTime) / 1.0E6);
+                ai.getMoves(moves, state.getAttackRows());                          
             } 
             
             if (moves != null) {
@@ -143,12 +129,6 @@ public class Textrads {
             }
         }
                 
-        GameStateSource.getState().getStates()[0].update();
-        if (!blockUpdate) {
-            GameStateSource.getState().getStates()[1].update();
-        } else {
-            System.out.println("blocked!!!");
-        }
         GameStateSource.getState().update();
     }
     

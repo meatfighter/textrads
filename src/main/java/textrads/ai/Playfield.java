@@ -14,7 +14,7 @@ public interface Playfield {
     }
 
     static void clearPlayfield(final boolean[][] playfield) {
-        for (int y = PLAYFIELD_HEIGHT; y >= 0; --y) {
+        for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
                 playfield[y][x] = false;
             }

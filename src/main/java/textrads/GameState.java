@@ -31,7 +31,9 @@ public class GameState implements Serializable {
         states[player].handleInputEvent(event);
     }
     
-    public void update() {
+    public void update() {        
+        states[0].update();
+        states[1].update();
         ++updates;
     }
 
