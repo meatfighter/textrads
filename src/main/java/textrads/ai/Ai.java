@@ -28,10 +28,9 @@ public class Ai {
     private final List<Byte> nexts = new ArrayList<>();
     private final List<Byte> garbageXs = new ArrayList<>();
         
-    private byte garbageX;
     private byte garbageCounter;
     
-    private boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
+    private final boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private short currentLevel;
     private short currentLines;
     
@@ -50,12 +49,13 @@ public class Ai {
         }
     }
     
-    public void init(final short level, final long seed, final int difficulty) {
+    public void reset(final short level, final long seed, final int difficulty) {
         
         synchronized (searchMonitor) {
             if (thread.getState() == Thread.State.NEW) {
                 thread.start();
             }
+            requestedAttackRows = 0;
             while (searching) {                                                
                 try {
                     searchMonitor.wait();
@@ -71,7 +71,6 @@ public class Ai {
             Playfield.clearPlayfield(currentPlayfield);
             currentLevel = level;
             currentLines = 0;
-            garbageX = -1;
             garbageCounter = 0;
             garbageXs.clear();
             updateGarbageXs();
@@ -138,7 +137,7 @@ public class Ai {
             for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {                
                 synchronized (searchMonitor) {                    
                     if (requestedAttackRows >= 0) {
-                        if (attackRows < requestedAttackRows) {
+                        if (attackRows > requestedAttackRows) {
                             break;
                         }
                         attackRows = requestedAttackRows;
@@ -186,14 +185,14 @@ public class Ai {
         }
         
         final int shift = PLAYFIELD_HEIGHT - attackRows;
-        for (int s = shift; s < PLAYFIELD_HEIGHT; ++s) {
-            System.arraycopy(playfield[s], 0, playfield[s - shift], 0, PLAYFIELD_WIDTH);
+        for (int i = 0; i < shift; ++i) {
+            System.arraycopy(playfield[i + attackRows], 0, playfield[i], 0, PLAYFIELD_WIDTH);
         }        
         for (int i = 0; i < attackRows; ++i) {
-            final int y = shift + i;
             final int gx = garbageXs.get(i);
+            final boolean[] row = playfield[shift + i];            
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                playfield[y][x] = (x != gx);
+                row[x] = (x != gx);
             }
         }
     }
@@ -213,16 +212,18 @@ public class Ai {
     
     private void updateGarbageXs() {
         while (garbageXs.size() < 20) {
+            byte garbageX = garbageXs.isEmpty() ? -1 : garbageXs.get(garbageXs.size() - 1);
             if (garbageCounter == 0) {
                 garbageCounter = MonoGameState.MOVES_PER_GARBAGE_ROW;
                 int x;
                 do {
                     x = garbageRandomizer.nextInt(PLAYFIELD_WIDTH);
                 } while (x == garbageX);
-                garbageXs.add((byte) x);
+                garbageX = (byte) x;                
             } else {
                 --garbageCounter;
             }
+            garbageXs.add(garbageX);
         }
     }
 }
