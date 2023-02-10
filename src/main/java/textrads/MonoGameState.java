@@ -154,6 +154,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void lockTetrimino() {
+        lastAttackRows = 0;
         for (final Offset offset : Tetromino.TETROMINOES[tetrominoType][tetrominoRotation].offsets) {
             final int by = tetrominoY + offset.y;
             if (by < 0) {
@@ -164,8 +165,7 @@ public class MonoGameState implements Serializable {
         }
         findLines();
         if (lineYs.isEmpty()) {
-            if (attackRows > 0) {
-                lastAttackRows = 0;
+            if (attackRows > 0) {                
                 mode = ADDING_GARBAGE_MODE;
             } else {
                 mode = SPAWN_MODE;

@@ -8,8 +8,6 @@ import textrads.MonoGameState;
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 
-// TODO THIS WILL REPLACE AsyncSearchChain
-
 public class Ai {
     
     private static final class Solution {
@@ -86,11 +84,7 @@ public class Ai {
         }        
     }
     
-    public void getMoves(final List<Byte> moves, final int attackRows,
-            
-            final MonoGameState state) { // TODO TESTING
-
-        System.out.format("getMoves: %d%n", attackRows);
+    public void getMoves(final List<Byte> moves, final int attackRows) {
         
         synchronized (searchMonitor) {
             requestedAttackRows = attackRows;
@@ -99,30 +93,10 @@ public class Ai {
                     searchMonitor.wait();
                 } catch (final InterruptedException e) {                    
                 }
-            }            
+            } 
         }
         
         synchronized (solutionsMonitor) {
-            
-            // TODO TESTING
-            outer: {
-                final byte[][] pf = state.getPlayfield();
-                for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
-                    for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
-                        if ((pf[y][x] != MonoGameState.EMPTY_BLOCK) != currentPlayfield[y][x]) {
-                            System.out.println("*** mismatch :( ***");
-                            Playfield.print(currentPlayfield);
-                            try {
-                                Thread.sleep(30_000L);
-                            } catch (final InterruptedException ignored) {                                
-                            }
-                            break outer;
-                        }
-                    }
-                }
-                System.out.println("matches :)");
-            }
-            
             final Solution solution = solutions[attackRows];
             currentLevel = solution.level;
             currentLines = solution.lines;
@@ -148,7 +122,6 @@ public class Ai {
     
     private void loop() {        
         while (true) {
-            System.out.println("STATE: WAITING");
             synchronized (searchMonitor) {
                 while (!searching) {
                     try {
@@ -158,7 +131,6 @@ public class Ai {
                 }
             }
             
-            System.out.println("STATE: SEARCHING");
             for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {                
                 synchronized (searchMonitor) {                    
                     if (requestedAttackRows >= 0) {
@@ -181,7 +153,6 @@ public class Ai {
     }    
     
     private void computeMoves(final int attackRows) {
-        
         final Solution solution = solutions[attackRows];        
         solution.level = currentLevel;
         solution.lines = currentLines;
@@ -199,13 +170,10 @@ public class Ai {
             }
             final int lev = solution.lines / 10;
             solution.lines += Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
-                    searchChain.getRotation());            
+                    searchChain.getRotation());
             if (solution.lines / 10 != lev) {
                 ++solution.level;
             }
-            System.out.format("solution: %d%n", attackRows);
-        } else {
-            System.out.format("no solution: %d%n", attackRows);
         }      
     }
     
