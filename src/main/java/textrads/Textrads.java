@@ -112,7 +112,7 @@ public class Textrads {
             
             if (state.isJustSpawned()) {                 
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-                ai.getMoves(moves, state.getAttackRows(), GameStateSource.getState().getStates()[1]);                          
+                ai.getMoves(moves, state.getLastAttackRows(), GameStateSource.getState().getStates()[1]);                          
                 System.out.println(moves);
             } 
                         

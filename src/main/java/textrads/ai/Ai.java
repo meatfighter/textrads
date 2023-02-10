@@ -89,8 +89,8 @@ public class Ai {
     public void getMoves(final List<Byte> moves, final int attackRows,
             
             final MonoGameState state) { // TODO TESTING
-        
-        // TODO FOR TESTING VERIFY PLAYFIELDS ALWAYS MATCH!!!
+
+        System.out.format("getMoves: %d%n", attackRows);
         
         synchronized (searchMonitor) {
             requestedAttackRows = attackRows;
@@ -188,10 +188,6 @@ public class Ai {
         solution.moves.clear();
         Playfield.copy(currentPlayfield, solution.playfield);
         addGarbage(solution.playfield, attackRows);
-        
-        // TODO TESTING
-        System.out.println("attackRows: " + attackRows);
-        Playfield.print(solution.playfield);
         
         searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, 
                 MonoGameState.getFramesPerGravityDrop(solution.level),

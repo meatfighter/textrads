@@ -76,6 +76,7 @@ public class MonoGameState implements Serializable {
     private short lines;
     private short wins;
     private byte attackRows;
+    private byte lastAttackRows;
     
     private byte tetrominoType;
     private byte tetrominoRotation;
@@ -164,6 +165,7 @@ public class MonoGameState implements Serializable {
         findLines();
         if (lineYs.isEmpty()) {
             if (attackRows > 0) {
+                lastAttackRows = 0;
                 mode = ADDING_GARBAGE_MODE;
             } else {
                 mode = SPAWN_MODE;
@@ -377,6 +379,7 @@ public class MonoGameState implements Serializable {
         }
         
         --attackRows;
+        ++lastAttackRows;
         
         if (garbageCounter == 0) {
             garbageCounter = MOVES_PER_GARBAGE_ROW;
@@ -461,6 +464,10 @@ public class MonoGameState implements Serializable {
 
     public int getAttackRows() {
         return attackRows;
+    }
+
+    public byte getLastAttackRows() {
+        return lastAttackRows;
     }
     
     public void addAttackRows(final int rows) {
