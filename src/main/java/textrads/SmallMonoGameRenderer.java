@@ -136,7 +136,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
             }            
         }
         
-        GraphicsUtil.drawBlockImage(g, image, 10, 10);
+        GraphicsUtil.drawBlockImage(g, image, 10, 11);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
