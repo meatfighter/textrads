@@ -4,7 +4,7 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
-import textrads.util.RenderUtil;
+import textrads.util.GraphicsUtil;
 
 public class SmallMonoGameRenderer extends MonoGameRenderer {
     
@@ -72,12 +72,12 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
 
         g.setForegroundColor(VALUE_COLOR);
-        RenderUtil.putIntRight(g, x + 33, y + 16, state.getScore());
-        RenderUtil.putStringRight(g, x + 33, y + 17, RenderUtil.formatTime(state.getGameState().getUpdates()));
-        RenderUtil.putIntRight(g, x + 33, y + 18, state.getLevel());
-        RenderUtil.putIntRight(g, x + 33, y + 19, state.getLines());
+        GraphicsUtil.putIntRight(g, x + 33, y + 16, state.getScore());
+        GraphicsUtil.putStringRight(g, x + 33, y + 17, GraphicsUtil.formatTime(state.getGameState().getUpdates()));
+        GraphicsUtil.putIntRight(g, x + 33, y + 18, state.getLevel());
+        GraphicsUtil.putIntRight(g, x + 33, y + 19, state.getLines());
         if (showWins) {
-            RenderUtil.putIntRight(g, x + 33, y + 20, state.getWins());
+            GraphicsUtil.putIntRight(g, x + 33, y + 20, state.getWins());
         }
         
         final byte[][] playfield = state.getPlayfield();

@@ -3,6 +3,7 @@ package textrads.ai;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import textrads.Offset;
 import java.util.List;
 
@@ -21,11 +22,14 @@ public class SearchChain {
     private static final double[] WEIGHTS = new double[17];
     
     static {
-        try (final DataInputStream in = new DataInputStream(new BufferedInputStream(
-                SearchChain.class.getResourceAsStream("/weights.dat")))) {
+        try (final InputStream is = SearchChain.class.getResourceAsStream("/ai/weights.dat"); 
+                final BufferedInputStream bis = new BufferedInputStream(is); 
+                final DataInputStream in = new DataInputStream(bis)) {
+            
             for (int i = 0; i < WEIGHTS.length; ++i) {
                 WEIGHTS[i] = in.readDouble();
             }
+            
         } catch (final IOException ignored) {
         }
     }

@@ -4,7 +4,7 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
-import textrads.util.RenderUtil;
+import textrads.util.GraphicsUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
 
@@ -74,7 +74,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
 
         g.setForegroundColor(VALUE_COLOR);
         g.putString(x + 52, oy, Integer.toString(state.getScore()));
-        g.putString(x + 51, oy + 2, RenderUtil.formatTime(state.getGameState().getUpdates()));
+        g.putString(x + 51, oy + 2, GraphicsUtil.formatTime(state.getGameState().getUpdates()));
         g.putString(x + 52, oy + 4, Integer.toString(state.getLevel()));
         g.putString(x + 52, oy + 6, Integer.toString(state.getLines()));
         if (showWins) {
