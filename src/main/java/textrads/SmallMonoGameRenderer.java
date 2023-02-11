@@ -10,6 +10,9 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     
     private final Dimensions DIMENSIONS = new Dimensions(35, 22);
     
+    // TODO TESTING
+    private BlockImage image = GraphicsUtil.readBlockImage("test-go.gif");
+    
     @Override
     public Dimensions getDimensions() {
         return DIMENSIONS;
@@ -132,6 +135,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 break;
             }            
         }
+        
+        GraphicsUtil.drawBlockImage(g, image, 10, 10);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 

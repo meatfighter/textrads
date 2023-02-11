@@ -1,5 +1,6 @@
 package textrads.util;
 
+import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.awt.image.BufferedImage;
@@ -12,6 +13,8 @@ import textrads.BlockImage;
 
 public final class GraphicsUtil {
     
+    private static final char LOWER_HALF_BLOCK = '\u2584';
+    
     private static final TextColor[] INDEXED_COLORS = new TextColor[256];
     
     private static final TextColor TRANSPARENT_COLOR;
@@ -23,11 +26,14 @@ public final class GraphicsUtil {
         TRANSPARENT_COLOR = INDEXED_COLORS[16];
     }
     
-    public static BlockImage readBlockImage(final String filename) throws IOException {
+    public static BlockImage readBlockImage(final String filename) {
         try (final InputStream is = GraphicsUtil.class.getResourceAsStream("/images/" + filename); 
                 final BufferedInputStream bis = new BufferedInputStream(is)) {
             return readBlockImage(bis);
+        } catch (final Exception ignored) {
+            ignored.printStackTrace(); // TODO REMOVE
         }
+        return null;
     }
 
     public static BlockImage readBlockImage(final InputStream in) throws IOException {
@@ -54,8 +60,40 @@ public final class GraphicsUtil {
         return blockImage;
     }   
     
-    public static void drawBlockImage(final TextGraphics g, final int x, final int y) {
-        
+    public static void drawBlockImage(final TextGraphics g, final BlockImage image, final int x, final int y) {
+        final TextColor[][] pixels = image.getPixels();
+        for (int i = image.getHeight() - 1; i >= 0; --i) {
+            final int oy = i + y;
+            final int cy = oy / 2;
+            final boolean setUpper = (oy & 1) == 0;
+            for (int j = image.getWidth() - 1; j >= 0; --j) {
+                final TextColor color = pixels[i][j];
+                if (color == TRANSPARENT_COLOR) {
+                    continue;
+                }
+                final int ox = j + x;                
+                final TextCharacter c = g.getCharacter(ox, cy);
+                if (c == null) {
+                    continue;
+                }
+                TextColor upperColor;
+                TextColor lowerColor;
+                if (c.getCharacterString().charAt(0) != LOWER_HALF_BLOCK) {
+                    upperColor = lowerColor = c.getBackgroundColor();
+                } else {
+                    upperColor = c.getBackgroundColor();
+                    lowerColor = c.getForegroundColor();
+                }
+                if (setUpper) {
+                    upperColor = color;
+                } else {
+                    lowerColor = color;
+                }
+                g.setBackgroundColor(upperColor);
+                g.setForegroundColor(lowerColor);
+                g.setCharacter(ox, cy, LOWER_HALF_BLOCK);
+            }
+        }
     }
 
     public static void putIntRight(final TextGraphics g, final int x, final int y, final int value) {

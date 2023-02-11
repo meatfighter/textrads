@@ -1,6 +1,7 @@
 package textrads;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
+import textrads.util.GraphicsUtil;
 
 public class Textrads {
     
@@ -99,6 +101,8 @@ public class Textrads {
 //        }
 //        state.update();
 
+// --------------------
+
         {
             final GameState state = GameStateSource.getState();
             InputEventSource.poll(eventList);
@@ -127,6 +131,10 @@ public class Textrads {
         }
                 
         GameStateSource.getState().update();
+
+// --------------------
+
+        
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
