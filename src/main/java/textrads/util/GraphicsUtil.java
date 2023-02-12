@@ -13,7 +13,7 @@ import textrads.BlockImage;
 
 public final class GraphicsUtil {
     
-    private static final char LOWER_HALF_BLOCK = '\u2584';
+    private static final char UPPER_HALF_BLOCK = '\u2590';
     
     private static final TextColor[] INDEXED_COLORS = new TextColor[256];
     
@@ -78,20 +78,20 @@ public final class GraphicsUtil {
                 }
                 TextColor upperColor;
                 TextColor lowerColor;
-                if (c.getCharacterString().charAt(0) != LOWER_HALF_BLOCK) {
+                if (c.getCharacterString().charAt(0) != UPPER_HALF_BLOCK) {
                     upperColor = lowerColor = c.getBackgroundColor();
                 } else {
-                    upperColor = c.getBackgroundColor();
-                    lowerColor = c.getForegroundColor();
+                    upperColor = c.getForegroundColor();
+                    lowerColor = c.getBackgroundColor();
                 }
                 if (setUpper) {
                     upperColor = color;
                 } else {
                     lowerColor = color;
                 }
-                g.setBackgroundColor(upperColor);
-                g.setForegroundColor(lowerColor);
-                g.setCharacter(ox, cy, LOWER_HALF_BLOCK);
+                g.setForegroundColor(upperColor);
+                g.setBackgroundColor(lowerColor);
+                g.setCharacter(ox, cy, UPPER_HALF_BLOCK);
             }
         }
     }
