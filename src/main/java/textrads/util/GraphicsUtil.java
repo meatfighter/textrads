@@ -3,17 +3,16 @@ package textrads.util;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
-import java.io.IOException;
+import java.io.DataInputStream;
 import java.io.InputStream;
-import javax.imageio.ImageIO;
-import textrads.BlockImage;
+import textrads.BlockPic;
 
 public final class GraphicsUtil {
     
-    private static final char UPPER_HALF_BLOCK = '\u2590';
+    private static final String BLOCK_PICS_FILENAME_EXTENSION = ".bpx";
+    
+    private static final char RIGHT_HALF_BLOCK = '\u2590';
     
     private static final TextColor[] INDEXED_COLORS = new TextColor[256];
     
@@ -26,72 +25,59 @@ public final class GraphicsUtil {
         TRANSPARENT_COLOR = INDEXED_COLORS[16];
     }
     
-    public static BlockImage readBlockImage(final String filename) {
-        try (final InputStream is = GraphicsUtil.class.getResourceAsStream("/images/" + filename); 
-                final BufferedInputStream bis = new BufferedInputStream(is)) {
-            return readBlockImage(bis);
+    public static BlockPic loadBlockPic(final String name) {
+        try (final InputStream is = GraphicsUtil.class.getResourceAsStream(
+                    String.format("/images/%s%s", name, BLOCK_PICS_FILENAME_EXTENSION)); 
+                final BufferedInputStream bis = new BufferedInputStream(is); 
+                final DataInputStream dis = new DataInputStream(bis)) {
+            final int width = dis.readInt();
+            final int height = dis.readInt();
+            final BlockPic blockPic = new BlockPic(width, height);
+            final TextColor[][] colors = blockPic.getColors();
+            for (int y = 0; y < height; ++y) {
+                for (int x = 0; x < width; ++x) {
+                    colors[y][x] = INDEXED_COLORS[0xFF & dis.read()];
+                }
+            }
+            return blockPic;
         } catch (final Exception ignored) {
             ignored.printStackTrace(); // TODO REMOVE
         }
         return null;
     }
-
-    public static BlockImage readBlockImage(final InputStream in) throws IOException {
-        
-        final BufferedImage bufferedImage = ImageIO.read(in);
-        if (bufferedImage.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
-            throw new IllegalArgumentException("Image is not indexed byte type.");
-        }
-        final WritableRaster raster = bufferedImage.getRaster();
-        if (raster.getNumBands() != 1) {
-            throw new IllegalArgumentException("Image contains more than one band.");
-        }
-        
-        final BlockImage blockImage = new BlockImage(bufferedImage.getWidth(), bufferedImage.getHeight());
-        final TextColor[][] pixels = blockImage.getPixels();
-        final int[] sample = new int[1];
-        for (int y = bufferedImage.getHeight() - 1; y >= 0; --y) {
-            for (int x = bufferedImage.getWidth() - 1; x >= 0; --x) {
-                raster.getPixel(x, y, sample);
-                pixels[y][x] = INDEXED_COLORS[sample[0]];
-            }
-        }
-        
-        return blockImage;
-    }   
     
-    public static void drawBlockImage(final TextGraphics g, final BlockImage image, final int x, final int y) {
-        final TextColor[][] pixels = image.getPixels();
-        for (int i = image.getHeight() - 1; i >= 0; --i) {
+    public static void drawBlockPic(final TextGraphics g, final BlockPic pic, final int x, final int y) {
+        final TextColor[][] pixels = pic.getColors();
+        for (int i = pixels.length - 1; i >= 0; --i) {
             final int oy = i + y;
-            final int cy = oy / 2;
-            final boolean setUpper = (oy & 1) == 0;
-            for (int j = image.getWidth() - 1; j >= 0; --j) {
-                final TextColor color = pixels[i][j];
-                if (color == TRANSPARENT_COLOR) {
+            final TextColor[] row = pixels[i];
+            for (int j = row.length - 1; j >= 0; --j) {
+                final TextColor color = row[j];                
+                if (color == TRANSPARENT_COLOR) {                    
                     continue;
                 }
-                final int ox = j + x;                
-                final TextCharacter c = g.getCharacter(ox, cy);
-                if (c == null) {
+                final int ox = j + x;
+                final int cx = ox / 2;
+                final TextCharacter c = g.getCharacter(cx, oy);
+                if (c == null) {                   
                     continue;
                 }
-                TextColor upperColor;
-                TextColor lowerColor;
-                if (c.getCharacterString().charAt(0) != UPPER_HALF_BLOCK) {
-                    upperColor = lowerColor = c.getBackgroundColor();
+                TextColor leftColor;
+                TextColor rightColor;
+                if (c.getCharacterString().charAt(0) != RIGHT_HALF_BLOCK) {
+                    leftColor = rightColor = c.getBackgroundColor();
                 } else {
-                    upperColor = c.getForegroundColor();
-                    lowerColor = c.getBackgroundColor();
+                    leftColor = c.getBackgroundColor();
+                    rightColor = c.getForegroundColor();
                 }
-                if (setUpper) {
-                    upperColor = color;
+                if ((ox & 1) == 0) {
+                    leftColor = color;
                 } else {
-                    lowerColor = color;
+                    rightColor = color;
                 }
-                g.setForegroundColor(upperColor);
-                g.setBackgroundColor(lowerColor);
-                g.setCharacter(ox, cy, UPPER_HALF_BLOCK);
+                g.setBackgroundColor(leftColor);
+                g.setForegroundColor(rightColor);
+                g.setCharacter(cx, oy, RIGHT_HALF_BLOCK);
             }
         }
     }

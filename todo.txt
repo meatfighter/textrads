@@ -1,6 +1,8 @@
 3 2 1 GO!
 
+sudo service ssh restart
 
+ssh -i wsl_ssh_private_key.pem -p 2022 mbirken@localhost
 
 
 does Ctrl and Alt actually work?
