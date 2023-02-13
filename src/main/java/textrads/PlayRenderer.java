@@ -6,7 +6,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 
 public class PlayRenderer {
  
-    public static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(0);
+    public static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(16);
 
     private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
     private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
