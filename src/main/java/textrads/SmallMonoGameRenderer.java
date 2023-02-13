@@ -136,7 +136,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
             }            
         }
         
-        GraphicsUtil.drawBlockPic(g, pic, 2 * x + 7, y + 3);
+        // TODO TESTING
+        //GraphicsUtil.drawBlockPic(g, pic, 2 * x + 7, y + 3);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
