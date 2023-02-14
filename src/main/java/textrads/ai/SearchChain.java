@@ -81,7 +81,7 @@ public class SearchChain {
             this.dropFailed1 = dropFailed;
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
-            if (seedFiller.canClearMoreLines(playfield1)) {
+            if (seedFiller.canClearMoreLines(playfield1)) {                
                 searcher2.search(type2, playfield1, framesPerGravityDrop, framesPerLock, framesPerMove);
             }
         });
@@ -89,8 +89,8 @@ public class SearchChain {
         searcher2.setSearchListener((tetrominoX, tetrominoY, tetrominoRotation, dropFailed, framesPerGravityDrop, 
                 framesPerLock, framesPerMove) -> {
             lockHeight2 = TETROMINOES[type2][tetrominoRotation].getLockHeight(tetrominoY);
-            linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);
-            if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {
+            linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);            
+            if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {                
                 evaluate();
             }
         });
@@ -134,7 +134,7 @@ public class SearchChain {
         bestFound = false;
         bestScore = Double.MAX_VALUE;        
         
-        if (seedFiller.canClearMoreLines(playfield)) {
+        if (seedFiller.canClearMoreLines(playfield)) {            
             searcher1.search(currentType, playfield, framesPerGravityDrop, framesPerLock, framesPerMove);
         }
     }

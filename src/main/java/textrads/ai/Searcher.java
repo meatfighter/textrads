@@ -169,10 +169,8 @@ public final class Searcher {
                         inner: {
                             final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
                             if (!testPosition(playfield, c)) {
-                                if (listener != null) {
-                                    listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
-                                            framesPerGravityDrop, framesPerLock, framesPerMove);
-                                }
+                                listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
+                                        framesPerGravityDrop, framesPerLock, framesPerMove);
                                 break inner;
                             }
                             if (c.previous != null) {
@@ -210,15 +208,14 @@ public final class Searcher {
                                     c.moveTimer = moveTimer;
                                     c.state = Coordinate.State.START_MOVE;
                                 }
+                                break outer;
                             } else if (--lockTimer < 0) {
-                                if (listener != null) {
-                                    listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
-                                            framesPerGravityDrop, framesPerLock, framesPerMove);
-                                }
-                            }
-                            break outer;
+                                listener.locked(tetrominoX, tetrominoY, tetrominoRotation, dropFailed, 
+                                        framesPerGravityDrop, framesPerLock, framesPerMove);
+                                break outer;
+                            }                            
                         } else if (gravityDropTimer <= 0) {                            
-                            final Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
+                            Coordinate c = matrix[0][tetrominoRotation][tetrominoY + 3][tetrominoX + 2];
                             if (testPosition(playfield, c)) {
                                 if (c.previous == null) {
                                     c.previous = tail;
@@ -226,6 +223,17 @@ public final class Searcher {
                                     c.inputEvent = InputEvent.NOTHING_PRESSED;                         
                                     c.gravityDropTimer = gravityDropTimer + framesPerGravityDrop;
                                     c.lockTimer = framesPerLock;
+                                    c.moveTimer = moveTimer;
+                                    c.state = state;
+                                }
+                            } else {                                
+                                c = matrix[1][tetrominoRotation][tetrominoY + 2][tetrominoX + 2];
+                                if (c.previous == null) {                                    
+                                    c.previous = tail;
+                                    head = head.next = c;
+                                    c.inputEvent = InputEvent.NOTHING_PRESSED;                         
+                                    c.gravityDropTimer = gravityDropTimer;
+                                    c.lockTimer = lockTimer;
                                     c.moveTimer = moveTimer;
                                     c.state = state;
                                 }

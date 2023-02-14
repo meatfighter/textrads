@@ -109,7 +109,7 @@ public class MonoGameState implements Serializable {
         
         attackRows = 0;
         score = 0;
-        level = 17; // TODO TESTING
+        level = 10; // TODO TESTING
         lines = 0;
         tetrominoType = 0;
         tetrominoRotation = 0;
@@ -164,6 +164,7 @@ public class MonoGameState implements Serializable {
             playfield[by][bx] = (byte) (tetrominoType + 1);
         }
         findLines();
+        System.out.println("lockTetrimino: " + lineYs);
         if (lineYs.isEmpty()) {
             if (attackRows > 0) {                
                 mode = ADDING_GARBAGE_MODE;
@@ -174,6 +175,7 @@ public class MonoGameState implements Serializable {
             mode = CLEARING_LINES_MODE;
             resetLineClearTimer();
         }
+        System.out.println("mode: " + mode);
     }
     
     private boolean testPosition(final int rotation, final int x, final int y) {
@@ -324,6 +326,7 @@ public class MonoGameState implements Serializable {
     }
     
     public void update() {
+        justSpawned = false;
         switch (mode) {
             case SPAWN_MODE:
                 attemptSpawn();
@@ -344,8 +347,6 @@ public class MonoGameState implements Serializable {
     }
         
     private void updateFallingTetromino() {
-        justSpawned = false;
-        
         if (dropFailed) {
             attemptGravityDrop();            
             if (dropFailed && --lockTimer < 0) {
@@ -362,7 +363,9 @@ public class MonoGameState implements Serializable {
     }  
     
     private void updateClearingLines() {
+        System.out.println("updateClearingLines: " + lineClearTimer);
         if (--lineClearTimer < 0) {
+            System.out.println("update clearing lines: " + lineYs);
             clearLines();
             if (attackRows > 0) {
                 mode = ADDING_GARBAGE_MODE;
@@ -431,6 +434,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptSpawn() {
+        System.out.println("attempt spawn");
         rejectSoftDropRepeated = true;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;

@@ -84,7 +84,9 @@ public class Ai {
         }        
     }
     
-    public void getMoves(final List<Byte> moves, final int attackRows) {
+    public void getMoves(final List<Byte> moves, final int attackRows,
+            
+            final MonoGameState state) { // TODO TESTING
         
         synchronized (searchMonitor) {
             requestedAttackRows = attackRows;
@@ -97,6 +99,53 @@ public class Ai {
         }
         
         synchronized (solutionsMonitor) {
+            // TODO TESTING
+            outer: {
+                addGarbage(currentPlayfield, attackRows);                
+                final byte[][] pf = state.getPlayfield();
+                for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
+                    for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                        if ((pf[y][x] != MonoGameState.EMPTY_BLOCK) != currentPlayfield[y][x]) {
+                            System.out.println("*** mismatch :( ***");
+                            System.out.println("expected:");
+                            Playfield.print(currentPlayfield);
+                            System.out.println("actual:");
+                            
+                            final StringBuilder sb = new StringBuilder();
+                            sb.append("    0 1 2 3 4 5 6 7 8 9").append(System.lineSeparator());
+                            for (int i = 0; i < PLAYFIELD_HEIGHT; ++i) {
+                                sb.append(String.format("%02d ", i));
+                                for (int j = 0; j < PLAYFIELD_WIDTH; ++j) {
+                                    sb.append((pf[i][j] != MonoGameState.EMPTY_BLOCK) ? "[]" : " .");                                    
+                                }
+                                sb.append(String.format(" %02d%n", i));
+                            }    
+                            sb.append("    0 1 2 3 4 5 6 7 8 9").append(System.lineSeparator());
+                            System.out.println(sb);  
+                            
+                            System.out.format("%d %d %f %d%n", nexts.get(0), nexts.get(1),  
+                MonoGameState.getFramesPerGravityDrop(currentLevel),
+                MonoGameState.getFramesPerLock(currentLines));
+                            
+                            /*
+                            for (int i = 0; i < PLAYFIELD_HEIGHT; ++i) {                                
+                                for (int j = 0; j < PLAYFIELD_WIDTH; ++j) {
+                                    System.out.format("%b,", currentPlayfield[i][j]);                                   
+                                }
+                                System.out.println();
+                            } */                           
+                            
+                            try {
+                                Thread.sleep(60_000L);
+                            } catch (final InterruptedException ignored) {                                
+                            }
+                            break outer;
+                        }
+                    }
+                }
+                System.out.println("matches :)");
+            }            
+            
             final Solution solution = solutions[attackRows];
             currentLevel = solution.level;
             currentLines = solution.lines;
@@ -174,7 +223,9 @@ public class Ai {
             if (solution.lines / 10 != lev) {
                 ++solution.level;
             }
-        }      
+        } else if (attackRows == 0) {
+            System.out.println("GAME OVER!!!");
+        }       
     }
     
     private void addGarbage(final boolean[][] playfield, final int attackRows) {
@@ -197,7 +248,7 @@ public class Ai {
     }
     
     private float getFramesPerMove(final int level) { // TODO ENHANCE
-        return MonoGameState.getFramesPerGravityDrop(level) / 100; // TODO 2 ?
+        return MonoGameState.getFramesPerGravityDrop(level) / 2; // TODO 2 ?
     }
     
     private void updateNexts() {

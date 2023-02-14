@@ -13,32 +13,34 @@ public class TestAI {
     public void launch() throws Exception {
   
 //        System.out.println(Tetromino.TETROMINOES[Tetromino.I_TYPE][0].validPosition[19 + 2][7 + 2]);
-        
-        final boolean[][] playfield = Playfield.createPlayfield();        
+               
         final SearchChain searchChain = new SearchChain();
   
-//        final boolean[][] playfield = {  
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { false, false, false, false, false, false, false, false, false, false, }, 
-//            { true, true, true, false, false, false, false, false, false, false, }, 
-//            { true, true, true, false, false, false, false, false, false, false, }, 
-//            { true, true, true, false, false, true, true, false, false, false, }, 
-//            { true, true, true, true, true, true, true, true, false, false, }, 
-//            { true, true, true, true, true, true, true, true, true, false, },            
-//        };
+        final boolean[][] playfield = {  
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,false, },
+            { false,false,false,false,false,false,false,false,false,true, },
+            { false,false,false,false,false,false,false,false,false,true, },
+            { false,false,false,false,false,false,false,false,true,true, },
+            { false,false,false,false,false,false,false,false,true,true, },
+            { false,false,true,false,false,false,true,true,true,true, },
+            { true,true,true,true,false,true,true,true,true,true, },
+            { true,true,true,true,false,true,true,true,true,true, },
+            { true,true,true,true,true,true,true,false,true,true, },
+            { true,true,true,true,true,true,true,false,true,true, },
+            { true,true,true,true,true,true,true,false,true,true, },            
+        };
+        
+        searchChain.search(0, 4, playfield, 0.164519f, (byte) 32, 0.164519f / 2f);
+        System.out.println(searchChain.isBestFound());
         
         
 //        final int[] sequence = { 5, 0, 6, 4, 2, 2, 1, 6 };      
@@ -55,7 +57,7 @@ public class TestAI {
         
         
         
-        final Random random = ThreadLocalRandom.current();
+        /*final Random random = ThreadLocalRandom.current();
         int current = random.nextInt(7);
         int next = random.nextInt(7);
         
@@ -81,7 +83,7 @@ public class TestAI {
                 System.out.println("game over");
                 break;
             }
-        }
+        }*/
     }
     
     public static void main(final String... args) throws Exception {

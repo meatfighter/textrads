@@ -17,7 +17,7 @@ import textrads.util.GraphicsUtil;
 
 public class Textrads {
     
-    public static final int FRAMES_PER_SECOND = 60;
+    public static final int FRAMES_PER_SECOND = 60000; // TODO 60
     
     private static final int MAX_FRAME_SKIPS = 3;
     private static final int MIN_SLEEP_MICROS = 1500;
@@ -39,9 +39,9 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
         
         GameStateSource.getState().setPlayers((byte) 2); // TODO TESTING AI
-        final long seed = ThreadLocalRandom.current().nextLong();
+        final long seed = 42;   // 18 //ThreadLocalRandom.current().nextLong();
         GameStateSource.getState().setSeed(seed);                
-        ai.reset((short) 10, seed, 0); // TODO DIFFICULTY
+        ai.reset((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
         
         try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
             
@@ -114,9 +114,10 @@ public class Textrads {
         {
             final MonoGameState state = GameStateSource.getState().getStates()[1];
             
-            if (state.isJustSpawned()) {                 
+            if (state.isJustSpawned()) { 
+                System.out.println("just spawned: " + state.getMode());
                 moveTimer = state.getFramesPerGravityDrop() / 2;
-                ai.getMoves(moves, state.getLastAttackRows());                          
+                ai.getMoves(moves, state.getLastAttackRows(), state); // TODO TESTING
             } 
                         
             --moveTimer;            
