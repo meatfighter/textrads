@@ -164,7 +164,6 @@ public class MonoGameState implements Serializable {
             playfield[by][bx] = (byte) (tetrominoType + 1);
         }
         findLines();
-        System.out.println("lockTetrimino: " + lineYs);
         if (lineYs.isEmpty()) {
             if (attackRows > 0) {                
                 mode = ADDING_GARBAGE_MODE;
@@ -175,7 +174,6 @@ public class MonoGameState implements Serializable {
             mode = CLEARING_LINES_MODE;
             resetLineClearTimer();
         }
-        System.out.println("mode: " + mode);
     }
     
     private boolean testPosition(final int rotation, final int x, final int y) {
@@ -363,9 +361,7 @@ public class MonoGameState implements Serializable {
     }  
     
     private void updateClearingLines() {
-        System.out.println("updateClearingLines: " + lineClearTimer);
         if (--lineClearTimer < 0) {
-            System.out.println("update clearing lines: " + lineYs);
             clearLines();
             if (attackRows > 0) {
                 mode = ADDING_GARBAGE_MODE;
@@ -434,7 +430,6 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptSpawn() {
-        System.out.println("attempt spawn");
         rejectSoftDropRepeated = true;
         dropFailed = false;
         gravityDropTimer = framesPerGravityDrop;
