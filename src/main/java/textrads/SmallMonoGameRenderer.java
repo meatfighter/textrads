@@ -13,7 +13,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     private final Dimensions DIMENSIONS = new Dimensions(35, 22);
     
     // TODO TESTING
-    private TextImage textImage = GraphicsUtil.loadImage("seal");
+    private TextImage textImage = GraphicsUtil.loadImage("small-go");
     
     @Override
     public Dimensions getDimensions() {
