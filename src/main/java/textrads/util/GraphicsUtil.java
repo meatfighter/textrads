@@ -1,83 +1,84 @@
 package textrads.util;
 
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.graphics.TextImage;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.InputStream;
-import textrads.BlockPic;
 
 public final class GraphicsUtil {
     
-    private static final String BLOCK_PICS_FILENAME_EXTENSION = ".bpx";
+    private static final String TEXT_IMAGE_FILENAME_EXTENSION = ".tim";
     
     private static final char RIGHT_HALF_BLOCK = '\u2590';
     
     private static final TextColor[] INDEXED_COLORS = new TextColor[256];
-    
-    private static final TextColor TRANSPARENT_COLOR;
+    private static final TextCharacter[][] BLOCK_CHARACTERS 
+            = new TextCharacter[INDEXED_COLORS.length][INDEXED_COLORS.length];
 
     static {
         for (int i = INDEXED_COLORS.length - 1; i >= 0; --i) {
             INDEXED_COLORS[i] = new TextColor.Indexed(i);   
         }
-        TRANSPARENT_COLOR = INDEXED_COLORS[16];
+        for (int i = INDEXED_COLORS.length - 1; i >= 0; --i) {
+            for (int j = INDEXED_COLORS.length - 1; j >= 0; --j) {
+                BLOCK_CHARACTERS[i][j] = TextCharacter.fromCharacter(RIGHT_HALF_BLOCK, INDEXED_COLORS[j], 
+                        INDEXED_COLORS[i])[0];
+            }
+        }
     }
     
-    public static BlockPic loadBlockPic(final String name) {
+    public static TextImage loadImage(final String name) {
         try (final InputStream is = GraphicsUtil.class.getResourceAsStream(
-                    String.format("/images/%s%s", name, BLOCK_PICS_FILENAME_EXTENSION)); 
+                    String.format("/images/%s%s", name, TEXT_IMAGE_FILENAME_EXTENSION)); 
                 final BufferedInputStream bis = new BufferedInputStream(is); 
                 final DataInputStream dis = new DataInputStream(bis)) {
-            final int width = dis.readInt();
-            final int height = dis.readInt();
-            final BlockPic blockPic = new BlockPic(width, height);
-            final TextColor[][] colors = blockPic.getColors();
-            for (int y = 0; y < height; ++y) {
-                for (int x = 0; x < width; ++x) {
-                    colors[y][x] = INDEXED_COLORS[0xFF & dis.read()];
+            final int columns = dis.readInt();
+            final int rows = dis.readInt();
+            final TextImage textImage = new BasicTextImage(columns, rows);            
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < columns; ++j) {
+                    final int leftColor = 0xFF & dis.read();
+                    final int rightColor = 0xFF & dis.read();                    
+                    textImage.setCharacterAt(j, i, BLOCK_CHARACTERS[leftColor][rightColor]);
                 }
             }
-            return blockPic;
+            return textImage;
         } catch (final Exception ignored) {
             ignored.printStackTrace(); // TODO REMOVE
         }
         return null;
     }
     
-    public static void drawBlockPic(final TextGraphics g, final BlockPic pic, final int x, final int y) {
-        final TextColor[][] pixels = pic.getColors();
-        for (int i = pixels.length - 1; i >= 0; --i) {
-            final int oy = i + y;
-            final TextColor[] row = pixels[i];
-            for (int j = row.length - 1; j >= 0; --j) {
-                final TextColor color = row[j];                
-                if (color == TRANSPARENT_COLOR) {                    
-                    continue;
-                }
-                final int ox = j + x;
-                final int cx = ox / 2;
-                final TextCharacter c = g.getCharacter(cx, oy);
-                if (c == null) {                   
-                    continue;
-                }
-                TextColor leftColor;
-                TextColor rightColor;
-                if (c.getCharacterString().charAt(0) != RIGHT_HALF_BLOCK) {
-                    leftColor = rightColor = c.getBackgroundColor();
-                } else {
-                    leftColor = c.getBackgroundColor();
-                    rightColor = c.getForegroundColor();
-                }
-                if ((ox & 1) == 0) {
-                    leftColor = color;
-                } else {
-                    rightColor = color;
-                }
-                g.setBackgroundColor(leftColor);
-                g.setForegroundColor(rightColor);
-                g.setCharacter(cx, oy, RIGHT_HALF_BLOCK);
+    public static void drawImage(final TextGraphics g, final TextImage image, final int x, final int y) {
+        
+        TerminalSize sourceImageSize = image.getSize();
+        
+        // cropping specified image-subrectangle to the image itself:
+        int fromRow = 0;
+        int untilRow = Math.min(sourceImageSize.getRows(), image.getSize().getRows());
+        int fromColumn = 0;
+        int untilColumn = Math.min(sourceImageSize.getColumns(), image.getSize().getColumns());
+
+        // top/left-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
+        fromRow = Math.max(0, -y);
+        fromColumn = Math.max(0, -x);
+
+        // bot/right-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
+        untilRow = Math.min(untilRow, g.getSize().getRows() - y);
+        untilColumn = Math.min(untilColumn, g.getSize().getColumns() - x);
+
+        if (fromRow >= untilRow || fromColumn >= untilColumn) {
+            return;
+        }
+        for (int row = fromRow; row < untilRow; row++) {
+            for (int column = fromColumn; column < untilColumn; column++) {
+                g.setCharacter(column + x, row + y, image.getCharacterAt(column, row));
             }
         }
     }

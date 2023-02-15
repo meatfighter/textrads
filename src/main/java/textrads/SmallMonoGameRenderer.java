@@ -1,8 +1,10 @@
 package textrads;
 
 import com.googlecode.lanterna.Symbols;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.graphics.TextImage;
 import java.util.List;
 import textrads.util.GraphicsUtil;
 
@@ -11,7 +13,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     private final Dimensions DIMENSIONS = new Dimensions(35, 22);
     
     // TODO TESTING
-    private BlockPic pic = GraphicsUtil.loadBlockPic("test-go-3");
+    private TextImage textImage = GraphicsUtil.loadImage("seal");
     
     @Override
     public Dimensions getDimensions() {
@@ -137,7 +139,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         // TODO TESTING
-        //GraphicsUtil.drawBlockPic(g, pic, 2 * x + 7, y + 3);
+        //GraphicsUtil.drawImage(g, textImage, x + 4, y + 5);
+        g.drawImage(TerminalPosition.TOP_LEFT_CORNER, textImage);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
