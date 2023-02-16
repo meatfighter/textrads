@@ -4,12 +4,16 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.graphics.TextImage;
 import java.util.List;
 import textrads.util.GraphicsUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
 
     private final Dimensions DIMENSIONS = new Dimensions(64, 42);
+    
+    // TODO TESTING
+    private TextImage textImage = GraphicsUtil.loadImage("big-go");
     
     @Override
     public Dimensions getDimensions() {
@@ -137,6 +141,9 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                 break;
             }
         }
+        
+        // TODO TESTING
+        GraphicsUtil.drawImage(g, size, textImage, x + 5, y + 5);
     }    
     
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation) {

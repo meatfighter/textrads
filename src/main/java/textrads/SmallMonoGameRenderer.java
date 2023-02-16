@@ -1,7 +1,6 @@
 package textrads;
 
 import com.googlecode.lanterna.Symbols;
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -140,7 +139,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         // TODO TESTING
-        GraphicsUtil.drawImage(g, size, textImage, x + 4, y + 5);        
+        GraphicsUtil.drawImage(g, size, textImage, x + 4, y + 5);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
