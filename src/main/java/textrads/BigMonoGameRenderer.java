@@ -1,6 +1,7 @@
 package textrads;
 
 import com.googlecode.lanterna.Symbols;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
@@ -16,8 +17,8 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
     }
 
     @Override
-    public void render(final TextGraphics g, final MonoGameState state, final int x, final int y, 
-            final boolean showWins) {
+    public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
+            final int y, final boolean showWins) {
         
         g.setBackgroundColor(EMPTY_COLOR);
         g.setForegroundColor(LINE_COLOR);

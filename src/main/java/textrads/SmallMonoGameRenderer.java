@@ -2,6 +2,7 @@ package textrads;
 
 import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.graphics.TextImage;
@@ -21,8 +22,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     }
 
     @Override
-    public void render(final TextGraphics g, final MonoGameState state, final int x, final int y, 
-            final boolean showWins) {
+    public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
+            final int y, final boolean showWins) {
         
         g.setBackgroundColor(EMPTY_COLOR);
         g.setForegroundColor(LINE_COLOR);
@@ -139,8 +140,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         // TODO TESTING
-        //GraphicsUtil.drawImage(g, textImage, x + 4, y + 5);
-        g.drawImage(TerminalPosition.TOP_LEFT_CORNER, textImage);
+        GraphicsUtil.drawImage(g, size, textImage, x + 4, y + 5);        
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 

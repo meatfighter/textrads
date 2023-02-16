@@ -55,7 +55,8 @@ public final class GraphicsUtil {
         return null;
     }
     
-    public static void drawImage(final TextGraphics g, final TextImage image, final int x, final int y) {
+    public static void drawImage(final TextGraphics g, final TerminalSize size, final TextImage image, final int x, 
+            final int y) {
         
         TerminalSize sourceImageSize = image.getSize();
         
@@ -70,8 +71,8 @@ public final class GraphicsUtil {
         fromColumn = Math.max(0, -x);
 
         // bot/right-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
-        untilRow = Math.min(untilRow, g.getSize().getRows() - y);
-        untilColumn = Math.min(untilColumn, g.getSize().getColumns() - x);
+        untilRow = Math.min(untilRow, size.getRows() - y);
+        untilColumn = Math.min(untilColumn, size.getColumns() - x);
 
         if (fromRow >= untilRow || fromColumn >= untilColumn) {
             return;

@@ -1,5 +1,6 @@
 package textrads;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
@@ -36,5 +37,5 @@ public abstract class MonoGameRenderer {
     };    
     
     public abstract Dimensions getDimensions();
-    public abstract void render(TextGraphics g, MonoGameState state, int x, int y, boolean showWins);    
+    public abstract void render(TextGraphics g, TerminalSize size, MonoGameState state, int x, int y, boolean showWins);    
 }

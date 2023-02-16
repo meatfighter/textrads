@@ -25,13 +25,13 @@ public class PlayRenderer {
         }
         
         if (state.getPlayers() == 1) {        
-            renderer.render(g, state.getStates()[0], (size.getColumns() - dims.getWidth()) / 2, 
+            renderer.render(g, size, state.getStates()[0], (size.getColumns() - dims.getWidth()) / 2, 
                     (size.getRows() - dims.getHeight()) / 2, false);
         } else {
             final int x = (size.getColumns() - (2 * dims.getWidth() + 1)) / 2;
             final int y = (size.getRows() - dims.getHeight()) / 2;
-            renderer.render(g, state.getStates()[0], x, y, true);
-            renderer.render(g, state.getStates()[1], x + dims.getWidth() + 1, y, true);
+            renderer.render(g, size, state.getStates()[0], x, y, true);
+            renderer.render(g, size, state.getStates()[1], x + dims.getWidth() + 1, y, true);
         }
     }
 }
