@@ -26,7 +26,7 @@ public class MonoGameState implements Serializable {
     public static final byte GAME_OVER_MODE = 6;
 
     public static final int PLAYFIELD_WIDTH = 10;
-    public static final int PLAYFIELD_HEIGHT = 20; 
+    public static final int PLAYFIELD_HEIGHT = 20;
     
     public static final int SPAWN_X = 4;
     public static final int SPAWN_Y = 0;
@@ -104,6 +104,8 @@ public class MonoGameState implements Serializable {
     
     private byte mode;
     
+    private int updates;
+    
     public MonoGameState(final GameState gameState) {
         this.gameState = gameState;
         reset();
@@ -130,16 +132,15 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
-        countdownTimer = 59;
+        countdownTimer = Textrads.FRAMES_PER_SECOND;
         countdownValue = 3;
         mode = COUNTDOWN_MODE;
-        
+        updates = 0;        
         for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
             Arrays.fill(playfield[y], (byte) 0);
         }
         lineYs.clear();
         nexts.clear();
-        updateNexts();        
     }
     
     public void init() {        
@@ -332,6 +333,9 @@ public class MonoGameState implements Serializable {
     
     public void update() {
         justSpawned = false;
+        if (mode != COUNTDOWN_MODE && mode != GAME_OVER_MODE) {
+            ++updates;
+        }
         switch (mode) {
             case COUNTDOWN_MODE:
                 updateCountdown();
@@ -355,8 +359,8 @@ public class MonoGameState implements Serializable {
     }
     
     private void updateCountdown() {
-        if (--countdownTimer < 0) {
-            countdownTimer = 59;
+        if (--countdownTimer <= 0) {
+            countdownTimer = Textrads.FRAMES_PER_SECOND;
             if (--countdownValue < 0) {
                 mode = SPAWN_MODE;
             } 
@@ -466,6 +470,8 @@ public class MonoGameState implements Serializable {
     public void setSeed(final long seed) {
         tetrominoRandomizer.setSeed(seed);
         garbageRandomizer.setSeed(seed);
+        nexts.clear();
+        updateNexts();
     }
 
     public void setOpponent(final MonoGameState opponent) {
@@ -570,5 +576,9 @@ public class MonoGameState implements Serializable {
     
     public int getCountdownValue() {
         return countdownValue;
+    }
+
+    public int getUpdates() {
+        return updates;
     }
 }

@@ -74,7 +74,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
 
         g.setForegroundColor(VALUE_COLOR);
         GraphicsUtil.putIntRight(g, x + 33, y + 16, state.getScore());
-        GraphicsUtil.putStringRight(g, x + 33, y + 17, GraphicsUtil.formatTime(state.getGameState().getUpdates()));
+        GraphicsUtil.putStringRight(g, x + 33, y + 17, GraphicsUtil.formatTime(state.getUpdates()));
         GraphicsUtil.putIntRight(g, x + 33, y + 18, state.getLevel());
         GraphicsUtil.putIntRight(g, x + 33, y + 19, state.getLines());
         if (showWins) {
@@ -114,7 +114,6 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 BlockText.draw(countdown, g, X, y + 8, BlockText.Colors.NUMBERS, true);
                 break;                
             }
-            case MonoGameState.SPAWN_MODE:
             case MonoGameState.TETROMINO_FALLING_MODE:
                 drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),

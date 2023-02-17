@@ -76,7 +76,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
 
         g.setForegroundColor(VALUE_COLOR);
         g.putString(x + 52, oy, Integer.toString(state.getScore()));
-        g.putString(x + 51, oy + 2, GraphicsUtil.formatTime(state.getGameState().getUpdates()));
+        g.putString(x + 51, oy + 2, GraphicsUtil.formatTime(state.getUpdates()));
         g.putString(x + 52, oy + 4, Integer.toString(state.getLevel()));
         g.putString(x + 52, oy + 6, Integer.toString(state.getLines()));
         if (showWins) {
@@ -100,7 +100,23 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         }
         
         switch (state.getMode()) {
-            case MonoGameState.SPAWN_MODE:
+            case MonoGameState.COUNTDOWN_MODE: {
+                final int countdown = state.getCountdownValue();
+                int X = x + 4;
+                switch(countdown) {
+                    case 0:
+                        X += 2;
+                        break;
+                    case 1:
+                        X += 18;
+                        break;
+                    default:
+                        X += 14;
+                        break;
+                }
+                BlockText.draw(countdown, g, X, y + 16, BlockText.Colors.NUMBERS, false);
+                break;                
+            }            
             case MonoGameState.TETROMINO_FALLING_MODE:
                 drawTetromino(g, x + 4 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),
