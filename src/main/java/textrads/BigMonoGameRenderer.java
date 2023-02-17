@@ -12,9 +12,6 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
 
     private final Dimensions DIMENSIONS = new Dimensions(64, 42);
     
-    // TODO TESTING
-    private TextImage textImage = GraphicsUtil.loadImage("big-go");
-    
     @Override
     public Dimensions getDimensions() {
         return DIMENSIONS;
@@ -141,9 +138,6 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                 break;
             }
         }
-        
-        // TODO TESTING
-        GraphicsUtil.drawImage(g, size, textImage, x + 5, y + 5);
     }    
     
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation) {

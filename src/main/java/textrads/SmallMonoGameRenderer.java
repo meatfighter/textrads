@@ -4,16 +4,12 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import com.googlecode.lanterna.graphics.TextImage;
 import java.util.List;
 import textrads.util.GraphicsUtil;
 
 public class SmallMonoGameRenderer extends MonoGameRenderer {
     
     private final Dimensions DIMENSIONS = new Dimensions(35, 22);
-    
-    // TODO TESTING
-    private TextImage textImage = GraphicsUtil.loadImage("small-go");
     
     @Override
     public Dimensions getDimensions() {
@@ -101,6 +97,23 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         switch (state.getMode()) {
+            case MonoGameState.COUNTDOWN_MODE: {
+                final int countdown = state.getCountdownValue();
+                int X = x + 3;
+                switch(countdown) {
+                    case 0:
+                        X += 1;
+                        break;
+                    case 1:
+                        X += 9;
+                        break;
+                    default:
+                        X += 7;
+                        break;
+                }
+                BlockText.draw(countdown, g, X, y + 8, BlockText.Colors.NUMBERS, true);
+                break;                
+            }
             case MonoGameState.SPAWN_MODE:
             case MonoGameState.TETROMINO_FALLING_MODE:
                 drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
@@ -137,9 +150,6 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 break;
             }            
         }
-        
-        // TODO TESTING
-        GraphicsUtil.drawImage(g, size, textImage, x + 4, y + 5);
     }
 
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, 
