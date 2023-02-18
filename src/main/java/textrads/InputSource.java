@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public final class InputSource {
     
-    private static final int MAX_POLLS = 32;
+    private static final int MAX_POLLS = 1024;
     
     private static Screen screen;
     

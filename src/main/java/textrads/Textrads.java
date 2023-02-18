@@ -6,6 +6,10 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +35,8 @@ public class Textrads {
     private final InputEventList eventList = new InputEventList();
     
     private final WinnersDontUseDrugsRenderer winnersDontUseDrugsRenderer = new WinnersDontUseDrugsRenderer();
+    private final RecycleItDontTrashItRenderer recycleItDontTrashItRenderer = new RecycleItDontTrashItRenderer();
+    private final HackThePlanetRenderer hackThePlanetRenderer = new HackThePlanetRenderer();
         
     private final Ai ai = new Ai();
     private float moveTimer;
@@ -45,7 +51,18 @@ public class Textrads {
         GameStateSource.getState().setSeed(seed);                
         ai.reset((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
         
-        try (final Screen screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal())) {
+        final Terminal terminal = new DefaultTerminalFactory().createTerminal();
+        if (terminal instanceof Window) {
+            final Window window = (Window) terminal;
+            window.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(final WindowEvent e) {
+                    Terminator.setTerminate(true);
+                }
+            });
+        }
+        
+        try (final Screen screen = new TerminalScreen(terminal)) {
             
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor
@@ -142,7 +159,9 @@ public class Textrads {
     private void render(final TextGraphics g, final TerminalSize size) {
 //        playRenderer.render(g, size, GameStateSource.getState());
 
-        winnersDontUseDrugsRenderer.render(g, size);
+//        winnersDontUseDrugsRenderer.render(g, size);
+//        recycleItDontTrashItRenderer.render(g, size);
+        hackThePlanetRenderer.render(g, size);
     }
     
     public static void main(final String... args) throws Exception {
