@@ -83,6 +83,10 @@ public final class GraphicsUtil {
             }
         }
     }
+    
+    public static void centerImage(final TextGraphics g, final TerminalSize size, final TextImage image, final int y) {
+        drawImage(g, size, image, (size.getColumns() - image.getSize().getColumns()) / 2, y);
+    }
 
     public static void putIntRight(final TextGraphics g, final int x, final int y, final int value) {
         putStringRight(g, x, y, String.format(" %d", value));
@@ -108,6 +112,23 @@ public final class GraphicsUtil {
             return String.format(" %d:%02d:%02d", time, minutes, seconds);
         }
         return String.format(" %d:%02d:%02d:%02d", time / 24, time % 24, minutes, seconds);
+    }
+    
+    public static boolean isSmallTerminal(final TerminalSize size) {
+        
+        // standard size: 80 x 24
+        // 2p small size: 71 x 22
+        // 2p big size:  129 x 42
+        
+        return size.getColumns() < 129 || size.getRows() < 42;
+    }
+    
+    public static boolean isBigTerminal(final TerminalSize size) {
+        return !isSmallTerminal(size);
+    }
+    
+    public static void centerString(final TextGraphics g, final TerminalSize size, final int y, final String str) {        
+        g.putString((size.getColumns() - str.length()) / 2, y, str);
     }
     
     private GraphicsUtil() {        
