@@ -122,34 +122,34 @@ public class Textrads {
 
 // --------------------
 
-//        {
-//            final GameState state = GameStateSource.getState();
-//            InputEventSource.poll(eventList);
-//            for (int i = 0; i < eventList.size(); ++i) {
-//                state.handleInputEvent(eventList.get(i), 0);
-//            }
-//        }
-//
-//        {
-//            final MonoGameState state = GameStateSource.getState().getStates()[1];
-//            
-//            if (state.isJustSpawned()) { 
-//                moveTimer = state.getFramesPerGravityDrop() / 2;
-//                ai.getMoves(moves, state.getLastAttackRows());
-//            } 
-//                        
-//            --moveTimer;            
-//            while (moveTimer <= 0) {
-//                moveTimer += state.getFramesPerGravityDrop() / 2;
-//                if (moves.isEmpty()) {
-//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-//                } else {                    
-//                    state.handleInputEvent(moves.remove(0));
-//                }
-//            }                
-//        }
-//                
-//        GameStateSource.getState().update();
+        {
+            final GameState state = GameStateSource.getState();
+            InputEventSource.poll(eventList);
+            for (int i = 0; i < eventList.size(); ++i) {
+                state.handleInputEvent(eventList.get(i), 0);
+            }
+        }
+
+        {
+            final MonoGameState state = GameStateSource.getState().getStates()[1];
+            
+            if (state.isJustSpawned()) { 
+                moveTimer = state.getFramesPerGravityDrop() / 2;
+                ai.getMoves(moves, state.getLastAttackRows());
+            } 
+                        
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += state.getFramesPerGravityDrop() / 2;
+                if (moves.isEmpty()) {
+                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    state.handleInputEvent(moves.remove(0));
+                }
+            }                
+        }
+                
+        GameStateSource.getState().update();
 
 // --------------------
 
@@ -157,11 +157,11 @@ public class Textrads {
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        playRenderer.render(g, size, GameStateSource.getState());
+        playRenderer.render(g, size, GameStateSource.getState());
 
 //        winnersDontUseDrugsRenderer.render(g, size);
 //        recycleItDontTrashItRenderer.render(g, size);
-        hackThePlanetRenderer.render(g, size);
+//        hackThePlanetRenderer.render(g, size);
     }
     
     public static void main(final String... args) throws Exception {

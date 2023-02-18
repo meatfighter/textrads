@@ -1,6 +1,7 @@
 package textrads;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,15 +34,16 @@ public final class InputEventSource {
             if (keyStroke == null) {
                 break;
             }
+            if (keyStroke.getKeyType() == KeyType.Character && keyStroke.isCtrlDown()) {
+                final char c = keyStroke.getCharacter();
+                if (c == 'c' || c == 'C') {
+                    Terminator.setTerminate(true);
+                }
+            }
             final InputType inputType = inputMap.get(keyStroke);
             if (inputType == null) {
                 continue;
             }
-            
-            if (inputType == InputType.QUIT) {
-                Terminator.setTerminate(true); // TODO ENHANCE
-            }
-            
             final long last = lastPressedTimes.get(inputType);
             lastPressedTimes.put(inputType, updates);
             events.add(InputEvent.fromInputType(inputType, updates - last <= MAX_REPEAT_PERIOD));

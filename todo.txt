@@ -1,4 +1,7 @@
-3 2 1 GO!
+(C) 2023 meatfighter.com
+This program is free software. 
+Share and/or modify it per GPLv3.
+
 
 sudo service ssh restart
 
