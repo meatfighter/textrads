@@ -54,6 +54,8 @@ public class Textrads {
         GameStateSource.getState().setSeed(seed);                
         ai.reset((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
         
+        titleScreenState.reset(); // TODO TESTING
+        
         final Terminal terminal = new DefaultTerminalFactory().createTerminal();
         if (terminal instanceof Window) {
             final Window window = (Window) terminal;
@@ -156,7 +158,8 @@ public class Textrads {
 
 // --------------------
 
-        
+        InputEventSource.clear();
+        titleScreenState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
