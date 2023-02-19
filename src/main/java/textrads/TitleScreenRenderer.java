@@ -38,16 +38,17 @@ public class TitleScreenRenderer {
             }
                 
             case PRESS_ENTER_FLASHING:
-                g.setForegroundColor(COPYRIGHT_COLOR);
-                g.putString(copyrightX, copyrightY, COPYRIGHT_STRING);
-                g.putString(copyrightX, copyrightY + 1, LICENSE_STRING);
+                BlockText.draw(BlockText.TEXTRADS, g, titleX, titleY, TITLE_COLOR, small);
 
+                g.setBackgroundColor(BACKGROUND_COLOR);
                 if (state.isFlash()) {
                     g.setForegroundColor(PRESS_START_COLOR);
                     GraphicsUtil.centerString(g, size, pressEnterY, PRESS_ENTER_STRING);
                 }
 
-                BlockText.draw(BlockText.TEXTRADS, g, titleX, titleY, TITLE_COLOR, small);
+                g.setForegroundColor(COPYRIGHT_COLOR);
+                g.putString(copyrightX, copyrightY, COPYRIGHT_STRING);
+                g.putString(copyrightX, copyrightY + 1, LICENSE_STRING);
                 break;                
         }       
     }
