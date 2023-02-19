@@ -167,16 +167,14 @@ public class Ai {
             searchChain.getMoves(moves);
             for (final Coordinate move : moves) {
                 solution.moves.add(move.inputEvent);
-            }
-            final int lev = solution.lines / 10;
+            }            
             solution.lines += Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
                     searchChain.getRotation());
-            if (solution.lines / 10 != lev) {
-                ++solution.level;
+            final short minLevel = (short) (solution.lines / 10);
+            if (minLevel > solution.level) {
+                solution.level = minLevel;
             }
-        } else if (attackRows == 0) {
-            System.out.println("GAME OVER!!!");
-        }       
+        }      
     }
     
     private void addGarbage(final boolean[][] playfield, final int attackRows) {

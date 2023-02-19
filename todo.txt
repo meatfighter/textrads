@@ -1,9 +1,3 @@
-TODO ALWAYS MAKE SURE FOREGROUND AND BACKGROUND COLOR IS SET TO AVOID FLASHES!!!!!!!!!!!!!!!!!!!!!
-
-(C) 2023 meatfighter.com
-This is free software licensed under GPLv3.
-
-
 Structure this as nested state machines.
 Each outer machine must poll the state of the inner machine to decide to change state.
 
@@ -20,31 +14,37 @@ marathon:
 score
 level
 lines
+{ score, starting level }
 
 ultra:
 score
 time (3:00)
 lines
+{ score, starting level }
 
 40 lines: (solid height)
 score
 time ( :  ) -- counts up
 lines -- counts down from 40
+{ height, starting level, completed time, score }
 
 vs. com:
 score
 time ( :  ) -- counts up
 lines
+{ difficulty, starting level, completed time, score }
 
 b-type: (random garbage height)
 level
 high -- random garbage height
 lines -- counts down from 25
+{ height, starting level, completed time, score }
 
 c-type: (rising garbage)
 score
 level
 lines
+{ score, starting level }
 
 
    --

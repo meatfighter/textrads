@@ -49,7 +49,7 @@ public class Textrads {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
         
-        GameStateSource.getState().setPlayers((byte) 2); // TODO TESTING AI
+        GameStateSource.getState().setPlayers((byte) 1); // TODO TESTING AI
         final long seed = ThreadLocalRandom.current().nextLong();
         GameStateSource.getState().setSeed(seed);                
         ai.reset((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
@@ -118,12 +118,12 @@ public class Textrads {
 //        client.update();
 //        server.update();
 //        
-//        final GameState state = GameStateSource.getState();
-//        InputEventSource.poll(eventList);
-//        for (int i = 0; i < eventList.size(); ++i) {
-//            state.handleInputEvent(eventList.get(i), 0);
-//        }
-//        state.update();
+        final GameState state = GameStateSource.getState();
+        InputEventSource.poll(eventList);
+        for (int i = 0; i < eventList.size(); ++i) {
+            state.handleInputEvent(eventList.get(i), 0);
+        }
+        state.update();
 
 // --------------------
 
@@ -158,18 +158,18 @@ public class Textrads {
 
 // --------------------
 
-        InputEventSource.clear();
-        titleScreenState.update();
+//        InputEventSource.clear();
+//        titleScreenState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        playRenderer.render(g, size, GameStateSource.getState());
+        playRenderer.render(g, size, GameStateSource.getState());
 
 //        winnersDontUseDrugsRenderer.render(g, size);
 //        recycleItDontTrashItRenderer.render(g, size);
 //        hackThePlanetRenderer.render(g, size);
 
-        titleScreenRenderer.render(g, size, titleScreenState);
+//        titleScreenRenderer.render(g, size, titleScreenState);
     }
     
     public static void main(final String... args) throws Exception {
