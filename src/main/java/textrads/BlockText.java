@@ -3,6 +3,7 @@ package textrads;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import textrads.util.GraphicsUtil;
 
 public final class BlockText {
     
@@ -103,7 +104,7 @@ public final class BlockText {
     public static void draw(final int index, final TextGraphics g, final int x, final int y, TextColor color, 
             final boolean small, final int startY, final int endY) {
         
-        g.setBackgroundColor(color);
+        GraphicsUtil.setColor(g, color, Colors.BLACK);
         
         final boolean[][] blocks = BLOCKS[index];
         if (small) {
@@ -131,6 +132,6 @@ public final class BlockText {
         }
     }
     
-    private BlockText() {        
+    private BlockText() {       
     }
 }

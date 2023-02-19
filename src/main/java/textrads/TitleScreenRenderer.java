@@ -7,9 +7,9 @@ import textrads.util.GraphicsUtil;
 
 public class TitleScreenRenderer {
 
-    private static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(16);
-    private static final TextColor PRESS_START_COLOR = new TextColor.Indexed(231);
-    private static final TextColor TITLE_COLOR = new TextColor.Indexed(220);
+    private static final TextColor BACKGROUND_COLOR = Colors.BLACK;
+    private static final TextColor PRESS_START_COLOR = Colors.WHITE;
+    private static final TextColor TITLE_COLOR = Colors.GOLD;
     private static final TextColor COPYRIGHT_COLOR = new TextColor.Indexed(248);
     
     private static final String PRESS_ENTER_STRING = "PRESS ENTER";
@@ -25,7 +25,7 @@ public class TitleScreenRenderer {
         final int copyrightY = size.getRows() - 5;
         final int pressEnterY = (titleY + BlockText.computeHeight(small) + copyrightY) / 2;
         
-        g.setBackgroundColor(BACKGROUND_COLOR);        
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
         g.fill(' ');
         
         switch (state.getState()) {
@@ -40,13 +40,12 @@ public class TitleScreenRenderer {
             case PRESS_ENTER_FLASHING:
                 BlockText.draw(BlockText.TEXTRADS, g, titleX, titleY, TITLE_COLOR, small);
 
-                g.setBackgroundColor(BACKGROUND_COLOR);
                 if (state.isFlash()) {
-                    g.setForegroundColor(PRESS_START_COLOR);
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, PRESS_START_COLOR);
                     GraphicsUtil.centerString(g, size, pressEnterY, PRESS_ENTER_STRING);
                 }
 
-                g.setForegroundColor(COPYRIGHT_COLOR);
+                GraphicsUtil.setColor(g, BACKGROUND_COLOR, COPYRIGHT_COLOR);
                 g.putString(copyrightX, copyrightY, COPYRIGHT_STRING);
                 g.putString(copyrightX, copyrightY + 1, LICENSE_STRING);
                 break;                

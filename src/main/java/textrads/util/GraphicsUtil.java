@@ -131,6 +131,18 @@ public final class GraphicsUtil {
         g.putString((size.getColumns() - str.length()) / 2, y, str);
     }
     
+    // Always set background and foreground color at the same time, particularly when printing spaces. Spaces do not
+    // have a visible foreground color. However, the Screen buffer maintains the foreground color of all characters,
+    // including spaces. Forgetting to set the foreground color when printing spaces can inadvertantly lead to large 
+    // regions of the buffer invisibly changing. That, in turn, can cause the terminal to flicker since the terminal
+    // will clear to black and repaint when it receives a lot of data in a short period.
+    public static void setColor(final TextGraphics g, final TextColor backgroundColor, 
+            final TextColor foregroundColor) {
+        
+        g.setBackgroundColor(backgroundColor);
+        g.setForegroundColor(foregroundColor);
+    }
+    
     private GraphicsUtil() {        
     }
 }

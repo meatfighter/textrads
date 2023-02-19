@@ -1,3 +1,5 @@
+TODO ALWAYS MAKE SURE FOREGROUND AND BACKGROUND COLOR IS SET TO AVOID FLASHES!!!!!!!!!!!!!!!!!!!!!
+
 (C) 2023 meatfighter.com
 This is free software licensed under GPLv3.
 

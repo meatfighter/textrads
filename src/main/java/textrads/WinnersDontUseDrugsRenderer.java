@@ -19,13 +19,10 @@ public class WinnersDontUseDrugsRenderer {
         final int imageY = (size.getRows() - (imageHeight + (small ? 4 : 5))) / 2;
         final int textY = imageY + imageHeight + (small ? 1 : 2);
 
-        g.setBackgroundColor(BACKGROUND_COLOR);        
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, TEXT_COLOR);
         g.fill(' '); 
-        
-        g.setForegroundColor(TEXT_COLOR);
         GraphicsUtil.centerString(g, size, textY, "\u201cWINNERS DON'T USE DRUGS\u201d");
         GraphicsUtil.centerString(g, size, textY + 2, "William S. Sessions, Director, FBI");
-        
         GraphicsUtil.centerImage(g, size, image, imageY);
     }    
 }

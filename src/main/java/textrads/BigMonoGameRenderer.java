@@ -19,10 +19,14 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
     @Override
     public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
             final int y, final boolean showWins) {
+
+        GraphicsUtil.setColor(g, ATTACK_COLOR, BACKGROUND_COLOR);
+        for (int i = state.getAttackRows() - 1; i >= 0; --i) {
+            g.putString(x + 1, y + 40 - 2 * i, "  ");
+            g.putString(x + 1, y + 39 - 2 * i, "  ");
+        }
         
-        g.setBackgroundColor(EMPTY_COLOR);
-        g.setForegroundColor(LINE_COLOR);
-                  
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, LINE_COLOR);                  
         for (int i = 1; i < 41; ++i) {
             g.setCharacter(x, y + i, Symbols.SINGLE_LINE_VERTICAL);            
         }
@@ -30,14 +34,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         g.putString(x + 1, y, "\u2500\u2500");
         g.setCharacter(x, y + 41, Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER);
         g.putString(x + 1, y + 41, "\u2500\u2500");
-
-        g.setBackgroundColor(ATTACK_COLOR);
-        for (int i = state.getAttackRows() - 1; i >= 0; --i) {
-            g.putString(x + 1, y + 40 - 2 * i, "  ");
-            g.putString(x + 1, y + 39 - 2 * i, "  ");
-        }
-
-        g.setBackgroundColor(EMPTY_COLOR);        
+       
         for (int i = 1; i < 41; ++i) {
             g.setCharacter(x + 3, y + i, Symbols.SINGLE_LINE_VERTICAL);            
         }
@@ -63,7 +60,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         g.setCharacter(x + 44, y + 29, Symbols.SINGLE_LINE_T_RIGHT);
         g.setCharacter(x + 63, y + 29, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);      
         
-        g.setForegroundColor(LABEL_COLOR);
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, LABEL_COLOR);
         final int oy = y + (showWins ? 31 : 32);
         g.putString(x + 46, oy, "Score");
         g.putString(x + 46, oy + 2, "Time");
@@ -73,7 +70,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
             g.putString(x + 46, oy + 8, "Wins");
         }
 
-        g.setForegroundColor(VALUE_COLOR);
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, VALUE_COLOR);
         g.putString(x + 52, oy, Integer.toString(state.getScore()));
         g.putString(x + 51, oy + 2, GraphicsUtil.formatTime(state.getUpdates()));
         g.putString(x + 52, oy + 4, Integer.toString(state.getLevel()));
@@ -85,7 +82,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         final byte[][] playfield = state.getPlayfield();
         for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
-                g.setBackgroundColor(BLOCK_COLORS[playfield[i][j]]);
+                GraphicsUtil.setColor(g, BLOCK_COLORS[playfield[i][j]], BACKGROUND_COLOR);
                 g.putString(x + 4 + 4 * j, y + 1 + 2 * i, "    ");
                 g.putString(x + 4 + 4 * j, y + 2 + 2 * i, "    ");
             }
@@ -124,7 +121,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
             case MonoGameState.CLEARING_LINES_MODE: {
                 final int timer = state.getLineClearTimer();
                 if (timer >= 36 || timer >= 6 && timer <= 20) {
-                    g.setBackgroundColor(FLASH_COLOR);
+                    GraphicsUtil.setColor(g, FLASH_COLOR, BACKGROUND_COLOR);
                     for (final int lineY : state.getLineYs()) {
                         for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                             g.putString(x + 4 + 4 * j, y + 2 * lineY + 1, "    ");
@@ -141,7 +138,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                             state.getTetrominoType(), state.getTetrominoRotation(),
                             BLOCK_COLORS[state.getTetrominoType() + 1]);                    
                 } else if (t >= 90) {
-                    g.setBackgroundColor(GAME_OVER_COLOR);
+                    GraphicsUtil.setColor(g, GAME_OVER_COLOR, BACKGROUND_COLOR);
                     final int start = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89));
                     for (int i = start; i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
                         for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {                            
@@ -161,7 +158,8 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
     
     private void drawTetromino(final TextGraphics g, final int x, final int y, final int type, final int rotation, 
             final TextColor color) {
-        g.setBackgroundColor(color);
+        
+        GraphicsUtil.setColor(g, color, BACKGROUND_COLOR);
         for (final Offset offset : Tetromino.TETROMINOES[type][rotation].offsets) {
             final int bx = x + 4 * offset.x;
             final int by = y + 2 * offset.y;

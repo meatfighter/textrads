@@ -6,13 +6,14 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 
 public abstract class MonoGameRenderer {
     
-    static final TextColor EMPTY_COLOR = new TextColor.Indexed(16);
-    static final TextColor LINE_COLOR = new TextColor.Indexed(231);
-    static final TextColor FLASH_COLOR = new TextColor.Indexed(231);
+    static final TextColor BACKGROUND_COLOR = Colors.BLACK;
+    static final TextColor EMPTY_COLOR = Colors.BLACK;
+    static final TextColor LINE_COLOR = Colors.WHITE;
+    static final TextColor FLASH_COLOR = Colors.WHITE;
     static final TextColor ATTACK_COLOR = new TextColor.Indexed(160);
     static final TextColor LABEL_COLOR = new TextColor.Indexed(248);
-    static final TextColor VALUE_COLOR = new TextColor.Indexed(231);
-    static final TextColor COUNTDOWN_COLOR = new TextColor.Indexed(220);
+    static final TextColor VALUE_COLOR = Colors.WHITE;
+    static final TextColor COUNTDOWN_COLOR = Colors.GOLD;
     
     static final TextColor T_COLOR = new TextColor.Indexed(133);
     static final TextColor J_COLOR = new TextColor.Indexed(61);

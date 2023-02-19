@@ -23,14 +23,11 @@ public class RecycleItDontTrashItRenderer {
         final int imageX = (size.getColumns() - (imageWidth + 33)) / 2;
         final int imageY = recycleY + (small ? 4 : 5);
         
-        g.setBackgroundColor(BACKGROUND_COLOR);
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, TEXT_COLOR);
         g.fill(' ');
-                
-        g.setForegroundColor(TEXT_COLOR);
         g.putString(recycleX, recycleY, "RECYCLE IT,");
         g.putString(recycleX + 3, recycleY + 2, "DON'T TRASH IT!");
         g.putString(imageX + imageWidth + 1, imageY + 3 * imageHeight / 4, "William K. Reilly, Administrator");
-        
         GraphicsUtil.drawImage(g, size, image, imageX, imageY);
     }
 }

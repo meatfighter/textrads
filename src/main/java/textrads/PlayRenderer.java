@@ -1,20 +1,17 @@
 package textrads;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import textrads.util.GraphicsUtil;
 
 public class PlayRenderer {
  
-    private static final TextColor BACKGROUND_COLOR = new TextColor.Indexed(16);
-
     private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
     private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
 
     public void render(final TextGraphics g, final TerminalSize size, final GameState state) {        
         
-        g.setBackgroundColor(BACKGROUND_COLOR);
+        GraphicsUtil.setColor(g, MonoGameRenderer.BACKGROUND_COLOR, MonoGameRenderer.BACKGROUND_COLOR);
         g.fill(' ');
         
         MonoGameRenderer renderer = bigRenderer;
