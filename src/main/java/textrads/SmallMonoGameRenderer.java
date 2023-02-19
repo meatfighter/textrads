@@ -111,7 +111,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         X += 7;
                         break;
                 }
-                BlockText.draw(countdown, g, X, y + 8, BlockText.Colors.NUMBERS, true);
+                BlockText.draw(countdown, g, X, y + 8, COUNTDOWN_COLOR, true);
                 break;                
             }
             case MonoGameState.TETROMINO_FALLING_MODE:

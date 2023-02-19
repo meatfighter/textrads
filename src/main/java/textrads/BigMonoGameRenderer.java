@@ -4,7 +4,6 @@ import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import com.googlecode.lanterna.graphics.TextImage;
 import java.util.List;
 import textrads.util.GraphicsUtil;
 
@@ -114,7 +113,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                         X += 14;
                         break;
                 }
-                BlockText.draw(countdown, g, X, y + 16, BlockText.Colors.NUMBERS, false);
+                BlockText.draw(countdown, g, X, y + 16, COUNTDOWN_COLOR, false);
                 break;                
             }            
             case MonoGameState.TETROMINO_FALLING_MODE:

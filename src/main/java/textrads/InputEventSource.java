@@ -39,6 +39,7 @@ public final class InputEventSource {
                 if (c == 'c' || c == 'C') {
                     Terminator.setTerminate(true);
                 }
+                continue;
             }
             final InputType inputType = inputMap.get(keyStroke);
             if (inputType == null) {

@@ -1,6 +1,10 @@
 (C) 2023 meatfighter.com
-This program is free software. 
-Share and/or modify it per GPLv3.
+This is free software licensed under GPLv3.
+
+
+Structure this as nested state machines.
+Each outer machine must poll the state of the inner machine to decide to change state.
+
 
 
 sudo service ssh restart

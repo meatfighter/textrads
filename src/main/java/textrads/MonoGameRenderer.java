@@ -12,6 +12,7 @@ public abstract class MonoGameRenderer {
     static final TextColor ATTACK_COLOR = new TextColor.Indexed(160);
     static final TextColor LABEL_COLOR = new TextColor.Indexed(248);
     static final TextColor VALUE_COLOR = new TextColor.Indexed(231);
+    static final TextColor COUNTDOWN_COLOR = new TextColor.Indexed(220);
     
     static final TextColor T_COLOR = new TextColor.Indexed(133);
     static final TextColor J_COLOR = new TextColor.Indexed(61);

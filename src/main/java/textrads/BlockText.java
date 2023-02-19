@@ -1,22 +1,16 @@
 package textrads;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
 public final class BlockText {
     
-    public static interface Colors {
-        TextColor NUMBERS = new TextColor.Indexed(220);
-        TextColor TITLE = new TextColor.Indexed(220);
-    }
-    
-    public static interface Indices {
-        int GO = 0;
-        int ONE = 1;
-        int TWO = 2;
-        int THREE_ = 3;
-        int TEXTRADS = 4;
-    }
+    public static final int GO = 0;
+    public static final int ONE = 1;
+    public static final int TWO = 2;
+    public static final int THREE = 3;
+    public static final int TEXTRADS = 4;
     
     private static final String[] STRINGS = {        
         "XXX XXX X",
@@ -64,6 +58,42 @@ public final class BlockText {
             }
         }
     }
+    
+    public static void drawCentered(final int index, final TextGraphics g, final TerminalSize size, TextColor color, 
+            final boolean small) {
+        draw(index, g, computeCenterX(index, size, small), computeCenterY(size, small), color, small, 0, 4);
+    }
+    
+    public static void drawCentered(final int index, final TextGraphics g, final TerminalSize size, TextColor color, 
+            final boolean small, final int startY, final int endY) {
+        draw(index, g, computeCenterX(index, size, small), computeCenterY(size, small), color, small, startY, endY);        
+    }    
+    
+    public static void drawCentered(final int index, final TextGraphics g, final TerminalSize size, final int y, 
+            TextColor color, final boolean small) {
+        draw(index, g, computeCenterX(index, size, small), y, color, small, 0, 4);
+    }
+    
+    public static void drawCentered(final int index, final TextGraphics g, final TerminalSize size, final int y, 
+            TextColor color, final boolean small, final int startY, final int endY) {
+        draw(index, g, computeCenterX(index, size, small), y, color, small, startY, endY);        
+    }
+    
+    public static int computeHeight(final boolean small) {
+        return small ? 5 : 10;
+    }
+    
+    public static int computeWidth(final int index, final boolean small) {
+        return BLOCKS[index][0].length * (small ? 2 : 4);
+    }
+    
+    public static int computeCenterX(final int index, final TerminalSize size, final boolean small) {
+        return (size.getColumns() - computeWidth(index, small)) / 2;
+    }
+    
+    public static int computeCenterY(final TerminalSize size, final boolean small) {
+        return (size.getRows() - computeHeight(small)) / 2;
+    }    
     
     public static void draw(final int index, final TextGraphics g, final int x, final int y, TextColor color, 
             final boolean small) {
