@@ -14,12 +14,13 @@ public class GameState implements Serializable {
     private static final int MIN_OBJECT_SIZE = 64 * 1024;
     
     public static final byte MARATHON_MODE = 0;
-    public static final byte GARBAGE_HEAP_MODE = 1;
-    public static final byte RISING_GARBAGE_MODE = 2;
-    public static final byte THREE_MINUTES_MODE = 3;
-    public static final byte FORTY_LINES_MODE = 4;
-    public static final byte VS_AI_MODE = 5;
-    public static final byte VS_HUMAN_MODE = 6;
+    public static final byte CONSTANT_LEVEL = 1;
+    public static final byte GARBAGE_HEAP_MODE = 2;
+    public static final byte RISING_GARBAGE_MODE = 3;
+    public static final byte THREE_MINUTES_MODE = 4;
+    public static final byte FORTY_LINES_MODE = 5;
+    public static final byte VS_AI_MODE = 6;
+    public static final byte VS_HUMAN_MODE = 7;
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     

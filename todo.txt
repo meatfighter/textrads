@@ -16,6 +16,12 @@ level **
 lines
 { score, starting level }
 
+"Constant Level"
+score
+level **
+lines
+{ score, level }
+
 "Garbage Heap": (random garbage height)
 level **
 high ** -- random garbage height

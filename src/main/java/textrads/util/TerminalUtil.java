@@ -34,26 +34,27 @@ public final class TerminalUtil {
         
         final Frame frame = (Frame) terminal;
         EventQueue.invokeAndWait(() -> {
-            final Runnable windowOpened = () -> {
-                frame.setTitle("Textrads");
-                frame.setIconImages(icons);
-                frame.setLocationRelativeTo(null);
-                frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
-            };
             frame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowOpened(final WindowEvent e) {
-                    windowOpened.run();
+                    TerminalUtil.windowOpened(frame, icons);
                 } 
                 @Override
                 public void windowClosed(final WindowEvent e) {
                     Terminator.setTerminate(true);
                 }
             });
-            windowOpened.run();
+            windowOpened(frame, icons);
         });
 
         return terminal;
+    }
+    
+    private static void windowOpened(final Frame frame, final List<Image> icons) {
+        frame.setTitle("Textrads");
+        frame.setIconImages(icons);
+        frame.setLocationRelativeTo(null);
+        frame.setExtendedState(frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
     }
 
     private static Image loadIcon(final int iconSize) throws IOException {
