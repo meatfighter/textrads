@@ -1,5 +1,9 @@
 package textrads;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import static java.lang.Math.max;
 import java.util.ArrayList;
@@ -45,10 +49,44 @@ public class MonoGameState implements Serializable {
     private static final float[] FRAMES_PER_GRAVITY_DROP = new float[256];
     private static final byte[] FRAMES_PER_LOCK = new byte[256];
     
+    private static final boolean[][] GARBAGE_LINES;
+    
     static {
         for (int i = FRAMES_PER_GRAVITY_DROP.length - 1; i >= 0; --i) {
             FRAMES_PER_GRAVITY_DROP[i] = (float) (LEVEL_ZERO_FRAMES_PER_DROP * Math.exp(DROP_DECAY_CONSTANT * i));
             FRAMES_PER_LOCK[i] = (byte) Math.round(Math.max(32f, FRAMES_PER_GRAVITY_DROP[i] + 4f));
+        }
+        
+        boolean[][] garbageLines = null;
+        try (final InputStream is = MonoGameState.class.getResourceAsStream("/garbage/garbage.dat");
+                final BufferedInputStream bis = new BufferedInputStream(is);
+                final DataInputStream dis = new DataInputStream(bis)) {
+            
+            final int packedLines = dis.readInt();
+            garbageLines = new boolean[3 * packedLines][10];
+            for (int i = packedLines - 1, g = 0; i >= 0; --i) {
+                int bits = dis.readInt();
+                for (int j = 2; j >= 0; --j) {
+                    final boolean[] line = garbageLines[g++];
+                    for (int k = line.length - 1; k >= 0; --k) {
+                        line[k] = (bits & 1) == 1;
+                        bits >>= 1;
+                    }
+                }
+            }
+            
+        } catch (final IOException ignored) {
+            ignored.printStackTrace(); // TODO REMOVE
+        } finally {
+            GARBAGE_LINES = garbageLines;
+        }
+        
+        // TODO TESTING
+        for (int i = 0; i < GARBAGE_LINES.length; ++i) {
+            for (int j = GARBAGE_LINES[i].length - 1; j >= 0; --j) {
+                System.out.print(GARBAGE_LINES[i][j] ? "XX" : "  ");
+            }
+            System.out.println();
         }
     }
     

@@ -10,41 +10,50 @@ ssh -i wsl_ssh_private_key.pem -p 2022 mbirken@localhost
 
 does Ctrl and Alt actually work?
 
-marathon:
+"Marathon"
 score
 level
 lines
 { score, starting level }
 
-ultra:
-score
-time (3:00)
-lines
-{ score, starting level }
-
-40 lines: (solid height)
-score
-time ( :  ) -- counts up
-lines -- counts down from 40
-{ height, starting level, completed time, score }
-
-vs. com:
-score
-time ( :  ) -- counts up
-lines
-{ difficulty, starting level, completed time, score }
-
-b-type: (random garbage height)
+"Garbage Heap": (random garbage height)
 level
 high -- random garbage height
 lines -- counts down from 25
 { height, starting level, completed time, score }
 
-c-type: (rising garbage)
+"Rising Garbage" (rising garbage)
 score
 level
 lines
 { score, starting level }
+Lines	Garbage frequency
+0-9	Every 6 pieces
+10-19	None
+20-29	Every 16 pieces
+30-39	None
+40-49	Every 12 pieces
+50-59	None
+
+"Three Minutes"
+score
+time (3:00)
+lines
+{ score, starting level }
+
+"Forty Lines" (solid height)
+score
+time ( :  ) -- counts up
+lines -- counts down from 40
+{ height, starting level, completed time, score }
+
+"Vs. AI":
+score
+time ( :  ) -- counts up
+lines
+{ difficulty, starting level, completed time, score }
+
+
 
 
    --
