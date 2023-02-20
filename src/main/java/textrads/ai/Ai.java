@@ -48,7 +48,7 @@ public class Ai {
         }
     }
     
-    public void reset(final short level, final long seed, final int difficulty) {
+    public void init(final short level, final long seed, final int difficulty) {
         
         synchronized (searchMonitor) {
             if (thread.getState() == Thread.State.NEW) {

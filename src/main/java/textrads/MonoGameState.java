@@ -26,7 +26,7 @@ public class MonoGameState implements Serializable {
     public static final byte SPAWN_MODE = 2;
     public static final byte TETROMINO_FALLING_MODE = 3;
     public static final byte CLEARING_LINES_MODE = 4;
-    public static final byte ADDING_GARBAGE_MODE = 5;
+    public static final byte ADDING_ATTACK_GARBAGE_MODE = 5;
     public static final byte GAME_OVER_MODE = 6;
 
     public static final int PLAYFIELD_WIDTH = 10;
@@ -76,17 +76,8 @@ public class MonoGameState implements Serializable {
             }
             
         } catch (final IOException ignored) {
-            ignored.printStackTrace(); // TODO REMOVE
         } finally {
             GARBAGE_LINES = garbageLines;
-        }
-        
-        // TODO TESTING
-        for (int i = 0; i < GARBAGE_LINES.length; ++i) {
-            for (int j = GARBAGE_LINES[i].length - 1; j >= 0; --j) {
-                System.out.print(GARBAGE_LINES[i][j] ? "XX" : "  ");
-            }
-            System.out.println();
         }
     }
     
@@ -142,26 +133,30 @@ public class MonoGameState implements Serializable {
     
     private byte mode;
     
+    private byte maxRow;
+    
     private int updates;
     
     public MonoGameState(final GameState gameState) {
-        this.gameState = gameState;
-        reset();
+        this.gameState = gameState;        
     }
     
-    public void reset() {
+    public void init(
+            final long seed, 
+            final int startingLevel,
+            final int garbageHeight, 
+            final int floorHeight) {
         
         attackRows = 0;
         score = 0;
-        level = 10; // TODO TESTING
-        lines = 0;
+        level = (short) startingLevel;
         tetrominoType = 0;
         tetrominoRotation = 0;
         tetrominoX = 0;
         tetrominoY = 0;
-        framesPerGravityDrop = 0;       
+        framesPerGravityDrop = getFramesPerGravityDrop(startingLevel);       
         gravityDropTimer = 0;
-        framesPerLock = 0;
+        framesPerLock = getFramesPerLock(startingLevel);
         lockTimer = 0;
         dropFailed = false;
         lineClearTimer = 0;
@@ -173,17 +168,31 @@ public class MonoGameState implements Serializable {
         countdownTimer = Textrads.FRAMES_PER_SECOND;
         countdownValue = 3;
         mode = COUNTDOWN_MODE;
-        updates = 0;        
+        maxRow = (byte) (PLAYFIELD_HEIGHT - 1 - floorHeight);
+        updates = 0; 
+        
+        lineYs.clear();
+        
+        tetrominoRandomizer.setSeed(seed);
+        garbageRandomizer.setSeed(seed);
+        nexts.clear();
+        updateNexts();        
+                
         for (int y = PLAYFIELD_HEIGHT - 1; y >= 0; --y) {
             Arrays.fill(playfield[y], (byte) 0);
         }
-        lineYs.clear();
-        nexts.clear();
-    }
-    
-    public void init() {        
-        framesPerGravityDrop = getFramesPerGravityDrop(level);
-        framesPerLock = getFramesPerLock(level);
+        
+        switch (gameState.getMode()) {
+            case GameState.GARBAGE_HEAP_MODE:
+                lines = 25;
+                break;
+            case GameState.FORTY_LINES_MODE:
+                lines = 40;
+                break;
+            default:
+                lines = 0;
+                break;
+        }
     }
     
     private void resetLineClearTimer() {
@@ -212,7 +221,7 @@ public class MonoGameState implements Serializable {
         findLines();
         if (lineYs.isEmpty()) {
             if (attackRows > 0) {                
-                mode = ADDING_GARBAGE_MODE;
+                mode = ADDING_ATTACK_GARBAGE_MODE;
             } else {
                 mode = SPAWN_MODE;
             }
@@ -387,8 +396,8 @@ public class MonoGameState implements Serializable {
             case CLEARING_LINES_MODE:
                 updateClearingLines();
                 break;
-            case ADDING_GARBAGE_MODE:
-                updateAddingGarbage();
+            case ADDING_ATTACK_GARBAGE_MODE:
+                updateAddingAttackGarbage();
                 break;
             case GAME_OVER_MODE:
                 updateGameOver();
@@ -425,14 +434,14 @@ public class MonoGameState implements Serializable {
         if (--lineClearTimer < 0) {
             clearLines();
             if (attackRows > 0) {
-                mode = ADDING_GARBAGE_MODE;
+                mode = ADDING_ATTACK_GARBAGE_MODE;
             } else {
                 mode = SPAWN_MODE;
             }
         }
     }
     
-    private void updateAddingGarbage() {
+    private void updateAddingAttackGarbage() {
         if (attackRows == 0) {
             mode = SPAWN_MODE;
             return;
@@ -503,13 +512,6 @@ public class MonoGameState implements Serializable {
         gameOverTimer = 0; 
         justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
         mode = justSpawned ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
-    }
-    
-    public void setSeed(final long seed) {
-        tetrominoRandomizer.setSeed(seed);
-        garbageRandomizer.setSeed(seed);
-        nexts.clear();
-        updateNexts();
     }
 
     public void setOpponent(final MonoGameState opponent) {

@@ -12,19 +12,19 @@ does Ctrl and Alt actually work?
 
 "Marathon"
 score
-level
+level **
 lines
 { score, starting level }
 
 "Garbage Heap": (random garbage height)
-level
-high -- random garbage height
+level **
+high ** -- random garbage height
 lines -- counts down from 25
 { height, starting level, completed time, score }
 
 "Rising Garbage" (rising garbage)
 score
-level
+level **
 lines
 { score, starting level }
 Lines	Garbage frequency
@@ -39,18 +39,22 @@ Lines	Garbage frequency
 score
 time (3:00)
 lines
+level **
 { score, starting level }
 
 "Forty Lines" (solid height)
 score
 time ( :  ) -- counts up
 lines -- counts down from 40
+level **
 { height, starting level, completed time, score }
 
 "Vs. AI":
 score
 time ( :  ) -- counts up
 lines
+level **
+difficulty **
 { difficulty, starting level, completed time, score }
 
 

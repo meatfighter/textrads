@@ -1,15 +1,10 @@
 package textrads;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
-import textrads.util.GraphicsUtil;
+import textrads.util.TerminalUtil;
 
 public class Textrads {
     
@@ -48,26 +43,16 @@ public class Textrads {
     public void launch() throws Exception {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
-        
-        GameStateSource.getState().setPlayers((byte) 1); // TODO TESTING AI
+
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().setSeed(seed);                
-        ai.reset((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
+        GameStateSource.getState().init(GameState.MARATHON_MODE, seed);     
+        
+        ai.init((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
         
         titleScreenState.reset(); // TODO TESTING
         
-        final Terminal terminal = new DefaultTerminalFactory().createTerminal();
-        if (terminal instanceof Window) {
-            final Window window = (Window) terminal;
-            window.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(final WindowEvent e) {
-                    Terminator.setTerminate(true);
-                }
-            });
-        }
-        
-        try (final Screen screen = new TerminalScreen(terminal)) {
+        try (final Terminal terminal = TerminalUtil.createTerminal();
+                final Screen screen = new TerminalScreen(terminal)) {
             
             screen.startScreen();
             screen.setCursorPosition(null); // turn off cursor

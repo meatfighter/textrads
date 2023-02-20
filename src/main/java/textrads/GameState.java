@@ -13,17 +13,22 @@ public class GameState implements Serializable {
     
     private static final int MIN_OBJECT_SIZE = 64 * 1024;
     
+    public static final byte MARATHON_MODE = 0;
+    public static final byte GARBAGE_HEAP_MODE = 1;
+    public static final byte RISING_GARBAGE_MODE = 2;
+    public static final byte THREE_MINUTES_MODE = 3;
+    public static final byte FORTY_LINES_MODE = 4;
+    public static final byte VS_AI_MODE = 5;
+    public static final byte VS_HUMAN_MODE = 6;
+    
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
-    private byte players;
     private boolean paused;
+    private byte mode;
     
     public GameState() {
         states[0].setOpponent(states[1]);
         states[1].setOpponent(states[0]);
-        
-        states[0].init();
-        states[1].init();
     }
     
     public void handleInputEvent(final byte event, final int player) {
@@ -47,17 +52,18 @@ public class GameState implements Serializable {
         this.paused = paused;
     }
 
-    public byte getPlayers() {
-        return players;
+    public int getPlayers() {
+        return (mode == VS_AI_MODE || mode == VS_HUMAN_MODE) ? 2 : 1;
     }
 
-    public void setPlayers(final byte players) {
-        this.players = players;
+    public void init(final byte mode, final long seed) {
+        this.mode = mode;
+        states[0].init(seed, 0, 0, 0);
+        states[1].init(seed, 0, 0, 0);
     }
-    
-    public void setSeed(final long seed) {
-        states[0].setSeed(seed);
-        states[1].setSeed(seed);
+
+    public byte getMode() {
+        return mode;
     }
     
     public byte[] toByteArray() throws IOException {
