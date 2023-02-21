@@ -80,7 +80,8 @@ public final class Tetromino {
     }
     
     public final Offset[] offsets = new Offset[4];    
-    public final boolean[][] validPosition = new boolean[PLAYFIELD_HEIGHT + 4][PLAYFIELD_WIDTH + 4];
+    public final boolean[][][] validPosition 
+            = new boolean[PLAYFIELD_HEIGHT + 1][PLAYFIELD_HEIGHT + 4][PLAYFIELD_WIDTH + 4];
     public final int minOffsetY;
     public final int maxOffsetY;
 
@@ -96,15 +97,19 @@ public final class Tetromino {
         this.minOffsetY = minY;
         this.maxOffsetY = maxY;
         
-        for (int y = PLAYFIELD_HEIGHT + 1; y >= -2; --y) {
-            for (int x = PLAYFIELD_WIDTH + 1; x >= -2; --x) {
-                validPosition[y + 2][x + 2] = true;
-                for (final Offset offset : offsets) {
-                    final int X = offset.x + x;
-                    final int Y = offset.y + y;
-                    if (X < 0 || X >= PLAYFIELD_WIDTH || Y >= PLAYFIELD_HEIGHT) {
-                        validPosition[y + 2][x + 2] = false;
-                        break;
+        for (int floorHeight = PLAYFIELD_HEIGHT; floorHeight >= 0; --floorHeight) {
+            final boolean[][] matrix = validPosition[floorHeight];
+            for (int y = PLAYFIELD_HEIGHT + 1; y >= -2; --y) {
+                final boolean[] row = matrix[y + 2];
+                for (int x = PLAYFIELD_WIDTH + 1; x >= -2; --x) {
+                    row[x + 2] = true;
+                    for (final Offset offset : offsets) {
+                        final int X = offset.x + x;
+                        final int Y = offset.y + y;
+                        if (X < 0 || X >= PLAYFIELD_WIDTH || Y >= PLAYFIELD_HEIGHT - floorHeight) {
+                            row[x + 2] = false;
+                            break;
+                        }
                     }
                 }
             }

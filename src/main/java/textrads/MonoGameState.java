@@ -41,6 +41,8 @@ public class MonoGameState implements Serializable {
     
     public static final int MOVES_PER_GARBAGE_ROW = 8;
     
+    public static final int MIN_GARBAGE_HEAP_ROW = 8;
+    
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
     private static final double LEVEL_THIRTY_FRAMES_PER_DROP = 2.0;
     
@@ -133,7 +135,7 @@ public class MonoGameState implements Serializable {
     
     private byte mode;
     
-    private byte maxRow;
+    private byte floorHeight;
     
     private int updates;
     
@@ -168,7 +170,7 @@ public class MonoGameState implements Serializable {
         countdownTimer = Textrads.FRAMES_PER_SECOND;
         countdownValue = 3;
         mode = COUNTDOWN_MODE;
-        maxRow = (byte) (PLAYFIELD_HEIGHT - 1 - floorHeight);
+        this.floorHeight = (byte) floorHeight;
         updates = 0; 
         
         lineYs.clear();
@@ -185,6 +187,7 @@ public class MonoGameState implements Serializable {
         switch (gameState.getMode()) {
             case GameState.GARBAGE_HEAP_MODE:
                 lines = 25;
+                createGarbageHeap(garbageHeight);
                 break;
             case GameState.FORTY_LINES_MODE:
                 lines = 40;
@@ -193,6 +196,18 @@ public class MonoGameState implements Serializable {
                 lines = 0;
                 break;
         }
+    }
+    
+    private void createGarbageHeap(final int garbageHeight) {
+        for (int y = Math.max(MIN_GARBAGE_HEAP_ROW, PLAYFIELD_HEIGHT - garbageHeight); y < PLAYFIELD_HEIGHT; ++y) {
+            final byte[] playfieldRow = playfield[y];
+            final boolean[] garbageRow = GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)];
+            for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+                if (garbageRow[x]) {
+                    playfieldRow[x] = GARBAGE_BLOCK;
+                }
+            }
+        } 
     }
     
     private void resetLineClearTimer() {
@@ -236,7 +251,7 @@ public class MonoGameState implements Serializable {
             return false;
         }
         final Tetromino tetromino = Tetromino.TETROMINOES[tetrominoType][rotation];
-        if (!tetromino.validPosition[y + 2][x + 2]) {
+        if (!tetromino.validPosition[floorHeight][y + 2][x + 2]) {
             return false;
         }
         for (final Offset offset : tetromino.offsets) {
