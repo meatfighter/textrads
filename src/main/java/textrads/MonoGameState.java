@@ -41,8 +41,6 @@ public class MonoGameState implements Serializable {
     
     public static final int MOVES_PER_GARBAGE_ROW = 8;
     
-    public static final int MIN_GARBAGE_HEAP_ROW = 8;
-    
     private static final double LEVEL_ZERO_FRAMES_PER_DROP = 52.0;
     private static final double LEVEL_THIRTY_FRAMES_PER_DROP = 2.0;
     
@@ -199,7 +197,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void createGarbageHeap(final int garbageHeight) {
-        for (int y = Math.max(MIN_GARBAGE_HEAP_ROW, PLAYFIELD_HEIGHT - garbageHeight); y < PLAYFIELD_HEIGHT; ++y) {
+        for (int y = Math.max(0, PLAYFIELD_HEIGHT - garbageHeight); y < PLAYFIELD_HEIGHT; ++y) {
             final byte[] playfieldRow = playfield[y];
             final boolean[] garbageRow = GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)];
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
@@ -635,5 +633,9 @@ public class MonoGameState implements Serializable {
 
     public int getUpdates() {
         return updates;
+    }
+
+    public byte getFloorHeight() {
+        return floorHeight;
     }
 }

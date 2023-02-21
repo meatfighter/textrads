@@ -260,7 +260,7 @@ public final class Searcher {
         }
                        
         final Tetromino tetromino = tetrominoes[tetrominoRotation];
-        if (!tetromino.validPosition[tetrominoY + 2][tetrominoX + 2]) {
+        if (!tetromino.validPosition[0][tetrominoY + 2][tetrominoX + 2]) { // TODO FLOOR HEIGHT
             return false;
         }
 

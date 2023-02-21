@@ -80,7 +80,17 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
         }        
                 
         final byte[][] playfield = state.getPlayfield();
-        for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1; i >= 0; --i) {
+        final int floorHeight = state.getFloorHeight();
+        if (floorHeight > 0) {
+            GraphicsUtil.setColor(g, GARBAGE_COLOR, BACKGROUND_COLOR);
+            for (int i = floorHeight - 1; i >= 0; --i) {
+                g.putString(x + 4, y + 2 * (MonoGameState.PLAYFIELD_HEIGHT - i) - 1, 
+                        "                                        ");
+                g.putString(x + 4, y + 2 * (MonoGameState.PLAYFIELD_HEIGHT - i), 
+                        "                                        ");
+            }
+        }
+        for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1 - floorHeight; i >= 0; --i) {        
             for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
                 GraphicsUtil.setColor(g, BLOCK_COLORS[playfield[i][j]], BACKGROUND_COLOR);
                 g.putString(x + 4 + 4 * j, y + 1 + 2 * i, "    ");
