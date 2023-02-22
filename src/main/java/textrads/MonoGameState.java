@@ -18,6 +18,8 @@ public class MonoGameState implements Serializable {
     
     private static final long MAX_SCORE = 999_999_999L;
     
+    private static final int FRAMES_PER_THREE_MINUTES = Textrads.FRAMES_PER_SECOND * 60 * 3;
+    
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
@@ -171,7 +173,7 @@ public class MonoGameState implements Serializable {
         countdownValue = 3;
         mode = COUNTDOWN_MODE;
         this.floorHeight = (byte) floorHeight;
-        updates = 0; 
+        updates = (gameState.getMode() == GameState.THREE_MINUTES_MODE) ? FRAMES_PER_THREE_MINUTES : 0; 
         
         lineYs.clear();
         
@@ -434,7 +436,11 @@ public class MonoGameState implements Serializable {
     public void update() {
         justSpawned = false;
         if (mode != COUNTDOWN_MODE && mode != GAME_OVER_MODE) {
-            ++updates;
+            if (gameState.getMode() == GameState.THREE_MINUTES_MODE) {
+                --updates;
+            } else {
+                ++updates;
+            }
         }
         switch (mode) {
             case COUNTDOWN_MODE:
