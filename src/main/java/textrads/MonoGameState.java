@@ -199,7 +199,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void createGarbageHeap(final int garbageHeight) {
-        for (int y = Math.max(0, PLAYFIELD_HEIGHT - garbageHeight); y < PLAYFIELD_HEIGHT; ++y) {
+        for (int y = PLAYFIELD_HEIGHT - garbageHeight; y < PLAYFIELD_HEIGHT; ++y) {
             final byte[] playfieldRow = playfield[y];
             final boolean[] garbageRow = GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)];
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
@@ -249,10 +249,39 @@ public class MonoGameState implements Serializable {
     }
     
     private void conditionallyRaiseGarbage() {
+        
         if (gameState.getMode() != GameState.RISING_GARBAGE_MODE) {
             return;
         }
         
+        final int threshold;
+        switch ((lines % 60) / 10) {
+            case 0:
+                threshold = 6;
+                break;
+            case 2:
+                threshold = 16;
+                break;
+            case 4:
+                threshold = 12;
+                break;
+            default:
+                lockCounter = 0;
+                return;
+        }
+        if (lockCounter < threshold) {
+            return;
+        }
+
+        lockCounter = 0;
+        for (int y = 1; y < PLAYFIELD_HEIGHT; ++y) {
+            System.arraycopy(playfield[y], 0, playfield[y - 1], 0, PLAYFIELD_WIDTH);
+        }
+        final boolean[] garbageRow = GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)];
+        final byte[] playfieldRow = playfield[PLAYFIELD_HEIGHT - 1];
+        for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
+            playfieldRow[x] = garbageRow[x] ? GARBAGE_BLOCK : EMPTY_BLOCK;
+        }
     }
     
     private boolean testPosition(final int rotation, final int x, final int y) {
