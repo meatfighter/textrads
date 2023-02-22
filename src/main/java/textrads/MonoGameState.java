@@ -135,6 +135,8 @@ public class MonoGameState implements Serializable {
     
     private byte floorHeight;
     
+    private byte lockCounter;
+    
     private int updates;
     
     public MonoGameState(final GameState gameState) {
@@ -222,6 +224,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void lockTetrimino() {
+        ++lockCounter;
         lastAttackRows = 0;
         for (final Offset offset : Tetromino.TETROMINOES[tetrominoType][tetrominoRotation].offsets) {
             final int by = tetrominoY + offset.y;
@@ -231,8 +234,9 @@ public class MonoGameState implements Serializable {
             final int bx = tetrominoX + offset.x;
             playfield[by][bx] = (byte) (tetrominoType + 1);
         }
-        findLines();
+        findLines();        
         if (lineYs.isEmpty()) {
+            conditionallyRaiseGarbage();
             if (attackRows > 0) {                
                 mode = ADDING_ATTACK_GARBAGE_MODE;
             } else {
@@ -242,6 +246,13 @@ public class MonoGameState implements Serializable {
             mode = CLEARING_LINES_MODE;
             resetLineClearTimer();
         }
+    }
+    
+    private void conditionallyRaiseGarbage() {
+        if (gameState.getMode() != GameState.RISING_GARBAGE_MODE) {
+            return;
+        }
+        
     }
     
     private boolean testPosition(final int rotation, final int x, final int y) {
@@ -446,6 +457,7 @@ public class MonoGameState implements Serializable {
     private void updateClearingLines() {
         if (--lineClearTimer < 0) {
             clearLines();
+            conditionallyRaiseGarbage();
             if (attackRows > 0) {
                 mode = ADDING_ATTACK_GARBAGE_MODE;
             } else {
@@ -455,7 +467,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void updateAddingAttackGarbage() {
-        if (attackRows == 0) {
+        if (attackRows == 0) {            
             mode = SPAWN_MODE;
             return;
         }
