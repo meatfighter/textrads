@@ -24,7 +24,7 @@ lines
 
 "Garbage Heap": (random garbage height)
 level **
-high ** -- random garbage height
+height ** -- random garbage height
 lines -- counts down from 25
 { height, starting level, completed time, score }
 
@@ -53,6 +53,7 @@ score
 time ( :  ) -- counts up
 lines -- counts down from 40
 level **
+height **
 { height, starting level, completed time, score }
 
 "Vs. AI":

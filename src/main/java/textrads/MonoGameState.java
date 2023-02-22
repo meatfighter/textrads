@@ -536,12 +536,20 @@ public class MonoGameState implements Serializable {
         incrementScore(CLEAR_POINTS[lineYs.size()] * (level + 1));
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
         
-        lines += lineYs.size();
-        final short minLevel = (short) (lines / 10);
-        if (minLevel > level) {
-            level = minLevel;
-            framesPerGravityDrop = getFramesPerGravityDrop(level);
-            framesPerLock = getFramesPerLock(level);
+        final byte gameMode = gameState.getMode();
+        if (gameMode == GameState.GARBAGE_HEAP_MODE || gameMode == GameState.FORTY_LINES_MODE) {
+            lines -= lineYs.size();
+        } else {
+            lines += lineYs.size();
+        }
+        
+        if (gameMode != GameState.CONSTANT_LEVEL) {
+            final short minLevel = (short) (lines / 10);
+            if (minLevel > level) {
+                level = minLevel;
+                framesPerGravityDrop = getFramesPerGravityDrop(level);
+                framesPerLock = getFramesPerLock(level);
+            }
         }
         
         for (final int lineY : lineYs) {
