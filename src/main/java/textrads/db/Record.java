@@ -1,6 +1,18 @@
 package textrads.db;
 
-public class Record {
+import java.io.Serializable;
+
+public class Record implements Serializable, Comparable<Record> {
+    
+    private static final long serialVersionUID = 1L;
+    
+    public static DefaultRecordMaker<Record> getDefaultRecordMaker() {
+        return index -> {
+            final char initial = (char) ('A' + index);
+            return new Record(new StringBuilder().append(initial).append(initial).append(initial).toString(), 
+                    10_000 * (10 - index), (short) 0, 0L);
+        };
+    }
 
     final String initials;
     final int score;
@@ -28,5 +40,18 @@ public class Record {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public int compareTo(final Record r) {
+        int result = Integer.compare(r.score, score); // descending
+        if (result != 0) {
+            return result;
+        }
+        result = Short.compare(r.level, level);       // descending
+        if (result != 0) {
+            return result;
+        }
+        return Long.compare(timestamp, r.timestamp);  // ascending
     }
 }

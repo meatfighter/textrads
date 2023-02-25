@@ -1,6 +1,19 @@
 package textrads.db;
 
-public class ExtendedRecord extends Record {
+import java.io.Serializable;
+import textrads.Textrads;
+
+public class ExtendedRecord extends Record implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
+    public static DefaultRecordMaker<Record> getDefaultRecordMaker() {
+        return index -> {
+            final char initial = (char) ('A' + index);
+            return new ExtendedRecord(new StringBuilder().append(initial).append(initial).append(initial).toString(),
+                    (byte) 0, (short) 0, (10 + index) * 60 * Textrads.FRAMES_PER_SECOND, 1000 * (10 - index), 0L);
+        };
+    }    
     
     final byte challenge;
     final int time;
@@ -19,5 +32,27 @@ public class ExtendedRecord extends Record {
 
     public int getTime() {
         return time;
+    }
+    
+    @Override
+    public int compareTo(final Record record) {
+        final ExtendedRecord r = (ExtendedRecord) record;
+        int result = Byte.compare(r.challenge, challenge);    // descending
+        if (result != 0) {
+            return result;
+        }
+        result = Short.compare(r.level, level);               // descending
+        if (result != 0) {
+            return result;
+        }        
+        result = Integer.compare(time, r.time);               // ascending
+        if (result != 0) {
+            return result;
+        }
+        result = Integer.compare(r.score, score);             // descending
+        if (result != 0) {
+            return result;
+        }
+        return Long.compare(timestamp, r.timestamp);          // ascending
     }
 }

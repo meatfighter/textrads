@@ -1,5 +1,5 @@
 package textrads.db;
 
-public interface RecordMaker<T> {
+public interface DefaultRecordMaker<T> {
     T make(int index);
 }
