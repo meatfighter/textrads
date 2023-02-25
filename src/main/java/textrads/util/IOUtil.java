@@ -23,6 +23,23 @@ public final class IOUtil {
         return data;
     }
     
+    public static void writeString(final DataOutputStream out, final String str) throws IOException {
+        final int length = str.length();
+        out.writeInt(length);
+        for (int i = 0; i < length; i++) {
+            out.write((byte) str.charAt(i));
+        }
+    }
+    
+    public static String readString(final DataInputStream in) throws IOException {
+        final int length = in.readInt();
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append((char) in.readByte());
+        }
+        return sb.toString();
+    }
+    
     private IOUtil() {        
     }
 }

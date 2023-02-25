@@ -65,8 +65,8 @@ difficulty **
 { difficulty, starting level, completed time, score }
 
 
-{ score, startingLevel } -- "Marathon", "Constant Level", "Rising Garbage", "Three Minutes"
-{ height/difficulty, starting level, completed time, score } -- "Garbage Heap", "Forty Lines", "Vs. AI"
+{ initials, score, startingLevel } -- "Marathon", "Constant Level", "Rising Garbage", "Three Minutes"
+{ initials, height/difficulty, starting level, completed time, score } -- "Garbage Heap", "Forty Lines", "Vs. AI"
 
 
 
