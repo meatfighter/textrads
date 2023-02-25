@@ -1,8 +1,8 @@
 package textrads.db;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public interface StreamEncoder<T> {
-    void encode(T object, OutputStream out) throws IOException;
+    void encode(T object, DataOutputStream out) throws IOException;
 }
