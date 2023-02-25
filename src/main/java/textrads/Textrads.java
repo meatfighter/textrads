@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
+import textrads.db.Database;
+import textrads.db.Record;
+import textrads.db.RecordList;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
 import textrads.util.TerminalUtil;
@@ -158,6 +161,20 @@ public class Textrads {
     }
     
     public static void main(final String... args) throws Exception {
-        new Textrads().launch();
+        //new Textrads().launch();
+        
+        final Database database = new Database();
+        database.init();
+        RecordList<Record> recordList = database.get(Database.ALL_TIME_MARATHON);
+//        final Record record = new Record("MDB", 123456, (short) 10);
+//        final int index = recordList.findIndex(record);
+//        if (index < RecordList.COUNT) {
+//            recordList = recordList.insert(index, record);
+//        }
+        for (final Record r : recordList.getRecords()) {
+            System.out.println(r);
+        }
+//        database.saveAsync(Database.ALL_TIME_MARATHON, recordList);
+//        database.shutdown();
     }
 }

@@ -41,6 +41,11 @@ public class Database {
     private final Map<String, ? super Serializable> values = new ConcurrentHashMap<>();
     
     public void init() {
+        final File dir = new File(DIR);
+        if (!(dir.exists() && dir.isDirectory())) {
+            dir.mkdirs();
+        }
+
         load(ALL_TIME_MARATHON, RecordList.RECORD_LIST_SUPPLIER);
         load(ALL_TIME_CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER);
         load(ALL_TIME_RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER);
@@ -70,7 +75,6 @@ public class Database {
     }
     
     private <T extends Serializable> void save(final String key, T value) {
-        
         final File dataFile = getDataFile(key);
         final File tempFile = getTempFile(key);
         
@@ -127,7 +131,8 @@ public class Database {
                 final BufferedInputStream bis = new BufferedInputStream(fis);
                 final ObjectInputStream ois = new ObjectInputStream(bis)) {
             return (T) ois.readObject();
-        } catch (final Exception ignored) {            
+        } catch (final Exception ignored) {
+            ignored.printStackTrace(); // TODO REMOVE
         }
         
         return null;
@@ -139,7 +144,8 @@ public class Database {
                 final BufferedOutputStream bos = new BufferedOutputStream(fos);
                 final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(obj);
-        } catch (final Exception ignored) {            
+        } catch (final Exception ignored) { 
+            ignored.printStackTrace(); // TODO REMOVE
         }
     }
     

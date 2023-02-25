@@ -24,19 +24,21 @@ public class RecordList<T extends Record> implements Serializable {
     public static final Function<RecordList, RecordList> TODAYS_INITIALIZATION_TASK 
             = recordList -> recordList.removeExpired(); 
     
-    private final RecordMaker<T> recordMaker;
+    private final RecordMaker<T> recordMaker; // TODO THIS SHOULD NOT BE SERIALIZED, RETHINK THIS
     private final List<T> records;
     
     private RecordList(final RecordMaker<T> recordMaker) {
-        this(recordMaker, new ArrayList<>());
+        this.recordMaker = recordMaker;
+        final List<T> rs = new ArrayList<>();
         for (int i = 0; i < COUNT; ++i) {
-            records.add(recordMaker.make(i));
+            rs.add(recordMaker.make(i));
         }
+        records = Collections.unmodifiableList(rs);
     }
     
     private RecordList(final RecordMaker<T> recordMaker, final List<T> records) {
         this.recordMaker = recordMaker;
-        this.records = records;
+        this.records = Collections.unmodifiableList(records);
     }
     
     public RecordList insert(final int index, final T record) {
@@ -44,6 +46,10 @@ public class RecordList<T extends Record> implements Serializable {
         rs.add(index, record);
         rs.remove(rs.size() - 1);
         return new RecordList(recordMaker, rs);
+    }
+    
+    public List<T> getRecords() {
+        return records;
     }
     
     public int findIndex(final T record) {
