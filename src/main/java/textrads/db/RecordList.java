@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RecordList<T extends Record> implements Serializable {
     
@@ -14,17 +16,25 @@ public class RecordList<T extends Record> implements Serializable {
     public static final int COUNT = 10;
     public static final long EXPIRATION_MILLIS = TimeUnit.DAYS.toMillis(1);
     
-    private final DefaultRecordMaker<T> recordMaker;
+    public static final Supplier<RecordList> RECORD_LIST_SUPPLIER = () -> new RecordList(Record.RECORD_MAKER);
+    
+    public static final Supplier<RecordList> EXTENDED_RECORD_LIST_SUPPLIER 
+            = () -> new RecordList(ExtendedRecord.RECORD_MAKER);
+    
+    public static final Function<RecordList, RecordList> TODAYS_INITIALIZATION_TASK 
+            = recordList -> recordList.removeExpired(); 
+    
+    private final RecordMaker<T> recordMaker;
     private final List<T> records;
     
-    public RecordList(final DefaultRecordMaker<T> recordMaker) {
+    private RecordList(final RecordMaker<T> recordMaker) {
         this(recordMaker, new ArrayList<>());
         for (int i = 0; i < COUNT; ++i) {
             records.add(recordMaker.make(i));
         }
     }
     
-    private RecordList(final DefaultRecordMaker<T> recordMaker, final List<T> records) {
+    private RecordList(final RecordMaker<T> recordMaker, final List<T> records) {
         this.recordMaker = recordMaker;
         this.records = records;
     }
