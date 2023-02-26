@@ -1,7 +1,6 @@
 package textrads.db;
 
 import java.io.Serializable;
-import textrads.Textrads;
 
 public class ExtendedRecord extends Record implements Serializable {
     

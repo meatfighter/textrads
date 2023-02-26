@@ -161,6 +161,10 @@ public class Textrads {
     }
     
     public static void main(final String... args) throws Exception {
-        new Textrads().launch();
+        //new Textrads().launch();
+        
+        final RecordFormatter formatter = new RecordFormatter();
+        final Record record = new Record("AAA", 999999, (short) 3);
+        System.out.println(formatter.format(2, record));
     }
 }
