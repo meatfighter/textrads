@@ -161,20 +161,6 @@ public class Textrads {
     }
     
     public static void main(final String... args) throws Exception {
-        //new Textrads().launch();
-        
-        final Database database = new Database();
-        database.init();
-        RecordList<Record> recordList = database.get(Database.ALL_TIME_MARATHON);
-//        final Record record = new Record("MDB", 654321, (short) 10);
-//        final int index = recordList.findIndex(record);
-//        if (index < RecordList.COUNT) {
-//            recordList = recordList.insert(index, record);
-//        }
-        for (final Record r : recordList.getRecords()) {
-            System.out.println(r);
-        }
-//        database.saveAsync(Database.ALL_TIME_MARATHON, recordList);
-//        database.shutdown();
+        new Textrads().launch();
     }
 }
