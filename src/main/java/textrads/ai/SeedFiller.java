@@ -37,14 +37,14 @@ public class SeedFiller {
         }
     }
 
-    private boolean push(final int y, final int xl, final int xr, final int dy) {
+    private boolean push(final int y, final int xl, final int xr, final int dy, final int floorHeight) {
 
         // Halt early if a full row of the playfield is filled.
         if (xr - xl + 1 == PLAYFIELD_WIDTH) {
             return true;
         }
 
-        if (y + dy >= 0 && y + dy < playfield.length) {
+        if (y + dy >= 0 && y + dy < playfield.length - floorHeight) {
             final Segment segment = stack[sp++];
             segment.y = y;
             segment.xl = xl;
@@ -63,7 +63,7 @@ public class SeedFiller {
     // i.e., no set of moves will avoid Game Over.  
     // 
     // true - it may be possible to clear additiona lines, but not necessarily.
-    public boolean canClearMoreLines(final boolean[][] playfield) {
+    public boolean canClearMoreLines(final boolean[][] playfield, final int floorHeight) {
 
         // If the first row is empty, there is no need to do a flood fill.
         if (isFirstRowEmpty(playfield)) {
@@ -72,13 +72,13 @@ public class SeedFiller {
 
         // Do the flood fill.
         copy(playfield, this.playfield);
-        if (fill(SPAWN_X, SPAWN_Y)) {
+        if (fill(SPAWN_X, SPAWN_Y, floorHeight)) {
             return true; // The fill halted early after detecting a full row.
         }
 
         // Check if the flood fill populated any full rows.
         outer:
-        for (int y = 0; y < playfield.length; ++y) {
+        for (int y = 0, end = playfield.length - floorHeight; y < end; ++y) {
             final boolean[] row = this.playfield[y];
             for (int x = PLAYFIELD_WIDTH - 1; x >= 0; --x) {
                 if (!row[x]) {
@@ -102,16 +102,16 @@ public class SeedFiller {
     }
 
     // Halts early and returns true if it filled a full row (see push).
-    private boolean fill(int x, int y) {
+    private boolean fill(int x, int y, final int floorHeight) {
 
-        if (playfield[y][x] || x < 0 || x >= PLAYFIELD_WIDTH || y < 0 || y >= PLAYFIELD_HEIGHT) {
+        if (playfield[y][x] || x < 0 || x >= PLAYFIELD_WIDTH || y < 0 || y >= PLAYFIELD_HEIGHT - floorHeight) {
             return false;
         }
 
         sp = 0;
 
-        push(y, x, x, 1); // needed in some cases
-        push(y + 1, x, x, -1); // seed segment (popped first)
+        push(y, x, x, 1, floorHeight); // needed in some cases
+        push(y + 1, x, x, -1, floorHeight); // seed segment (popped first)
 
         while (sp > 0) {
             // pop segment off stack and fill a neighboring scan line
@@ -140,7 +140,7 @@ public class SeedFiller {
                 }
             } else {
                 left = x + 1;
-                if (left < xl && push(y, left, xl - 1, -dy)) { // leak on left? 
+                if (left < xl && push(y, left, xl - 1, -dy, floorHeight)) { // leak on left? 
                     return true;
                 }
                 x = xl + 1;
@@ -151,8 +151,8 @@ public class SeedFiller {
                     playfield[y][x++] = true;
                 }
 
-                if (push(y, left, x - 1, dy)
-                        || (x > xr + 1 && push(y, xr + 1, x - 1, -dy))) { // leak on right?
+                if (push(y, left, x - 1, dy, floorHeight)
+                        || (x > xr + 1 && push(y, xr + 1, x - 1, -dy, floorHeight))) { // leak on right?
                     return true;
                 }
 

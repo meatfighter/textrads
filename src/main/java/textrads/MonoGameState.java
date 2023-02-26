@@ -51,7 +51,7 @@ public class MonoGameState implements Serializable {
     private static final float[] FRAMES_PER_GRAVITY_DROP = new float[256];
     private static final byte[] FRAMES_PER_LOCK = new byte[256];
     
-    private static final boolean[][] GARBAGE_LINES;
+    public static final boolean[][] GARBAGE_LINES;
     
     static {
         for (int i = FRAMES_PER_GRAVITY_DROP.length - 1; i >= 0; --i) {
@@ -549,7 +549,9 @@ public class MonoGameState implements Serializable {
             lines += lineYs.size();
         }
         
-        if (gameMode != GameState.CONSTANT_LEVEL) {
+        if (!(gameMode == GameState.CONSTANT_LEVEL 
+                || gameMode == GameState.GARBAGE_HEAP_MODE 
+                || gameMode == GameState.FORTY_LINES_MODE)) {
             final short minLevel = (short) (lines / 10);
             if (minLevel > level) {
                 level = minLevel;

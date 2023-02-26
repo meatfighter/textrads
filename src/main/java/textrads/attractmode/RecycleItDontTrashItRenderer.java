@@ -1,9 +1,10 @@
-package textrads;
+package textrads.attractmode;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.graphics.TextImage;
+import textrads.Images;
 import textrads.util.GraphicsUtil;
 
 public class RecycleItDontTrashItRenderer {

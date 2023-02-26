@@ -1,6 +1,6 @@
-package textrads;
+package textrads.attractmode;
 
-import static textrads.AbstractRecordFormatter.PLACES;
+import static textrads.attractmode.AbstractRecordFormatter.PLACES;
 import textrads.db.ExtendedRecord;
 import textrads.util.GraphicsUtil;
 

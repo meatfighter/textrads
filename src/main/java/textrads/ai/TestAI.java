@@ -39,7 +39,7 @@ public class TestAI {
             { true,true,true,true,true,true,true,false,true,true, },            
         };
         
-        searchChain.search(0, 4, playfield, 0.164519f, (byte) 32, 0.164519f / 2f);
+        searchChain.search(0, 4, playfield, 0, 0.164519f, (byte) 32, 0.164519f / 2f);
         System.out.println(searchChain.isBestFound());
         
         

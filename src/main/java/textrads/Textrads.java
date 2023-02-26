@@ -1,5 +1,13 @@
 package textrads;
 
+import textrads.attractmode.RecordsState;
+import textrads.attractmode.ExtendedRecordDifficultyFormatter;
+import textrads.attractmode.RecycleItDontTrashItRenderer;
+import textrads.attractmode.RecordsRenderer;
+import textrads.attractmode.HackThePlanetRenderer;
+import textrads.attractmode.TitleScreenRenderer;
+import textrads.attractmode.TitleScreenState;
+import textrads.attractmode.WinnersDontUseDrugsRenderer;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;

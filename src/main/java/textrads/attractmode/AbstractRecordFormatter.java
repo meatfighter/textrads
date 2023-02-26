@@ -1,4 +1,4 @@
-package textrads;
+package textrads.attractmode;
 
 import textrads.db.Record;
 

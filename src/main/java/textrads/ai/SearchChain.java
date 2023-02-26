@@ -44,6 +44,7 @@ public class SearchChain {
     private final int[] columnMinY = new int[PLAYFIELD_WIDTH];
 
     private boolean[][] playfield;
+    private int floorHeight;
     private int type1;
     private int type2;
 
@@ -81,8 +82,8 @@ public class SearchChain {
             this.dropFailed1 = dropFailed;
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
-            if (seedFiller.canClearMoreLines(playfield1)) {                
-                searcher2.search(type2, playfield1, framesPerGravityDrop, framesPerLock, framesPerMove);
+            if (seedFiller.canClearMoreLines(playfield1, floorHeight)) {                
+                searcher2.search(type2, playfield1, floorHeight, framesPerGravityDrop, framesPerLock, framesPerMove);
             }
         });
 
@@ -90,7 +91,7 @@ public class SearchChain {
                 framesPerLock, framesPerMove) -> {
             lockHeight2 = TETROMINOES[type2][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared2 = lock(playfield1, playfield2, type2, tetrominoX, tetrominoY, tetrominoRotation);            
-            if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2)) {                
+            if (canAllTypesSpawn(playfield2) && seedFiller.canClearMoreLines(playfield2, floorHeight)) {                
                 evaluate();
             }
         });
@@ -125,17 +126,19 @@ public class SearchChain {
     }
 
     public void search(final int currentType, final int nextType, final boolean[][] playfield, 
-            final float framesPerGravityDrop, final byte framesPerLock, final float framesPerMove) {
+            final int floorHeight, final float framesPerGravityDrop, final byte framesPerLock, 
+            final float framesPerMove) {
 
         this.playfield = playfield;
+        this.floorHeight = floorHeight;
         this.type1 = currentType;
         this.type2 = nextType;
 
         bestFound = false;
         bestScore = Double.MAX_VALUE;        
         
-        if (seedFiller.canClearMoreLines(playfield)) {            
-            searcher1.search(currentType, playfield, framesPerGravityDrop, framesPerLock, framesPerMove);
+        if (seedFiller.canClearMoreLines(playfield, floorHeight)) {            
+            searcher1.search(currentType, playfield, floorHeight, framesPerGravityDrop, framesPerLock, framesPerMove);
         }
     }
 

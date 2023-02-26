@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import textrads.GameState;
 import textrads.MonoGameState;
+import static textrads.MonoGameState.GARBAGE_LINES;
 import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
 import static textrads.MonoGameState.PLAYFIELD_WIDTH;
 
@@ -40,6 +42,8 @@ public class Ai {
     private int requestedAttackRows;
     private boolean searching;
     
+    private byte mode;
+    private int floorHeight;
     private int difficulty; // TODO USE THIS
     
     public Ai() {
@@ -48,7 +52,13 @@ public class Ai {
         }
     }
     
-    public void init(final short level, final long seed, final int difficulty) {
+    public void init(
+            final byte mode,
+            final long seed, 
+            final int startingLevel, 
+            final int garbageHeight, 
+            final int floorHeight,            
+            final int difficulty) {
         
         synchronized (searchMonitor) {
             if (thread.getState() == Thread.State.NEW) {
@@ -64,17 +74,34 @@ public class Ai {
         }
         
         synchronized (solutionsMonitor) {
+            this.mode = mode;
+            this.floorHeight = floorHeight;
             this.difficulty = difficulty;
+            currentLevel = (short) startingLevel;
+            garbageCounter = 0;            
             tetrominoRandomizer.setSeed(seed);
             garbageRandomizer.setSeed(seed);
-            Playfield.clearPlayfield(currentPlayfield);
-            currentLevel = level;
-            currentLines = 0;
-            garbageCounter = 0;
-            garbageXs.clear();
-            updateGarbageXs();
             nexts.clear();
-            updateNexts();
+            updateNexts();            
+            Playfield.clearPlayfield(currentPlayfield);
+            
+            switch (mode) {
+                case GameState.GARBAGE_HEAP_MODE:
+                    currentLines = 25;
+                    createGarbageHeap(garbageHeight);
+                    break;
+                case GameState.FORTY_LINES_MODE:
+                    currentLines = 40;
+                    break;
+                case GameState.VS_AI_MODE:
+                    currentLines = 0;                        
+                    garbageXs.clear();
+                    updateGarbageXs();                    
+                    break;
+                default:
+                    currentLines = 0;
+                    break;
+            }
         } 
         
         synchronized (searchMonitor) {
@@ -83,6 +110,13 @@ public class Ai {
             searchMonitor.notifyAll();
         }        
     }
+    
+    private void createGarbageHeap(final int garbageHeight) {
+        for (int y = PLAYFIELD_HEIGHT - garbageHeight; y < PLAYFIELD_HEIGHT; ++y) {
+            System.arraycopy(GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)], 0, currentPlayfield[y], 0, 
+                    PLAYFIELD_WIDTH);
+        } 
+    }    
     
     public void getMoves(final List<Byte> moves, final int attackRows) {
         
@@ -160,7 +194,7 @@ public class Ai {
         Playfield.copy(currentPlayfield, solution.playfield);
         addGarbage(solution.playfield, attackRows);
         
-        searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, 
+        searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, floorHeight,
                 MonoGameState.getFramesPerGravityDrop(solution.level),
                 MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
         if (searchChain.isBestFound()) {            

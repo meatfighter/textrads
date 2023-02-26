@@ -1,4 +1,12 @@
- 0 All Time Best Marathon Records
+demos:
+[ ] Marathon
+[ ] Garbage Heap
+[ ] Rising Garbage
+[ ] Forty Lines (solid height > 0)
+[ ] Vs. AI
+
+
+0 All Time Best Marathon Records
  1
  2 Rank  Initials  Score      Starting Level
  3

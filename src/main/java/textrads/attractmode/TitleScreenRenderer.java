@@ -1,8 +1,10 @@
-package textrads;
+package textrads.attractmode;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import textrads.BlockText;
+import textrads.Colors;
 import textrads.util.GraphicsUtil;
 
 public class TitleScreenRenderer {
