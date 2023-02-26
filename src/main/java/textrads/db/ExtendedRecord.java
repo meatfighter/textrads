@@ -7,12 +7,6 @@ public class ExtendedRecord extends Record implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public static final RecordMaker<ExtendedRecord> RECORD_MAKER = index -> {
-        final char initial = (char) ('A' + index);
-        return new ExtendedRecord(new StringBuilder().append(initial).append(initial).append(initial).toString(),
-                (byte) 0, (short) 0, (10 + index) * 60 * Textrads.FRAMES_PER_SECOND, 1000 * (10 - index), 0L);
-    };
-      
     final byte challenge;
     final int time;
     

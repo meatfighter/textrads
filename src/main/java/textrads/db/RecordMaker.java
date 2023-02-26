@@ -1,10 +1,6 @@
 package textrads.db;
 
-import java.io.Serializable;
-
-public interface RecordMaker<T> extends Serializable {
-    
-    final long serialVersionUID = 1L;
+public interface RecordMaker<T> {
     
     T make(int index);
 }

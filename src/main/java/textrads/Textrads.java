@@ -166,7 +166,7 @@ public class Textrads {
         final Database database = new Database();
         database.init();
         RecordList<Record> recordList = database.get(Database.ALL_TIME_MARATHON);
-//        final Record record = new Record("MDB", 123456, (short) 10);
+//        final Record record = new Record("MDB", 654321, (short) 10);
 //        final int index = recordList.findIndex(record);
 //        if (index < RecordList.COUNT) {
 //            recordList = recordList.insert(index, record);

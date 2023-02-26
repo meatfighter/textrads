@@ -16,27 +16,27 @@ public class RecordList<T extends Record> implements Serializable {
     public static final int COUNT = 10;
     public static final long EXPIRATION_MILLIS = TimeUnit.DAYS.toMillis(1);
     
-    public static final Supplier<RecordList> RECORD_LIST_SUPPLIER = () -> new RecordList(Record.RECORD_MAKER);
+    public static final Supplier<RecordList> RECORD_LIST_SUPPLIER = () -> new RecordList(DefaultRecordMaker.RECORD);
     
     public static final Supplier<RecordList> EXTENDED_RECORD_LIST_SUPPLIER 
-            = () -> new RecordList(ExtendedRecord.RECORD_MAKER);
+            = () -> new RecordList(DefaultRecordMaker.EXTENDED_RECORD);
     
     public static final Function<RecordList, RecordList> TODAYS_INITIALIZATION_TASK 
             = recordList -> recordList.removeExpired(); 
     
-    private final RecordMaker<T> recordMaker; // TODO THIS SHOULD NOT BE SERIALIZED, RETHINK THIS
+    private final DefaultRecordMaker recordMaker;
     private final List<T> records;
     
-    private RecordList(final RecordMaker<T> recordMaker) {
+    private RecordList(final DefaultRecordMaker recordMaker) {
         this.recordMaker = recordMaker;
         final List<T> rs = new ArrayList<>();
         for (int i = 0; i < COUNT; ++i) {
-            rs.add(recordMaker.make(i));
+            rs.add((T) recordMaker.make(i));
         }
         records = Collections.unmodifiableList(rs);
     }
     
-    private RecordList(final RecordMaker<T> recordMaker, final List<T> records) {
+    private RecordList(final DefaultRecordMaker recordMaker, final List<T> records) {
         this.recordMaker = recordMaker;
         this.records = Collections.unmodifiableList(records);
     }
@@ -76,7 +76,7 @@ public class RecordList<T extends Record> implements Serializable {
             }
         }
         for (int i = 0; i < COUNT; ++i) {
-            rs.add(recordMaker.make(i));
+            rs.add((T) recordMaker.make(i));
         } 
         Collections.sort(rs);
         while (rs.size() > COUNT) {
