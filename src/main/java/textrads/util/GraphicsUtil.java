@@ -126,8 +126,10 @@ public final class GraphicsUtil {
         return !isSmallTerminal(size);
     }
     
-    public static void centerString(final TextGraphics g, final TerminalSize size, final int y, final String str) {        
-        g.putString((size.getColumns() - str.length()) / 2, y, str);
+    public static int centerString(final TextGraphics g, final TerminalSize size, final int y, final String str) {
+        final int x = (size.getColumns() - str.length()) / 2;
+        g.putString(x, y, str);
+        return x;
     }
     
     // Always set background and foreground color at the same time, particularly when printing spaces. Spaces do not

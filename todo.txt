@@ -1,8 +1,8 @@
  0 All Time Best Marathon Records
  1
- 2 Rank  Initials    Score       Starting Level
+ 2 Rank  Initials  Score      Starting Level
  3
- 4  1st  AAA         999999999               12 
+ 4  1st  AAA       999999999              12 
  5
  6  2nd
  7
@@ -24,18 +24,18 @@
 
 0000000000111111111122222222223333333333444444444455555555556666666666
 0123456789012345678901234567890123456789012345678901234567890123456789
-Rank  Initials  Score      Starting Level
+Rank  Initials      Score  Starting Level
  1st  AAA       999999999              12
                                          
 
 0000000000111111111122222222223333333333444444444455555555556666666666
 0123456789012345678901234567890123456789012345678901234567890123456789
-Rank  Initials  Height  Starting Level  Completion Time  Score
+Rank  Initials  Height  Starting Level  Completion Time      Score
  1st  AAA           10              12     DDD:HH:MM:SS  999999999
 
 0000000000111111111122222222223333333333444444444455555555556666666666
 0123456789012345678901234567890123456789012345678901234567890123456789
-Rank  Initials  Difficulty  Starting Level  Completion Time  Score
+Rank  Initials  Difficulty  Starting Level  Completion Time      Score
  1st  AAA               10              12     DDD:HH:MM:SS  999999999
 
 

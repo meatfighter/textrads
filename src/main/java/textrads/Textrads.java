@@ -38,6 +38,10 @@ public class Textrads {
     
     private final TitleScreenState titleScreenState = new TitleScreenState();
     private final TitleScreenRenderer titleScreenRenderer = new TitleScreenRenderer();
+    
+    private final Database database = new Database();
+    private final RecordsState recordsState = new RecordsState();
+    private final RecordsRenderer recordsRender = new RecordsRenderer();
         
     private final Ai ai = new Ai();
     private float moveTimer;
@@ -53,6 +57,10 @@ public class Textrads {
         ai.init((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
         
         titleScreenState.reset(); // TODO TESTING
+        
+        database.init();
+        recordsState.init("All Time Best Marathon Records", database.get(Database.ALL_TIME_MARATHON), 
+                new RecordFormatter());
         
         try (final Terminal terminal = TerminalUtil.createTerminal();
                 final Screen screen = new TerminalScreen(terminal)) {
@@ -106,12 +114,12 @@ public class Textrads {
 //        client.update();
 //        server.update();
 //        
-        final GameState state = GameStateSource.getState();
-        InputEventSource.poll(eventList);
-        for (int i = 0; i < eventList.size(); ++i) {
-            state.handleInputEvent(eventList.get(i), 0);
-        }
-        state.update();
+//        final GameState state = GameStateSource.getState();
+//        InputEventSource.poll(eventList);
+//        for (int i = 0; i < eventList.size(); ++i) {
+//            state.handleInputEvent(eventList.get(i), 0);
+//        }
+//        state.update();
 
 // --------------------
 
@@ -146,25 +154,24 @@ public class Textrads {
 
 // --------------------
 
-//        InputEventSource.clear();
+        InputEventSource.clear();
 //        titleScreenState.update();
+        recordsState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        playRenderer.render(g, size, GameStateSource.getState());
+//        playRenderer.render(g, size, GameStateSource.getState());
 
 //        winnersDontUseDrugsRenderer.render(g, size);
 //        recycleItDontTrashItRenderer.render(g, size);
 //        hackThePlanetRenderer.render(g, size);
 
 //        titleScreenRenderer.render(g, size, titleScreenState);
+
+        recordsRender.render(g, size, recordsState);
     }
     
     public static void main(final String... args) throws Exception {
-        //new Textrads().launch();
-        
-        final RecordFormatter formatter = new RecordFormatter();
-        final Record record = new Record("AAA", 999999, (short) 3);
-        System.out.println(formatter.format(2, record));
+        new Textrads().launch();
     }
 }
