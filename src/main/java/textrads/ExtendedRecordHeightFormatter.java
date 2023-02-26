@@ -13,7 +13,7 @@ public class ExtendedRecordHeightFormatter extends AbstractRecordFormatter<Exten
     
     @Override
     public String format(final int place, final ExtendedRecord record) {
-        return String.format("%4s    %s     %6d  %14d  %15s  %9d", PLACES[place], record.getInitials(), 
+        return String.format("%4s     %s    %6d  %14d  %15s  %9d", PLACES[place], record.getInitials(), 
                 record.getChallenge(), record.getLevel(), GraphicsUtil.formatTime(record.getTime()), record.getScore());
     }
 }

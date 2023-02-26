@@ -32,7 +32,7 @@ public class RecordsRenderer {
         final int flashIndex = state.getFlashIndex();
         for (int i = recordStrings.length - 1; i >= 0; --i) {
             GraphicsUtil.setColor(g, BACKGROUND_COLOR, (i == flashIndex) 
-                    ? (i == 2 ? FOURTH_COLOR : Colors.WHITE) : RANK_COLORS[Math.min(3, i)]);
+                    ? (i == 2 ? Colors.GOLD : Colors.WHITE) : RANK_COLORS[Math.min(3, i)]);
             g.putString(ox, oy + 4 + 2 * i, recordStrings[i]);
         }
     }

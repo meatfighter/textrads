@@ -11,8 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.db.Database;
-import textrads.db.Record;
-import textrads.db.RecordList;
 import textrads.netplay.Client;
 import textrads.netplay.Server;
 import textrads.util.TerminalUtil;
@@ -59,8 +57,8 @@ public class Textrads {
         titleScreenState.reset(); // TODO TESTING
         
         database.init();
-        recordsState.init("All Time Best Marathon Records", database.get(Database.ALL_TIME_MARATHON), 
-                new RecordFormatter());
+        recordsState.init("All Time Best Vs. AI Records", database.get(Database.ALL_TIME_VS_AI), 
+                new ExtendedRecordDifficultyFormatter());
         
         try (final Terminal terminal = TerminalUtil.createTerminal();
                 final Screen screen = new TerminalScreen(terminal)) {
