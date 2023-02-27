@@ -23,6 +23,8 @@ import textrads.netplay.Client;
 import textrads.netplay.Server;
 import textrads.util.TerminalUtil;
 
+// TODO COMPARE INTERNAL AI STATE IN GARBAGE MODE, APPEARS TO BE MISPLACING PIECES
+
 public class Textrads {
     
     public static final int FRAMES_PER_SECOND = 60;
@@ -58,9 +60,13 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.THREE_MINUTES_MODE, seed);     
+        GameStateSource.getState().init(GameState.GARBAGE_HEAP_MODE, seed);     
         
-        ai.init(GameState.MARATHON_MODE, seed, (short) GameStateSource.getState().getStates()[1].getLevel(), 0, 0, 0); // TODO
+        ai.init(GameStateSource.getState().getMode(), seed, 
+                (short) GameStateSource.getState().getStates()[0].getLevel(), 
+                10, 
+                GameStateSource.getState().getStates()[0].getFloorHeight(), 
+                0); // TODO
         
         titleScreenState.reset(); // TODO TESTING
         
@@ -160,13 +166,44 @@ public class Textrads {
 
 // --------------------
 
-        InputEventSource.clear();
+//        InputEventSource.clear();
 //        titleScreenState.update();
-        recordsState.update();
+//        recordsState.update();
+
+// --------------------
+
+        {
+            final GameState state = GameStateSource.getState();
+            InputEventSource.poll(eventList);
+            for (int i = 0; i < eventList.size(); ++i) {
+                state.handleInputEvent(eventList.get(i), 0);
+            }
+        }
+
+        {
+            final MonoGameState state = GameStateSource.getState().getStates()[0];
+            
+            if (state.isJustSpawned()) { 
+                moveTimer = state.getFramesPerGravityDrop() / 2;
+                ai.getMoves(moves, state.getLastAttackRows());
+            } 
+                        
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += state.getFramesPerGravityDrop() / 2;
+                if (moves.isEmpty()) {
+                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    state.handleInputEvent(moves.remove(0));
+                }
+            }                
+        }
+                
+        GameStateSource.getState().update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        playRenderer.render(g, size, GameStateSource.getState());
+        playRenderer.render(g, size, GameStateSource.getState());
 
 //        winnersDontUseDrugsRenderer.render(g, size);
 //        recycleItDontTrashItRenderer.render(g, size);
@@ -174,7 +211,7 @@ public class Textrads {
 
 //        titleScreenRenderer.render(g, size, titleScreenState);
 
-        recordsRender.render(g, size, recordsState);
+//        recordsRender.render(g, size, recordsState);
     }
     
     public static void main(final String... args) throws Exception {
