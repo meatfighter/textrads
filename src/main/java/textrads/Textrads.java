@@ -60,7 +60,7 @@ public class Textrads {
         final long seed = ThreadLocalRandom.current().nextLong();
         GameStateSource.getState().init(GameState.THREE_MINUTES_MODE, seed);     
         
-        ai.init((short) GameStateSource.getState().getStates()[1].getLevel(), seed, 0); // TODO DIFFICULTY
+        ai.init(GameState.MARATHON_MODE, seed, (short) GameStateSource.getState().getStates()[1].getLevel(), 0, 0, 0); // TODO
         
         titleScreenState.reset(); // TODO TESTING
         

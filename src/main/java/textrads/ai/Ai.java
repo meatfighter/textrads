@@ -40,9 +40,10 @@ public class Ai {
     private final Object solutionsMonitor = new Object();
     private final Object searchMonitor = new Object();
     private int requestedAttackRows;
+    private int maxAttackRows;
     private boolean searching;
     
-    private byte mode;
+    private byte gameMode;
     private int floorHeight;
     private int difficulty; // TODO USE THIS
     
@@ -53,7 +54,7 @@ public class Ai {
     }
     
     public void init(
-            final byte mode,
+            final byte gameMode,
             final long seed, 
             final int startingLevel, 
             final int garbageHeight, 
@@ -65,6 +66,7 @@ public class Ai {
                 thread.start();
             }
             requestedAttackRows = 0;
+            maxAttackRows = (gameMode == GameState.VS_AI_MODE) ? PLAYFIELD_HEIGHT : 0;
             while (searching) {                                                
                 try {
                     searchMonitor.wait();
@@ -74,7 +76,7 @@ public class Ai {
         }
         
         synchronized (solutionsMonitor) {
-            this.mode = mode;
+            this.gameMode = gameMode;            
             this.floorHeight = floorHeight;
             this.difficulty = difficulty;
             currentLevel = (short) startingLevel;
@@ -85,7 +87,7 @@ public class Ai {
             updateNexts();            
             Playfield.clearPlayfield(currentPlayfield);
             
-            switch (mode) {
+            switch (gameMode) {
                 case GameState.GARBAGE_HEAP_MODE:
                     currentLines = 25;
                     createGarbageHeap(garbageHeight);
@@ -156,6 +158,8 @@ public class Ai {
     
     private void loop() {        
         while (true) {
+            
+            final int maxAttack;
             synchronized (searchMonitor) {
                 while (!searching) {
                     try {
@@ -163,9 +167,10 @@ public class Ai {
                     } catch (final InterruptedException e) {                    
                     }                    
                 }
+                maxAttack = maxAttackRows;
             }
             
-            for (int attackRows = 0; attackRows <= PLAYFIELD_HEIGHT; ++attackRows) {                
+            for (int attackRows = 0; attackRows <= maxAttack; ++attackRows) {                
                 synchronized (searchMonitor) {                    
                     if (requestedAttackRows >= 0) {
                         if (attackRows > requestedAttackRows) {
@@ -201,12 +206,21 @@ public class Ai {
             searchChain.getMoves(moves);
             for (final Coordinate move : moves) {
                 solution.moves.add(move.inputEvent);
-            }            
-            solution.lines += Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
+            } 
+            final int lines = Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
                     searchChain.getRotation());
-            final short minLevel = (short) (solution.lines / 10);
-            if (minLevel > solution.level) {
-                solution.level = minLevel;
+            if (gameMode == GameState.GARBAGE_HEAP_MODE || gameMode == GameState.FORTY_LINES_MODE) {
+                solution.lines -= lines;
+            } else {
+                solution.lines += lines;
+            }
+            if (!(gameMode == GameState.CONSTANT_LEVEL 
+                    || gameMode == GameState.GARBAGE_HEAP_MODE 
+                    || gameMode == GameState.FORTY_LINES_MODE)) {
+                final short minLevel = (short) (solution.lines / 10);
+                if (minLevel > solution.level) {
+                    solution.level = minLevel;
+                }
             }
         }      
     }
