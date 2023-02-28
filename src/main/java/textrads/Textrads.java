@@ -25,7 +25,7 @@ import textrads.util.TerminalUtil;
 
 public class Textrads {
     
-    public static final int FRAMES_PER_SECOND = 60 * 1000;// TODO 60;
+    public static final int FRAMES_PER_SECOND = 60;
     
     private static final int MAX_FRAME_SKIPS = 3;
     private static final int MIN_SLEEP_MICROS = 1500;
@@ -58,12 +58,12 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.RISING_GARBAGE_MODE, seed);     
+        GameStateSource.getState().init(GameState.VS_AI_MODE, seed);     
         
         ai.init(GameStateSource.getState().getMode(), seed, 
-                (short) GameStateSource.getState().getStates()[0].getLevel(), 
+                (short) GameStateSource.getState().getStates()[1].getLevel(), 
                 0, 
-                GameStateSource.getState().getStates()[0].getFloorHeight(), 
+                GameStateSource.getState().getStates()[1].getFloorHeight(), 
                 0); // TODO
         
         titleScreenState.reset(); // TODO TESTING
@@ -133,43 +133,6 @@ public class Textrads {
 
 // --------------------
 
-//        {
-//            final GameState state = GameStateSource.getState();
-//            InputEventSource.poll(eventList);
-//            for (int i = 0; i < eventList.size(); ++i) {
-//                state.handleInputEvent(eventList.get(i), 0);
-//            }
-//        }
-//
-//        {
-//            final MonoGameState state = GameStateSource.getState().getStates()[1];
-//            
-//            if (state.isJustSpawned()) { 
-//                moveTimer = state.getFramesPerGravityDrop() / 2;
-//                ai.getMoves(moves, state.getLastAttackRows());
-//            } 
-//                        
-//            --moveTimer;            
-//            while (moveTimer <= 0) {
-//                moveTimer += state.getFramesPerGravityDrop() / 2;
-//                if (moves.isEmpty()) {
-//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-//                } else {                    
-//                    state.handleInputEvent(moves.remove(0));
-//                }
-//            }                
-//        }
-//                
-//        GameStateSource.getState().update();
-
-// --------------------
-
-//        InputEventSource.clear();
-//        titleScreenState.update();
-//        recordsState.update();
-
-// --------------------
-
         {
             final GameState state = GameStateSource.getState();
             InputEventSource.poll(eventList);
@@ -179,7 +142,7 @@ public class Textrads {
         }
 
         {
-            final MonoGameState state = GameStateSource.getState().getStates()[0];
+            final MonoGameState state = GameStateSource.getState().getStates()[1];
             
             if (state.isJustSpawned()) { 
                 moveTimer = state.getFramesPerGravityDrop() / 2;
@@ -198,6 +161,43 @@ public class Textrads {
         }
                 
         GameStateSource.getState().update();
+
+// --------------------
+
+//        InputEventSource.clear();
+//        titleScreenState.update();
+//        recordsState.update();
+
+// --------------------
+
+//        {
+//            final GameState state = GameStateSource.getState();
+//            InputEventSource.poll(eventList);
+//            for (int i = 0; i < eventList.size(); ++i) {
+//                state.handleInputEvent(eventList.get(i), 0);
+//            }
+//        }
+//
+//        {
+//            final MonoGameState state = GameStateSource.getState().getStates()[0];
+//            
+//            if (state.isJustSpawned()) { 
+//                moveTimer = state.getFramesPerGravityDrop() / 2;
+//                ai.getMoves(moves, state.getLastAttackRows());
+//            } 
+//                        
+//            --moveTimer;            
+//            while (moveTimer <= 0) {
+//                moveTimer += state.getFramesPerGravityDrop() / 2;
+//                if (moves.isEmpty()) {
+//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+//                } else {                    
+//                    state.handleInputEvent(moves.remove(0));
+//                }
+//            }                
+//        }
+//                
+//        GameStateSource.getState().update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
