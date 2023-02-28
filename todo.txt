@@ -1,3 +1,6 @@
+Tetris DX max floor height is 12
+NES Tetris max garbage heights: 0, 3, 5, 8, 10, 12
+
 demos:
 [ ] Marathon
 [ ] Garbage Heap

@@ -34,6 +34,7 @@ public class Ai {
     private final boolean[][] currentPlayfield = new boolean[PLAYFIELD_HEIGHT][PLAYFIELD_WIDTH];
     private short currentLevel;
     private short currentLines;
+    private byte lockCounter;
     
     private final Solution[] solutions = new Solution[PLAYFIELD_HEIGHT + 1];
 
@@ -141,7 +142,9 @@ public class Ai {
             Playfield.copy(solution.playfield, currentPlayfield);
             nexts.remove(0);
             updateNexts();
-            if (attackRows > 0) {
+            if (gameMode == GameState.RISING_GARBAGE_MODE) {
+                conditionallyRaiseGarbage();
+            } else if (attackRows > 0) {
                 for (int i = 0; i < attackRows; ++i) {
                     garbageXs.remove(0);
                 }
@@ -272,5 +275,34 @@ public class Ai {
             }
             garbageXs.add(garbageX);
         }
+    }
+    
+    private void conditionallyRaiseGarbage() {
+        ++lockCounter;
+        final int threshold;
+        switch ((currentLines % 60) / 10) {
+            case 0:
+                threshold = 6;
+                break;
+            case 2:
+                threshold = 16;
+                break;
+            case 4:
+                threshold = 12;
+                break;
+            default:
+                lockCounter = 0;
+                return;
+        }
+        if (lockCounter < threshold) {
+            return;
+        }
+
+        lockCounter = 0;
+        for (int y = 1; y < PLAYFIELD_HEIGHT; ++y) {
+            System.arraycopy(currentPlayfield[y], 0, currentPlayfield[y - 1], 0, PLAYFIELD_WIDTH);
+        }
+        System.arraycopy(GARBAGE_LINES[garbageRandomizer.nextInt(GARBAGE_LINES.length)], 0, 
+                currentPlayfield[PLAYFIELD_HEIGHT - 1], 0, PLAYFIELD_WIDTH);
     }
 }

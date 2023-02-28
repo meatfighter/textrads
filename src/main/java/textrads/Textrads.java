@@ -23,11 +23,9 @@ import textrads.netplay.Client;
 import textrads.netplay.Server;
 import textrads.util.TerminalUtil;
 
-// TODO COMPARE INTERNAL AI STATE IN GARBAGE MODE, APPEARS TO BE MISPLACING PIECES
-
 public class Textrads {
     
-    public static final int FRAMES_PER_SECOND = 60;
+    public static final int FRAMES_PER_SECOND = 60 * 1000;// TODO 60;
     
     private static final int MAX_FRAME_SKIPS = 3;
     private static final int MIN_SLEEP_MICROS = 1500;
@@ -60,11 +58,11 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.GARBAGE_HEAP_MODE, seed);     
+        GameStateSource.getState().init(GameState.RISING_GARBAGE_MODE, seed);     
         
         ai.init(GameStateSource.getState().getMode(), seed, 
                 (short) GameStateSource.getState().getStates()[0].getLevel(), 
-                10, 
+                0, 
                 GameStateSource.getState().getStates()[0].getFloorHeight(), 
                 0); // TODO
         

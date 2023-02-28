@@ -169,7 +169,7 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
-        countdownTimer = Textrads.FRAMES_PER_SECOND;
+        countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
         countdownValue = 3;
         mode = COUNTDOWN_MODE;
         this.floorHeight = (byte) floorHeight;
@@ -466,7 +466,7 @@ public class MonoGameState implements Serializable {
     
     private void updateCountdown() {
         if (--countdownTimer <= 0) {
-            countdownTimer = Textrads.FRAMES_PER_SECOND;
+            countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
             if (--countdownValue < 0) {
                 mode = SPAWN_MODE;
             } 
