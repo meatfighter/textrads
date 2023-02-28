@@ -136,7 +136,7 @@ public class Textrads {
         {
             final GameState state = GameStateSource.getState();
             InputEventSource.poll(eventList);
-            for (int i = 0; i < eventList.size(); ++i) {
+            for (int i = 0; i < eventList.size(); ++i) {  
                 state.handleInputEvent(eventList.get(i), 0);
             }
         }
@@ -145,13 +145,13 @@ public class Textrads {
             final MonoGameState state = GameStateSource.getState().getStates()[1];
             
             if (state.isJustSpawned()) { 
-                moveTimer = state.getFramesPerGravityDrop() / 2;
+                moveTimer = 10f;//state.getFramesPerGravityDrop() / 2;
                 ai.getMoves(moves, state.getLastAttackRows());
             } 
                         
             --moveTimer;            
             while (moveTimer <= 0) {
-                moveTimer += state.getFramesPerGravityDrop() / 2;
+                moveTimer += 10f;//state.getFramesPerGravityDrop() / 2;
                 if (moves.isEmpty()) {
                     state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
                 } else {                    

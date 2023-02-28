@@ -60,7 +60,7 @@ public class GameState implements Serializable {
     public void init(final byte mode, final long seed) {
         this.mode = mode;
         states[0].init(seed, 10, 0, 0);
-        states[1].init(seed, 0, 0, 0);
+        states[1].init(seed, 10, 0, 0);
     }
 
     public byte getMode() {

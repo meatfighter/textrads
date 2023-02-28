@@ -247,8 +247,8 @@ public class Ai {
         }
     }
     
-    private float getFramesPerMove(final int level) { // TODO ENHANCE  
-        return MonoGameState.getFramesPerGravityDrop(level) / 3f;
+    private float getFramesPerMove(final int level) { // TODO ENHANCE          
+        return 10f;//*/MonoGameState.getFramesPerGravityDrop(level) / 2f;
     }
     
     private void updateNexts() {

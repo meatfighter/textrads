@@ -1,3 +1,8 @@
+I move around 5.5 frames/input.
+killed him at 25
+killed him at 20
+killed him at 15
+
 Tetris DX max floor height is 12
 NES Tetris max garbage heights: 0, 3, 5, 8, 10, 12
 
