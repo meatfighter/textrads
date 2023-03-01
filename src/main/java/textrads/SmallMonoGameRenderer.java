@@ -85,10 +85,16 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 g.putString(x + 3, y + MonoGameState.PLAYFIELD_HEIGHT - i, "                    ");
             }
         }
-        for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1 - floorHeight; i >= 0; --i) {
-            for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
-                GraphicsUtil.setColor(g, BLOCK_COLORS[playfield[i][j]], BACKGROUND_COLOR);
-                g.putString(x + 3 + 2 * j, y + 1 + i, "  ");
+        if (state.getGameState().getMode() != GameState.INVISIBLE_MODE) {
+            for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1 - floorHeight; i >= 0; --i) {
+                final byte[] row = playfield[i];
+                for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
+                    final byte block = row[j];
+                    if (block != MonoGameState.EMPTY_BLOCK) {
+                        GraphicsUtil.setColor(g, BLOCK_COLORS[block], BACKGROUND_COLOR);
+                        g.putString(x + 3 + 2 * j, y + 1 + i, "  ");
+                    }
+                }
             }
         }
         

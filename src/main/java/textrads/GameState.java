@@ -19,8 +19,9 @@ public class GameState implements Serializable {
     public static final byte RISING_GARBAGE_MODE = 3;
     public static final byte THREE_MINUTES_MODE = 4;
     public static final byte FORTY_LINES_MODE = 5;
-    public static final byte VS_AI_MODE = 6;
-    public static final byte VS_HUMAN_MODE = 7;
+    public static final byte INVISIBLE_MODE = 6;
+    public static final byte VS_AI_MODE = 7;
+    public static final byte VS_HUMAN_MODE = 8;
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     

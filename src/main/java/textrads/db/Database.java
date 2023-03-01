@@ -24,6 +24,7 @@ public class Database {
     public static final String ALL_TIME_RISING_GARBAGE = "all-time-rising-garbage";
     public static final String ALL_TIME_THREE_MINUTES = "all-time-three-minutes";
     public static final String ALL_TIME_FORTY_LINES = "all-time-forty-lines";
+    public static final String ALL_TIME_INVISIBLE = "all-time-invisible";
     public static final String ALL_TIME_VS_AI = "all-time-vs-ai";
     
     public static final String TODAYS_MARATHON = "todays-marathon";
@@ -32,6 +33,7 @@ public class Database {
     public static final String TODAYS_RISING_GARBAGE = "todays-rising-garbage";
     public static final String TODAYS_THREE_MINUTES = "todays-three-minutes";
     public static final String TODAYS_FORTY_LINES = "todays-forty-lines";
+    public static final String TODAYS_INVISIBLE = "todays-invisible";
     public static final String TODAYS_VS_AI = "todays-vs-ai";
     
     private static final String DIR = "data";
@@ -50,6 +52,7 @@ public class Database {
         load(ALL_TIME_CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER);
         load(ALL_TIME_RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER);
         load(ALL_TIME_THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER);
+        load(ALL_TIME_INVISIBLE, RecordList.RECORD_LIST_SUPPLIER);
         
         load(ALL_TIME_GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
         load(ALL_TIME_FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
@@ -59,6 +62,7 @@ public class Database {
         load(TODAYS_CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TODAYS_RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TODAYS_THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TODAYS_INVISIBLE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         
         load(TODAYS_GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TODAYS_FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
