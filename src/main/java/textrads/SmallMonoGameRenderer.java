@@ -85,7 +85,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 g.putString(x + 3, y + MonoGameState.PLAYFIELD_HEIGHT - i, "                    ");
             }
         }
-        if (state.getGameState().getMode() != GameState.INVISIBLE_MODE) {
+        if (state.getGameState().getMode() != GameState.Mode.INVISIBLE) {
             for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1 - floorHeight; i >= 0; --i) {
                 final byte[] row = playfield[i];
                 for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
@@ -106,7 +106,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
         }
         
         switch (state.getMode()) {
-            case MonoGameState.COUNTDOWN_MODE: {
+            case MonoGameState.Mode.COUNTDOWN: {
                 final int countdown = state.getCountdownValue();
                 int X = x + 3;
                 switch(countdown) {
@@ -123,12 +123,12 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 BlockText.draw(countdown, g, X, y + 8, COUNTDOWN_COLOR, true);
                 break;                
             }
-            case MonoGameState.TETROMINO_FALLING_MODE:
+            case MonoGameState.Mode.TETROMINO_FALLING:
                 drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
                         state.getTetrominoType(), state.getTetrominoRotation(),
                         state.getLockTimer() < 2 ? FLASH_COLOR : BLOCK_COLORS[state.getTetrominoType() + 1]);                
                 break;
-            case MonoGameState.CLEARING_LINES_MODE: {
+            case MonoGameState.Mode.CLEARING_LINES: {
                 final int timer = state.getLineClearTimer();
                 if (timer >= 36 || timer >= 6 && timer <= 20) {
                     GraphicsUtil.setColor(g, FLASH_COLOR, BACKGROUND_COLOR);
@@ -140,7 +140,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 }
                 break;
             }
-            case MonoGameState.GAME_OVER_MODE: {
+            case MonoGameState.Mode.GAME_OVER: {
                 final int t = state.getGameOverTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
                     drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 

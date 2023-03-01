@@ -43,7 +43,8 @@ public class SearchChain {
 
     private final int[] columnMinY = new int[PLAYFIELD_WIDTH];
 
-    private boolean[][] playfield;
+    private byte gameMode;
+    private boolean[][] playfield;    
     private int floorHeight;
     private int type1;
     private int type2;
@@ -83,7 +84,8 @@ public class SearchChain {
             lockHeight1 = TETROMINOES[type1][tetrominoRotation].getLockHeight(tetrominoY);
             linesCleared1 = lock(playfield, playfield1, type1, tetrominoX, tetrominoY, tetrominoRotation);
             if (seedFiller.canClearMoreLines(playfield1, floorHeight)) {                
-                searcher2.search(type2, playfield1, floorHeight, framesPerGravityDrop, framesPerLock, framesPerMove);
+                searcher2.search(type2, gameMode, playfield1, floorHeight, framesPerGravityDrop, framesPerLock, 
+                        framesPerMove);
             }
         });
 
@@ -125,12 +127,13 @@ public class SearchChain {
         }
     }
 
-    public void search(final int currentType, final int nextType, final boolean[][] playfield, 
+    public void search(final int currentType, final int nextType, final byte gameMode, final boolean[][] playfield, 
             final int floorHeight, final float framesPerGravityDrop, final byte framesPerLock, 
             final float framesPerMove) {
 
+        this.gameMode = gameMode;
         this.playfield = playfield;
-        this.floorHeight = floorHeight;
+        this.floorHeight = floorHeight;        
         this.type1 = currentType;
         this.type2 = nextType;
 
@@ -138,7 +141,8 @@ public class SearchChain {
         bestScore = Double.MAX_VALUE;        
         
         if (seedFiller.canClearMoreLines(playfield, floorHeight)) {            
-            searcher1.search(currentType, playfield, floorHeight, framesPerGravityDrop, framesPerLock, framesPerMove);
+            searcher1.search(currentType, gameMode, playfield, floorHeight, framesPerGravityDrop, framesPerLock, 
+                    framesPerMove);
         }
     }
 

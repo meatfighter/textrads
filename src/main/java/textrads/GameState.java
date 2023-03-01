@@ -11,17 +11,20 @@ public class GameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
+    public static interface Mode {
+        byte MARATHON = 0;
+        byte CONSTANT_LEVEL = 1;
+        byte GARBAGE_HEAP = 2;
+        byte RISING_GARBAGE = 3;
+        byte THREE_MINUTES = 4;
+        byte FORTY_LINES = 5;
+        byte NO_ROTATION = 6;
+        byte INVISIBLE = 7;
+        byte VS_AI = 8;
+        byte VS_HUMAN = 9;    
+    }
+
     private static final int MIN_OBJECT_SIZE = 64 * 1024;
-    
-    public static final byte MARATHON_MODE = 0;
-    public static final byte CONSTANT_LEVEL = 1;
-    public static final byte GARBAGE_HEAP_MODE = 2;
-    public static final byte RISING_GARBAGE_MODE = 3;
-    public static final byte THREE_MINUTES_MODE = 4;
-    public static final byte FORTY_LINES_MODE = 5;
-    public static final byte INVISIBLE_MODE = 6;
-    public static final byte VS_AI_MODE = 7;
-    public static final byte VS_HUMAN_MODE = 8;
     
     private final MonoGameState[] states = { new MonoGameState(this), new MonoGameState(this) };
     
@@ -55,7 +58,7 @@ public class GameState implements Serializable {
     }
 
     public int getPlayers() {
-        return (mode == VS_AI_MODE || mode == VS_HUMAN_MODE) ? 2 : 1;
+        return (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) ? 2 : 1;
     }
 
     public void init(final byte mode, final long seed) {

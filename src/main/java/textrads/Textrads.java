@@ -58,7 +58,7 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.INVISIBLE_MODE, seed);     
+        GameStateSource.getState().init(GameState.Mode.VS_AI, seed);     
         
         ai.init(GameStateSource.getState().getMode(), seed, 
                 (short) GameStateSource.getState().getStates()[1].getLevel(), 
@@ -124,43 +124,43 @@ public class Textrads {
 //        client.update();
 //        server.update();
 //        
-        final GameState state = GameStateSource.getState();
-        InputEventSource.poll(eventList);
-        for (int i = 0; i < eventList.size(); ++i) {
-            state.handleInputEvent(eventList.get(i), 0);
-        }
-        state.update();
+//        final GameState state = GameStateSource.getState();
+//        InputEventSource.poll(eventList);
+//        for (int i = 0; i < eventList.size(); ++i) {
+//            state.handleInputEvent(eventList.get(i), 0);
+//        }
+//        state.update();
 
 // --------------------
 
-//        {
-//            final GameState state = GameStateSource.getState();
-//            InputEventSource.poll(eventList);
-//            for (int i = 0; i < eventList.size(); ++i) {  
-//                state.handleInputEvent(eventList.get(i), 0);
-//            }
-//        }
-//
-//        {
-//            final MonoGameState state = GameStateSource.getState().getStates()[1];
-//            
-//            if (state.isJustSpawned()) { 
-//                moveTimer = 10f;//state.getFramesPerGravityDrop() / 2;
-//                ai.getMoves(moves, state.getLastAttackRows());
-//            } 
-//                        
-//            --moveTimer;            
-//            while (moveTimer <= 0) {
-//                moveTimer += 10f;//state.getFramesPerGravityDrop() / 2;
-//                if (moves.isEmpty()) {
-//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-//                } else {                    
-//                    state.handleInputEvent(moves.remove(0));
-//                }
-//            }                
-//        }
-//                
-//        GameStateSource.getState().update();
+        {
+            final GameState state = GameStateSource.getState();
+            InputEventSource.poll(eventList);
+            for (int i = 0; i < eventList.size(); ++i) {  
+                state.handleInputEvent(eventList.get(i), 0);
+            }
+        }
+
+        {
+            final MonoGameState state = GameStateSource.getState().getStates()[1];
+            
+            if (state.isJustSpawned()) { 
+                moveTimer = 10f;//state.getFramesPerGravityDrop() / 2;
+                ai.getMoves(moves, state.getLastAttackRows());
+            } 
+                        
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += 10f;//state.getFramesPerGravityDrop() / 2;
+                if (moves.isEmpty()) {
+                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    state.handleInputEvent(moves.remove(0));
+                }
+            }                
+        }
+                
+        GameStateSource.getState().update();
 
 // --------------------
 

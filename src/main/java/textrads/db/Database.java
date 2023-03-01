@@ -24,6 +24,7 @@ public class Database {
     public static final String ALL_TIME_RISING_GARBAGE = "all-time-rising-garbage";
     public static final String ALL_TIME_THREE_MINUTES = "all-time-three-minutes";
     public static final String ALL_TIME_FORTY_LINES = "all-time-forty-lines";
+    public static final String ALL_TIME_NO_ROTATION = "all-time-no-rotation";
     public static final String ALL_TIME_INVISIBLE = "all-time-invisible";
     public static final String ALL_TIME_VS_AI = "all-time-vs-ai";
     
@@ -33,6 +34,7 @@ public class Database {
     public static final String TODAYS_RISING_GARBAGE = "todays-rising-garbage";
     public static final String TODAYS_THREE_MINUTES = "todays-three-minutes";
     public static final String TODAYS_FORTY_LINES = "todays-forty-lines";
+    public static final String TODAYS_NO_ROTATION = "todays-no-rotation";
     public static final String TODAYS_INVISIBLE = "todays-invisible";
     public static final String TODAYS_VS_AI = "todays-vs-ai";
     

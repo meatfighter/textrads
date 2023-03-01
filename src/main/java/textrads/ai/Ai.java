@@ -67,7 +67,7 @@ public class Ai {
                 thread.start();
             }
             requestedAttackRows = 0;
-            maxAttackRows = (gameMode == GameState.VS_AI_MODE) ? PLAYFIELD_HEIGHT : 0;
+            maxAttackRows = (gameMode == GameState.Mode.VS_AI) ? PLAYFIELD_HEIGHT : 0;
             while (searching) {                                                
                 try {
                     searchMonitor.wait();
@@ -89,14 +89,14 @@ public class Ai {
             Playfield.clearPlayfield(currentPlayfield);
             
             switch (gameMode) {
-                case GameState.GARBAGE_HEAP_MODE:
+                case GameState.Mode.GARBAGE_HEAP:
                     currentLines = 25;
                     createGarbageHeap(garbageHeight);
                     break;
-                case GameState.FORTY_LINES_MODE:
+                case GameState.Mode.FORTY_LINES:
                     currentLines = 40;
                     break;
-                case GameState.VS_AI_MODE:
+                case GameState.Mode.VS_AI:
                     currentLines = 0;                        
                     garbageXs.clear();
                     updateGarbageXs();                    
@@ -142,7 +142,7 @@ public class Ai {
             Playfield.copy(solution.playfield, currentPlayfield);
             nexts.remove(0);
             updateNexts();
-            if (gameMode == GameState.RISING_GARBAGE_MODE) {
+            if (gameMode == GameState.Mode.RISING_GARBAGE) {
                 conditionallyRaiseGarbage();
             } else if (attackRows > 0) {
                 for (int i = 0; i < attackRows; ++i) {
@@ -202,7 +202,7 @@ public class Ai {
         Playfield.copy(currentPlayfield, solution.playfield);
         addGarbage(solution.playfield, attackRows);
         
-        searchChain.search(nexts.get(0), nexts.get(1), solution.playfield, floorHeight,
+        searchChain.search(nexts.get(0), nexts.get(1), gameMode, solution.playfield, floorHeight,
                 MonoGameState.getFramesPerGravityDrop(solution.level),
                 MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
         if (searchChain.isBestFound()) {            
@@ -212,14 +212,14 @@ public class Ai {
             } 
             final int lines = Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
                     searchChain.getRotation());
-            if (gameMode == GameState.GARBAGE_HEAP_MODE || gameMode == GameState.FORTY_LINES_MODE) {
+            if (gameMode == GameState.Mode.GARBAGE_HEAP || gameMode == GameState.Mode.FORTY_LINES) {
                 solution.lines -= lines;
             } else {
                 solution.lines += lines;
             }
-            if (!(gameMode == GameState.CONSTANT_LEVEL 
-                    || gameMode == GameState.GARBAGE_HEAP_MODE 
-                    || gameMode == GameState.FORTY_LINES_MODE)) {
+            if (!(gameMode == GameState.Mode.CONSTANT_LEVEL 
+                    || gameMode == GameState.Mode.GARBAGE_HEAP 
+                    || gameMode == GameState.Mode.FORTY_LINES)) {
                 final short minLevel = (short) (solution.lines / 10);
                 if (minLevel > solution.level) {
                     solution.level = minLevel;

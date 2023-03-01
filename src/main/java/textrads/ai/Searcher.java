@@ -2,6 +2,7 @@ package textrads.ai;
 
 import java.util.Collections;
 import java.util.List;
+import textrads.GameState;
 
 import textrads.InputEvent;
 import textrads.Offset;
@@ -37,7 +38,7 @@ public final class Searcher {
         Collections.reverse(moves);
     }
     
-    public void search(final int type, final boolean[][] playfield, final int floorHeight, 
+    public void search(final int type, final byte gameMode, final boolean[][] playfield, final int floorHeight, 
             final float framesPerGravityDrop, final byte framesPerLock, final float framesPerMove) {
 
         tetrominoes = TETROMINOES[type];
@@ -116,7 +117,7 @@ public final class Searcher {
                             c.state = state;
                         }  
                         
-                        if (type != Tetromino.O_TYPE) {
+                        if (type != Tetromino.O_TYPE && gameMode != GameState.Mode.NO_ROTATION) {
 
                             // rotate CCW
                             inner: {

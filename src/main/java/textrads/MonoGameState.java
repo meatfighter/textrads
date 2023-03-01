@@ -15,6 +15,16 @@ import java.util.Random;
 public class MonoGameState implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    public static interface Mode {
+        byte DISABLED = 0;
+        byte COUNTDOWN = 1;
+        byte SPAWN = 2;
+        byte TETROMINO_FALLING = 3;
+        byte CLEARING_LINES = 4;
+        byte ADDING_ATTACK_GARBAGE = 5;
+        byte GAME_OVER = 6;
+    }
     
     private static final long MAX_SCORE = 999_999_999L;
     
@@ -23,14 +33,6 @@ public class MonoGameState implements Serializable {
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
     
-    public static final byte DISABLED_MODE = 0;
-    public static final byte COUNTDOWN_MODE = 1;
-    public static final byte SPAWN_MODE = 2;
-    public static final byte TETROMINO_FALLING_MODE = 3;
-    public static final byte CLEARING_LINES_MODE = 4;
-    public static final byte ADDING_ATTACK_GARBAGE_MODE = 5;
-    public static final byte GAME_OVER_MODE = 6;
-
     public static final int PLAYFIELD_WIDTH = 10;
     public static final int PLAYFIELD_HEIGHT = 20;
     
@@ -171,9 +173,9 @@ public class MonoGameState implements Serializable {
         garbageCounter = 0;
         countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
         countdownValue = 3;
-        mode = COUNTDOWN_MODE;
+        mode = Mode.COUNTDOWN;
         this.floorHeight = (byte) floorHeight;
-        updates = (gameState.getMode() == GameState.THREE_MINUTES_MODE) ? FRAMES_PER_THREE_MINUTES : 0; 
+        updates = (gameState.getMode() == GameState.Mode.THREE_MINUTES) ? FRAMES_PER_THREE_MINUTES : 0; 
         
         lineYs.clear();
         
@@ -187,11 +189,11 @@ public class MonoGameState implements Serializable {
         }
         
         switch (gameState.getMode()) {
-            case GameState.GARBAGE_HEAP_MODE:
+            case GameState.Mode.GARBAGE_HEAP:
                 lines = 25;
                 createGarbageHeap(garbageHeight);
                 break;
-            case GameState.FORTY_LINES_MODE:
+            case GameState.Mode.FORTY_LINES:
                 lines = 40;
                 break;
             default:
@@ -240,19 +242,19 @@ public class MonoGameState implements Serializable {
         if (lineYs.isEmpty()) {
             conditionallyRaiseGarbage();
             if (attackRows > 0) {                
-                mode = ADDING_ATTACK_GARBAGE_MODE;
+                mode = Mode.ADDING_ATTACK_GARBAGE;
             } else {
-                mode = SPAWN_MODE;
+                mode = Mode.SPAWN;
             }
         } else {
-            mode = CLEARING_LINES_MODE;
+            mode = Mode.CLEARING_LINES;
             resetLineClearTimer();
         }
     }
     
     private void conditionallyRaiseGarbage() {
         
-        if (gameState.getMode() != GameState.RISING_GARBAGE_MODE) {
+        if (gameState.getMode() != GameState.Mode.RISING_GARBAGE) {
             return;
         }
         
@@ -317,7 +319,7 @@ public class MonoGameState implements Serializable {
     }
     
     public void handleInputEvent(final byte event) {
-        if (mode != TETROMINO_FALLING_MODE) {
+        if (mode != Mode.TETROMINO_FALLING) {
             return;
         }
         switch (event) {
@@ -350,7 +352,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptRotateCCW() {
-        if (tetrominoType == Tetromino.O_TYPE) {
+        if (tetrominoType == Tetromino.O_TYPE || gameState.getMode() == GameState.Mode.NO_ROTATION) {
             return;
         }
 
@@ -371,7 +373,7 @@ public class MonoGameState implements Serializable {
     }
     
     private void attemptRotateCW() {
-        if (tetrominoType == Tetromino.O_TYPE) {
+        if (tetrominoType == Tetromino.O_TYPE || gameState.getMode() == GameState.Mode.NO_ROTATION) {
             return;
         }
 
@@ -435,30 +437,30 @@ public class MonoGameState implements Serializable {
     
     public void update() {
         justSpawned = false;
-        if (mode != COUNTDOWN_MODE && mode != GAME_OVER_MODE) {
-            if (gameState.getMode() == GameState.THREE_MINUTES_MODE) {
+        if (mode != Mode.COUNTDOWN && mode != Mode.GAME_OVER) {
+            if (gameState.getMode() == GameState.Mode.THREE_MINUTES) {
                 --updates;
             } else {
                 ++updates;
             }
         }
         switch (mode) {
-            case COUNTDOWN_MODE:
+            case Mode.COUNTDOWN:
                 updateCountdown();
                 break;
-            case SPAWN_MODE:
+            case Mode.SPAWN:
                 attemptSpawn();
                 break;
-            case TETROMINO_FALLING_MODE:
+            case Mode.TETROMINO_FALLING:
                 updateFallingTetromino();
                 break;
-            case CLEARING_LINES_MODE:
+            case Mode.CLEARING_LINES:
                 updateClearingLines();
                 break;
-            case ADDING_ATTACK_GARBAGE_MODE:
+            case Mode.ADDING_ATTACK_GARBAGE:
                 updateAddingAttackGarbage();
                 break;
-            case GAME_OVER_MODE:
+            case Mode.GAME_OVER:
                 updateGameOver();
                 break;
         }
@@ -468,7 +470,7 @@ public class MonoGameState implements Serializable {
         if (--countdownTimer <= 0) {
             countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
             if (--countdownValue < 0) {
-                mode = SPAWN_MODE;
+                mode = Mode.SPAWN;
             } 
         }
     }
@@ -494,16 +496,16 @@ public class MonoGameState implements Serializable {
             clearLines();
             conditionallyRaiseGarbage();
             if (attackRows > 0) {
-                mode = ADDING_ATTACK_GARBAGE_MODE;
+                mode = Mode.ADDING_ATTACK_GARBAGE;
             } else {
-                mode = SPAWN_MODE;
+                mode = Mode.SPAWN;
             }
         }
     }
     
     private void updateAddingAttackGarbage() {
         if (attackRows == 0) {            
-            mode = SPAWN_MODE;
+            mode = Mode.SPAWN;
             return;
         }
         
@@ -543,15 +545,15 @@ public class MonoGameState implements Serializable {
         opponent.addAttackRows(ATTACK_ROWS[lineYs.size()]);
         
         final byte gameMode = gameState.getMode();
-        if (gameMode == GameState.GARBAGE_HEAP_MODE || gameMode == GameState.FORTY_LINES_MODE) {
+        if (gameMode == GameState.Mode.GARBAGE_HEAP || gameMode == GameState.Mode.FORTY_LINES) {
             lines -= lineYs.size();
         } else {
             lines += lineYs.size();
         }
         
-        if (!(gameMode == GameState.CONSTANT_LEVEL 
-                || gameMode == GameState.GARBAGE_HEAP_MODE 
-                || gameMode == GameState.FORTY_LINES_MODE)) {
+        if (!(gameMode == GameState.Mode.CONSTANT_LEVEL 
+                || gameMode == GameState.Mode.GARBAGE_HEAP 
+                || gameMode == GameState.Mode.FORTY_LINES)) {
             final short minLevel = (short) (lines / 10);
             if (minLevel > level) {
                 level = minLevel;
@@ -581,7 +583,7 @@ public class MonoGameState implements Serializable {
         tetrominoRotation = SPAWN_ROTATION;
         gameOverTimer = 0; 
         justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
-        mode = justSpawned ? TETROMINO_FALLING_MODE : GAME_OVER_MODE;
+        mode = justSpawned ? Mode.TETROMINO_FALLING : Mode.GAME_OVER;
     }
 
     public void setOpponent(final MonoGameState opponent) {
