@@ -26,7 +26,7 @@ public class AttractModeState {
         int TITLE_FLASHING = 7;
         int DEMO = 25;
         int RECORDS = 7;
-        int PSA = 3;
+        int PSA = 4;
     }
     
     private static final float FRAMES_PER_MOVE = Ai.getFramesPerMove(DEMO_AI_DIFFICULTY);
