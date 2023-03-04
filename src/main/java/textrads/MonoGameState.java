@@ -22,8 +22,9 @@ public class MonoGameState implements Serializable {
         byte SPAWN = 2;
         byte TETROMINO_FALLING = 3;
         byte CLEARING_LINES = 4;
-        byte ADDING_ATTACK_GARBAGE = 5;
-        byte GAME_OVER = 6;
+        byte ADDING_ATTACK_GARBAGE = 5;        
+        byte WON = 6;
+        byte LOST = 7;
     }
     
     private static final long MAX_SCORE = 999_999_999L;
@@ -124,7 +125,7 @@ public class MonoGameState implements Serializable {
     private boolean dropFailed;
     
     private byte lineClearTimer;
-    private byte gameOverTimer;
+    private byte lostTimer;
     
     private boolean justSpawned;
     private boolean rejectSoftDropRepeated;
@@ -167,7 +168,7 @@ public class MonoGameState implements Serializable {
         lockTimer = 0;
         dropFailed = false;
         lineClearTimer = 0;
-        gameOverTimer = 0;
+        lostTimer = 0;
         justSpawned = false;
         rejectSoftDropRepeated = false;
         garbageX = -1;
@@ -444,7 +445,10 @@ public class MonoGameState implements Serializable {
     
     public void update() {
         justSpawned = false;
-        if (mode != Mode.COUNTDOWN && mode != Mode.GAME_OVER) {
+        if (opponent.getMode() == Mode.LOST) {
+            mode = Mode.WON;
+        }
+        if (!(mode == Mode.COUNTDOWN || mode == Mode.LOST || mode == Mode.WON)) {
             if (gameState.getMode() == GameState.Mode.THREE_MINUTES) {
                 --updates;
             } else {
@@ -467,8 +471,8 @@ public class MonoGameState implements Serializable {
             case Mode.ADDING_ATTACK_GARBAGE:
                 updateAddingAttackGarbage();
                 break;
-            case Mode.GAME_OVER:
-                updateGameOver();
+            case Mode.LOST:
+                updateLost();
                 break;
         }
     }
@@ -538,9 +542,9 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    private void updateGameOver() {
-        if (gameOverTimer < Byte.MAX_VALUE) {
-            ++gameOverTimer;
+    private void updateLost() {
+        if (lostTimer < Byte.MAX_VALUE) {
+            ++lostTimer;
         }
     }
     
@@ -588,9 +592,9 @@ public class MonoGameState implements Serializable {
         tetrominoX = SPAWN_X;
         tetrominoY = SPAWN_Y;
         tetrominoRotation = SPAWN_ROTATION;
-        gameOverTimer = 0; 
+        lostTimer = 0; 
         justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
-        mode = justSpawned ? Mode.TETROMINO_FALLING : Mode.GAME_OVER;
+        mode = justSpawned ? Mode.TETROMINO_FALLING : Mode.LOST;
     }
 
     public void setOpponent(final MonoGameState opponent) {
@@ -657,8 +661,8 @@ public class MonoGameState implements Serializable {
         return lineYs;
     }
 
-    public byte getGameOverTimer() {
-        return gameOverTimer;
+    public byte getLostTimer() {
+        return lostTimer;
     }
 
     public int getScore() {

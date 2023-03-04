@@ -147,8 +147,8 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                 }
                 break;
             }
-            case MonoGameState.Mode.GAME_OVER: {
-                final int t = state.getGameOverTimer();
+            case MonoGameState.Mode.LOST: {
+                final int t = state.getLostTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
                     drawTetromino(g, x + 4 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
                             state.getTetrominoType(), state.getTetrominoRotation(),

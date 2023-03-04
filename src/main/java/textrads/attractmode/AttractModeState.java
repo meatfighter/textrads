@@ -9,6 +9,7 @@ import textrads.GameState;
 import textrads.GameStateSource;
 import textrads.InputEvent;
 import textrads.MonoGameState;
+import textrads.Textrads;
 import textrads.ai.Ai;
 import textrads.ai.AiSource;
 
@@ -20,13 +21,14 @@ public class AttractModeState {
     private static final int DEMO_AI_DIFFICULTY = 22;    
     
     static interface Durations {
-        int TITLE_FLASHING = 5;
+        int TITLE_FLASHING = 7;
         int DEMO = 25;
         int RECORDS = 7;
         int PSA = 3;        
     }
     
-    private static final float FRAMES_PER_MOVE = Ai.getFramesPerMove(15);
+    private static final float FRAMES_PER_MOVE = Ai.getFramesPerMove(DEMO_AI_DIFFICULTY);
+    private static final int FRAMES_PER_DEMO = Durations.DEMO * Textrads.FRAMES_PER_SECOND;
     
     public static enum Mode {
         TITLE_SCREEN,
@@ -46,22 +48,21 @@ public class AttractModeState {
         AiState(final int index) {
             monoGameState = GameStateSource.getState().getStates()[index];
             ai = AiSource.getAis()[index];
+            moveTimer = Float.MAX_VALUE;
         }
         
         void update() {
-            if (monoGameState.isJustSpawned()) { 
+            if (monoGameState.isJustSpawned()) {
                 moveTimer = FRAMES_PER_MOVE;
                 ai.getMoves(moves, monoGameState.getLastAttackRows());
             } 
-            if (monoGameState.getMode() == MonoGameState.Mode.TETROMINO_FALLING) {
-                --moveTimer;            
-                while (moveTimer <= 0) {
-                    moveTimer += FRAMES_PER_MOVE;
-                    if (moves.isEmpty()) {
-                        monoGameState.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-                    } else {                    
-                        monoGameState.handleInputEvent(moves.remove(0));
-                    }
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += FRAMES_PER_MOVE;
+                if (moves.isEmpty()) {
+                    monoGameState.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    monoGameState.handleInputEvent(moves.remove(0));
                 }
             }
         }
@@ -71,15 +72,15 @@ public class AttractModeState {
         }
     }
     
-    private List<Byte> gameModes = new ArrayList<>();
-    
+    private final List<Byte> gameModes = new ArrayList<>();    
     private final TitleScreenState titleScreenState = new TitleScreenState();
     private final GameState gameState = GameStateSource.getState();
     private final Random random = ThreadLocalRandom.current(); 
     private final AiState[] aiStates = { new AiState(0), new AiState(1) };
     
     private Mode mode = Mode.TITLE_SCREEN;
-    private byte demoMode;    
+    private byte demoMode;
+    private int timer;
     
     public void reset() {
         titleScreenState.reset();
@@ -99,7 +100,7 @@ public class AttractModeState {
     private void updateTitleScreen() {
         titleScreenState.update();
         if (titleScreenState.getMode() == TitleScreenState.Mode.DONE) {
-            startDemo();
+            startDemo();            
         }
     }
 
@@ -109,6 +110,18 @@ public class AttractModeState {
             aiStates[1].update();
         }         
         gameState.update();
+        
+        if (--timer <= 0 || checkLost(0) || checkLost(1)) {
+            startRecords();
+        }
+    }
+    
+    private boolean checkLost(final int index) {
+        return gameState.getStates()[index].getLostTimer() > 110;
+    }
+    
+    private void startRecords() {
+        mode = Mode.RECORDS;
     }
     
     private void startDemo() {
@@ -126,6 +139,7 @@ public class AttractModeState {
         } else {            
             aiStates[0].getAi().init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, DEMO_AI_DIFFICULTY, true);
         }
+        timer = FRAMES_PER_DEMO;
         mode = Mode.DEMO;
     }
     

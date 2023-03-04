@@ -24,7 +24,7 @@ public class TitleScreenState {
     private int flashTimer;
     
     public void reset() {
-        mode = Mode.TITLE_FALLING;
+        mode = Mode.DONE; // TODO Mode.TITLE_FALLING;
         landedLines = 0;
         fallFraction = 0f;
         flashFraction = 0f;        

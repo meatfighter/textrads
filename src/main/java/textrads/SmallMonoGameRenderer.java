@@ -140,8 +140,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 }
                 break;
             }
-            case MonoGameState.Mode.GAME_OVER: {
-                final int t = state.getGameOverTimer();
+            case MonoGameState.Mode.LOST: {
+                final int t = state.getLostTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
                     drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
                             state.getTetrominoType(), state.getTetrominoRotation(),
