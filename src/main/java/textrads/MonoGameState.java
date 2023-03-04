@@ -173,6 +173,7 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
+        lockCounter = 0;
         if (skipCountdown) {
             countdownTimer = 0;
             countdownValue = 0;

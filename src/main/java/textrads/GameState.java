@@ -42,7 +42,9 @@ public class GameState implements Serializable {
     
     public void update() {        
         states[0].update();
-        states[1].update();
+        if (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) {
+            states[1].update();
+        }
     }
 
     public MonoGameState[] getStates() {

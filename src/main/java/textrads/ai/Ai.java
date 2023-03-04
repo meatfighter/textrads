@@ -101,7 +101,8 @@ public class Ai {
             framesPerMove = getFramesPerMove(difficulty);
             this.findBestMove = findBestMove;
             currentLevel = (short) startingLevel;
-            garbageCounter = 0;            
+            garbageCounter = 0;
+            lockCounter = 0;
             tetrominoRandomizer.setSeed(seed);
             garbageRandomizer.setSeed(seed);
             nexts.clear();

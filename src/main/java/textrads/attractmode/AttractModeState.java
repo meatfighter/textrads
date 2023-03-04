@@ -26,7 +26,7 @@ public class AttractModeState {
         int TITLE_FLASHING = 7;
         int DEMO = 25;
         int RECORDS = 7;
-        int PSA = 3;        
+        int PSA = 3;
     }
     
     private static final float FRAMES_PER_MOVE = Ai.getFramesPerMove(DEMO_AI_DIFFICULTY);
@@ -228,7 +228,7 @@ public class AttractModeState {
         }         
         gameState.update();
         
-        if (--timer <= 0 || checkLost(0) || checkLost(1)) {
+        if (--timer <= 0 || checkLost(0) || (demoMode == GameState.Mode.VS_AI && checkLost(1))) {
             startRecords();
         }
     }
