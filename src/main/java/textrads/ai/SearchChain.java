@@ -66,6 +66,12 @@ public class SearchChain {
     private int bestY;
     private int bestRotation;
     private int bestDropFailed;
+    
+    private boolean secondBestFound;
+    private int secondBestX;
+    private int secondBestY;
+    private int secondBestRotation;
+    private int secondBestDropFailed;    
 
     public SearchChain() {
 
@@ -103,25 +109,46 @@ public class SearchChain {
         return bestFound;
     }
 
-    public int getX() {
+    public int getBestX() {
         return bestX;
     }
 
-    public int getY() {
+    public int getBestY() {
         return bestY;
     }
 
-    public int getRotation() {
+    public int getBestRotation() {
         return bestRotation;
     }
     
-    public int getDropFailed() {
+    public int getBestDropFailed() {
         return bestDropFailed;
     }
 
-    public void getMoves(final List<Coordinate> moves) {
-        if (bestFound) {
-            searcher1.getMoves(bestX, bestY, bestRotation, bestDropFailed, moves);
+    public boolean isSecondBestFound() {
+        return secondBestFound;
+    }
+
+    public int getSecondBestX() {
+        return secondBestX;
+    }
+
+    public int getSecondBestY() {
+        return secondBestY;
+    }    
+
+    public int getSecondBestRotation() {
+        return secondBestRotation;
+    }
+
+    public int getSecondBestDropFailed() {
+        return secondBestDropFailed;
+    }
+
+    public void getMoves(final List<Coordinate> moves, final boolean found, final int x, final int y, 
+            final int rotation, final int dropFailed) {
+        if (found) {
+            searcher1.getMoves(x, y, rotation, dropFailed, moves);
         } else {
             moves.clear();
         }
@@ -137,7 +164,7 @@ public class SearchChain {
         this.type1 = currentType;
         this.type2 = nextType;
 
-        bestFound = false;
+        bestFound = secondBestFound = false;
         bestScore = Double.MAX_VALUE;        
         
         if (seedFiller.canClearMoreLines(playfield, floorHeight)) {            
@@ -324,6 +351,12 @@ public class SearchChain {
         }
 
         if (score < bestScore) {
+            secondBestFound = bestFound;
+            secondBestX = bestX;
+            secondBestY = bestY;
+            secondBestRotation = bestRotation;
+            secondBestDropFailed = bestDropFailed;
+            
             bestFound = true;
             bestScore = score;
             bestX = x1;

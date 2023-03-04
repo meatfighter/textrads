@@ -30,7 +30,7 @@ public class TitleScreenRenderer {
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
         g.fill(' ');
         
-        switch (state.getState()) {
+        switch (state.getMode()) {
             case TITLE_FALLING: {
                 final int landedLines = state.getLandedLines();
                 BlockText.draw(BlockText.TEXTRADS, g, titleX, Math.round(state.getFallFraction() * titleY), TITLE_COLOR, 

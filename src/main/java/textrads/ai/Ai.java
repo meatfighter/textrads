@@ -19,6 +19,23 @@ public class Ai {
         short lines;
     }
     
+    private static final double DIFFICULTY_ZERO_FRAMES_PER_MOVE = 52.0;
+    private static final double DIFFICULTY_THIRTY_FRAMES_PER_MOVE = 2.0;
+    
+    private static final double MOVE_DECAY_CONSTANT 
+            = Math.log(DIFFICULTY_THIRTY_FRAMES_PER_MOVE / DIFFICULTY_ZERO_FRAMES_PER_MOVE) / 30.0;
+    private static final float[] FRAMES_PER_MOVE = new float[256];
+
+    static {
+        for (int i = FRAMES_PER_MOVE.length - 1; i >= 0; --i) {
+            FRAMES_PER_MOVE[i] = (float) (DIFFICULTY_ZERO_FRAMES_PER_MOVE * Math.exp(MOVE_DECAY_CONSTANT * i));
+        }
+    }
+    
+    public static float getFramesPerMove(final int difficulty) {
+        return FRAMES_PER_MOVE[Math.min(FRAMES_PER_MOVE.length - 1, difficulty)];
+    }    
+    
     private final Thread thread = new Thread(this::loop);
     
     private final Random tetrominoRandomizer = new Random();
@@ -46,7 +63,8 @@ public class Ai {
     
     private byte gameMode;
     private int floorHeight;
-    private int difficulty; // TODO USE THIS
+    private float framesPerMove;
+    private boolean findBestMove;
     
     public Ai() {
         for (int i = solutions.length - 1; i >= 0; --i) {
@@ -60,7 +78,8 @@ public class Ai {
             final int startingLevel, 
             final int garbageHeight, 
             final int floorHeight,            
-            final int difficulty) {
+            final int difficulty,
+            final boolean findBestMove) {
         
         synchronized (searchMonitor) {
             if (thread.getState() == Thread.State.NEW) {
@@ -79,7 +98,8 @@ public class Ai {
         synchronized (solutionsMonitor) {
             this.gameMode = gameMode;            
             this.floorHeight = floorHeight;
-            this.difficulty = difficulty;
+            framesPerMove = getFramesPerMove(difficulty);
+            this.findBestMove = findBestMove;
             currentLevel = (short) startingLevel;
             garbageCounter = 0;            
             tetrominoRandomizer.setSeed(seed);
@@ -204,14 +224,33 @@ public class Ai {
         
         searchChain.search(nexts.get(0), nexts.get(1), gameMode, solution.playfield, floorHeight,
                 MonoGameState.getFramesPerGravityDrop(solution.level),
-                MonoGameState.getFramesPerLock(solution.level), getFramesPerMove(solution.level));                
-        if (searchChain.isBestFound()) {            
-            searchChain.getMoves(moves);
+                MonoGameState.getFramesPerLock(solution.level), framesPerMove); 
+        
+        final boolean found;
+        final int x;
+        final int y;
+        final int rotation;
+        final int dropFailed;
+        if (findBestMove) {
+            found = searchChain.isBestFound();
+            x = searchChain.getBestX();
+            y = searchChain.getBestY();
+            rotation = searchChain.getBestRotation();
+            dropFailed = searchChain.getBestDropFailed();
+        } else {
+            found = searchChain.isSecondBestFound();
+            x = searchChain.getSecondBestX();
+            y = searchChain.getSecondBestY();
+            rotation = searchChain.getSecondBestRotation();
+            dropFailed = searchChain.getSecondBestDropFailed();
+        }        
+        
+        if (found) {                        
+            searchChain.getMoves(moves, found, x, y, rotation, dropFailed);
             for (final Coordinate move : moves) {
                 solution.moves.add(move.inputEvent);
             } 
-            final int lines = Playfield.lock(solution.playfield, nexts.get(0), searchChain.getX(), searchChain.getY(), 
-                    searchChain.getRotation());
+            final int lines = Playfield.lock(solution.playfield, nexts.get(0), x, y, rotation);
             if (gameMode == GameState.Mode.GARBAGE_HEAP || gameMode == GameState.Mode.FORTY_LINES) {
                 solution.lines -= lines;
             } else {
@@ -245,10 +284,6 @@ public class Ai {
                 row[x] = (x != gx);
             }
         }
-    }
-    
-    private float getFramesPerMove(final int level) { // TODO ENHANCE          
-        return 10f;//*/MonoGameState.getFramesPerGravityDrop(level) / 2f;
     }
     
     private void updateNexts() {

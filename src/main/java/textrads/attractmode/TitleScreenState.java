@@ -10,18 +10,18 @@ public class TitleScreenState {
     private static final float FALL_PER_FRAME = (float) (1.0 / (Textrads.FRAMES_PER_SECOND * SECONDS_PER_FALL));
     private static final float FLASH_PER_FRAME = (float) (FLASHES_PER_SECOND / (double) Textrads.FRAMES_PER_SECOND);
     
-    public static enum State {
+    public static enum Mode {
         TITLE_FALLING,
         PRESS_ENTER_FLASHING,
     }
     
-    private State state;
+    private Mode state;
     private int landedLines;
     private float fallFraction;
     private float flashFraction;
     
     public void reset() {
-        state = State.TITLE_FALLING;
+        state = Mode.TITLE_FALLING;
         landedLines = 0;
         fallFraction = 0f;
         flashFraction = 0f;
@@ -45,7 +45,7 @@ public class TitleScreenState {
             if (++landedLines == 5) {
                 landedLines = 0;
                 flashFraction = 1f;
-                state = State.PRESS_ENTER_FLASHING;
+                state = Mode.PRESS_ENTER_FLASHING;
             }
         }
     }
@@ -57,7 +57,7 @@ public class TitleScreenState {
         }
     }
     
-    public State getState() {
+    public Mode getMode() {
         return state;
     }
 

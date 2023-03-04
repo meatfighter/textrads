@@ -151,7 +151,8 @@ public class MonoGameState implements Serializable {
             final long seed, 
             final int startingLevel,
             final int garbageHeight, 
-            final int floorHeight) {
+            final int floorHeight,
+            final boolean skipCountdown) {
         
         attackRows = 0;
         score = 0;
@@ -171,9 +172,15 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
-        countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
-        countdownValue = 3;
-        mode = Mode.COUNTDOWN;
+        if (skipCountdown) {
+            countdownTimer = 0;
+            countdownValue = 0;
+            mode = Mode.SPAWN;
+        } else {
+            countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
+            countdownValue = 3;            
+            mode = Mode.COUNTDOWN;
+        }        
         this.floorHeight = (byte) floorHeight;
         updates = (gameState.getMode() == GameState.Mode.THREE_MINUTES) ? FRAMES_PER_THREE_MINUTES : 0; 
         
