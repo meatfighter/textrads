@@ -141,8 +141,9 @@ public class AttractModeState {
         demoModes.add(GameState.Mode.GARBAGE_HEAP);
         demoModes.add(GameState.Mode.RISING_GARBAGE);
         demoModes.add(GameState.Mode.FORTY_LINES);
+        demoModes.add(GameState.Mode.NO_ROTATION);
         demoModes.add(GameState.Mode.INVISIBLE);
-        demoModes.add(GameState.Mode.VS_AI);       
+        demoModes.add(GameState.Mode.VS_AI);
     }
     
     private void initRecordDescriptors() {
