@@ -9,26 +9,29 @@ public class TitleScreenState {
     
     private static final float FALL_PER_FRAME = (float) (1.0 / (Textrads.FRAMES_PER_SECOND * SECONDS_PER_FALL));
     private static final float FLASH_PER_FRAME = (float) (FLASHES_PER_SECOND / (double) Textrads.FRAMES_PER_SECOND);
+    private static final int FLASH_FRAMES = AttractModeState.Durations.TITLE_FLASHING * Textrads.FRAMES_PER_SECOND;
     
-    public static enum Mode {
+    static enum Mode {
         TITLE_FALLING,
         PRESS_ENTER_FLASHING,
+        DONE,
     }
     
-    private Mode state;
+    private Mode mode;
     private int landedLines;
     private float fallFraction;
     private float flashFraction;
+    private int flashTimer;
     
     public void reset() {
-        state = Mode.TITLE_FALLING;
+        mode = Mode.TITLE_FALLING;
         landedLines = 0;
         fallFraction = 0f;
-        flashFraction = 0f;
+        flashFraction = 0f;        
     }
     
     public void update() {
-        switch (state) {
+        switch (mode) {
             case TITLE_FALLING:
                 updateTitleFalling();
                 break;
@@ -45,20 +48,25 @@ public class TitleScreenState {
             if (++landedLines == 5) {
                 landedLines = 0;
                 flashFraction = 1f;
-                state = Mode.PRESS_ENTER_FLASHING;
+                flashTimer = FLASH_FRAMES;
+                mode = Mode.PRESS_ENTER_FLASHING;
             }
         }
     }
     
     private void updatePressEnterFlashing() {
+        if (--flashTimer == 0) {
+            mode = Mode.DONE;
+            return;
+        }
         flashFraction -= FLASH_PER_FRAME;
         if (flashFraction <= 0f) {
             flashFraction += 1f;
-        }
+        }        
     }
     
     public Mode getMode() {
-        return state;
+        return mode;
     }
 
     public int getLandedLines() {

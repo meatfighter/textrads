@@ -37,7 +37,7 @@ public class Textrads {
     
     private final Server server = new Server();
     private final Client client = new Client();
-    private final PlayRenderer playRenderer = new PlayRenderer();
+    private final GameRenderer playRenderer = new GameRenderer();
     private final InputEventList eventList = new InputEventList();
     
     private final Database database = new Database();
@@ -52,6 +52,8 @@ public class Textrads {
     private List<Byte> moves = new ArrayList<>(1024);
     
     public void launch() throws Exception {
+        
+        attractModeState.reset();
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 

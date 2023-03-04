@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import textrads.util.GraphicsUtil;
 
-public class PlayRenderer {
+public class GameRenderer {
  
     private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
     private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
