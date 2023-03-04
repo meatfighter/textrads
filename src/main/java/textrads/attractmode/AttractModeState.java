@@ -12,6 +12,8 @@ import textrads.MonoGameState;
 import textrads.Textrads;
 import textrads.ai.Ai;
 import textrads.ai.AiSource;
+import textrads.db.Database;
+import textrads.db.DatabaseSource;
 
 public class AttractModeState {
     
@@ -29,6 +31,8 @@ public class AttractModeState {
     
     private static final float FRAMES_PER_MOVE = Ai.getFramesPerMove(DEMO_AI_DIFFICULTY);
     private static final int FRAMES_PER_DEMO = Durations.DEMO * Textrads.FRAMES_PER_SECOND;
+    private static final int FRAMES_PER_RECORDS = Durations.RECORDS * Textrads.FRAMES_PER_SECOND;
+    private static final int FRAMES_PER_PSA = Durations.PSA * Textrads.FRAMES_PER_SECOND;
     
     public static enum Mode {
         TITLE_SCREEN,
@@ -36,6 +40,12 @@ public class AttractModeState {
         RECORDS,
         PSA,
         DONE,
+    }
+    
+    public static enum Psa {
+        WINNERS_DONT_USE_DRUGS,
+        RECYCLE_IT_DONT_TRASH_IT,
+        HACK_THE_PLANET,
     }
     
     private class AiState {
@@ -72,18 +82,119 @@ public class AttractModeState {
         }
     }
     
-    private final List<Byte> gameModes = new ArrayList<>();    
+    private class RecordsDescriptor {
+        
+        private final String title;
+        private final String key;
+        private final AbstractRecordFormatter formatter;
+
+        public RecordsDescriptor(final String title, final String key, final AbstractRecordFormatter formatter) {
+            this.title = title;
+            this.key = key;
+            this.formatter = formatter;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public AbstractRecordFormatter getFormatter() {
+            return formatter;
+        }
+    }
+    
+    private final List<Byte> demoModes = new ArrayList<>();
+    private final List<Psa> psas = new ArrayList<>();
     private final TitleScreenState titleScreenState = new TitleScreenState();
     private final GameState gameState = GameStateSource.getState();
     private final Random random = ThreadLocalRandom.current(); 
     private final AiState[] aiStates = { new AiState(0), new AiState(1) };
+    private final Database database = DatabaseSource.getDatabase();
+    private final List<RecordsDescriptor> recordsDescriptors = new ArrayList<>();
+    private final RecordsState recordsState = new RecordsState();
+    private final RecordFormatter recordFormatter = new RecordFormatter();
+    private final ExtendedRecordHeightFormatter extendedRecordHeightFormatter = new ExtendedRecordHeightFormatter();
+    private final ExtendedRecordDifficultyFormatter extendedRecordDifficultyFormatter 
+            = new ExtendedRecordDifficultyFormatter();
     
-    private Mode mode = Mode.TITLE_SCREEN;
+    private Mode mode;
     private byte demoMode;
+    private Psa psa;
     private int timer;
+    private int demoModesIndex;
+    private int recordsDescriptorsIndex;
+    private int psasIndex;
     
-    public void reset() {
+    public AttractModeState() {
+        initDemoModes();
+        initRecordDescriptors();
+        initPsas();
+    }
+    
+    private void initDemoModes() {
+        demoModes.clear();
+        demoModes.add(GameState.Mode.MARATHON);
+        demoModes.add(GameState.Mode.GARBAGE_HEAP);
+        demoModes.add(GameState.Mode.RISING_GARBAGE);
+        demoModes.add(GameState.Mode.FORTY_LINES);
+        demoModes.add(GameState.Mode.INVISIBLE);
+        demoModes.add(GameState.Mode.VS_AI);       
+    }
+    
+    private void initRecordDescriptors() {
+        recordsDescriptors.clear();
+        
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Marathon Records", 
+                Database.AllTimeKeys.MARATHON, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Constant Level Records", 
+                Database.AllTimeKeys.CONSTANT_LEVEL, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Rising Garbage Records", 
+                Database.AllTimeKeys.RISING_GARBAGE, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Three Minutes Records", 
+                Database.AllTimeKeys.THREE_MINUTES, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Invisible Records", 
+                Database.AllTimeKeys.INVISIBLE, recordFormatter));
+        
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Garbage Heap Records", 
+                Database.AllTimeKeys.GARBAGE_HEAP, extendedRecordHeightFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Forty Lines Records", 
+                Database.AllTimeKeys.FORTY_LINES, extendedRecordHeightFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("All Time Best Vs. AI Records", 
+                Database.AllTimeKeys.VS_AI, extendedRecordDifficultyFormatter));
+        
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Marathon Records", 
+                Database.TodaysKeys.MARATHON, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Constant Level Records", 
+                Database.TodaysKeys.CONSTANT_LEVEL, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Rising Garbage Records", 
+                Database.TodaysKeys.RISING_GARBAGE, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Three Minutes Records", 
+                Database.TodaysKeys.THREE_MINUTES, recordFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Invisible Records", 
+                Database.TodaysKeys.INVISIBLE, recordFormatter));
+        
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Garbage Heap Records", 
+                Database.TodaysKeys.GARBAGE_HEAP, extendedRecordHeightFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Forty Lines Records", 
+                Database.TodaysKeys.FORTY_LINES, extendedRecordHeightFormatter));
+        recordsDescriptors.add(new RecordsDescriptor("Today's Best Vs. AI Records", 
+                Database.TodaysKeys.VS_AI, extendedRecordDifficultyFormatter));
+    }
+    
+    private void initPsas() {
+        psas.clear();
+        for (final Psa psa : Psa.values()) {
+            psas.add(psa);
+        }
+    }
+    
+    public void reset() {        
         titleScreenState.reset();
+        mode = Mode.TITLE_SCREEN;
     }
     
     public void update() {
@@ -93,6 +204,12 @@ public class AttractModeState {
                 break;
             case DEMO:
                 updateDemo();
+                break;
+            case RECORDS:
+                updateRecords();
+                break;
+            case PSA:
+                updatePsa();
                 break;
         }
     }
@@ -116,11 +233,26 @@ public class AttractModeState {
         }
     }
     
+    private void updateRecords() {
+        recordsState.update();
+        if (--timer <= 0) {
+            startPsa();
+        }
+    }
+    
+    private void updatePsa() {
+        if (--timer <= 0) {
+            reset();
+        }
+    }
+    
     private boolean checkLost(final int index) {
         return gameState.getStates()[index].getLostTimer() > 110;
     }
     
     private void startRecords() {
+        chooseRecords();
+        timer = FRAMES_PER_RECORDS;
         mode = Mode.RECORDS;
     }
     
@@ -143,17 +275,36 @@ public class AttractModeState {
         mode = Mode.DEMO;
     }
     
-    public void chooseDemoMode() {        
-        if (gameModes.isEmpty()) {
-            gameModes.add(GameState.Mode.MARATHON);
-            gameModes.add(GameState.Mode.GARBAGE_HEAP);
-            gameModes.add(GameState.Mode.RISING_GARBAGE);
-            gameModes.add(GameState.Mode.FORTY_LINES);
-            gameModes.add(GameState.Mode.INVISIBLE);
-            gameModes.add(GameState.Mode.VS_AI);
-            Collections.shuffle(gameModes, random);
+    private void startPsa() {
+        choosePsa();
+        timer = FRAMES_PER_PSA;
+        mode = Mode.PSA;
+    }
+
+    private void chooseDemoMode() {
+        if (--demoModesIndex < 0) {
+            demoModesIndex = demoModes.size() - 1;
+            Collections.shuffle(demoModes, random);
+        }        
+        demoMode = demoModes.get(demoModesIndex);        
+    }
+    
+    private void chooseRecords() {
+        if (--recordsDescriptorsIndex < 0) {
+            recordsDescriptorsIndex = recordsDescriptors.size() - 1;
+            Collections.shuffle(recordsDescriptors, random);
         }
-        demoMode = gameModes.remove(gameModes.size() - 1);
+        final RecordsDescriptor recordsDescriptor = recordsDescriptors.get(recordsDescriptorsIndex);
+        recordsState.init(recordsDescriptor.getTitle(), database.get(recordsDescriptor.getKey()), 
+                recordsDescriptor.getFormatter());
+    }
+    
+    private void choosePsa() {
+        if (--psasIndex < 0) {
+            psasIndex = psas.size() - 1;
+            Collections.shuffle(psas, random);
+        }
+        psa = psas.get(psasIndex);
     }
     
     public Mode getMode() {
@@ -162,5 +313,13 @@ public class AttractModeState {
 
     TitleScreenState getTitleScreenState() {
         return titleScreenState;
+    }
+    
+    RecordsState getRecordsState() {
+        return recordsState;
+    }
+
+    public Psa getPsa() {
+        return psa;
     }
 }

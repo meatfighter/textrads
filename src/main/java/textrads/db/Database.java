@@ -18,25 +18,29 @@ import textrads.util.ThreadUtil;
 
 public class Database {
     
-    public static final String ALL_TIME_MARATHON = "all-time-marathon";
-    public static final String ALL_TIME_CONSTANT_LEVEL = "all-time-constant-level";
-    public static final String ALL_TIME_GARBAGE_HEAP = "all-time-garbage-heap";
-    public static final String ALL_TIME_RISING_GARBAGE = "all-time-rising-garbage";
-    public static final String ALL_TIME_THREE_MINUTES = "all-time-three-minutes";
-    public static final String ALL_TIME_FORTY_LINES = "all-time-forty-lines";
-    public static final String ALL_TIME_NO_ROTATION = "all-time-no-rotation";
-    public static final String ALL_TIME_INVISIBLE = "all-time-invisible";
-    public static final String ALL_TIME_VS_AI = "all-time-vs-ai";
+    public static interface AllTimeKeys {
+        String MARATHON = "all-time-marathon";
+        String CONSTANT_LEVEL = "all-time-constant-level";
+        String GARBAGE_HEAP = "all-time-garbage-heap";
+        String RISING_GARBAGE = "all-time-rising-garbage";
+        String THREE_MINUTES = "all-time-three-minutes";
+        String FORTY_LINES = "all-time-forty-lines";
+        String NO_ROTATION = "all-time-no-rotation";
+        String INVISIBLE = "all-time-invisible";
+        String VS_AI = "all-time-vs-ai";
+    }
     
-    public static final String TODAYS_MARATHON = "todays-marathon";
-    public static final String TODAYS_CONSTANT_LEVEL = "todays-constant-level";
-    public static final String TODAYS_GARBAGE_HEAP = "todays-garbage-heap";
-    public static final String TODAYS_RISING_GARBAGE = "todays-rising-garbage";
-    public static final String TODAYS_THREE_MINUTES = "todays-three-minutes";
-    public static final String TODAYS_FORTY_LINES = "todays-forty-lines";
-    public static final String TODAYS_NO_ROTATION = "todays-no-rotation";
-    public static final String TODAYS_INVISIBLE = "todays-invisible";
-    public static final String TODAYS_VS_AI = "todays-vs-ai";
+    public static interface TodaysKeys {
+        String MARATHON = "todays-marathon";
+        String CONSTANT_LEVEL = "todays-constant-level";
+        String GARBAGE_HEAP = "todays-garbage-heap";
+        String RISING_GARBAGE = "todays-rising-garbage";
+        String THREE_MINUTES = "todays-three-minutes";
+        String FORTY_LINES = "todays-forty-lines";
+        String NO_ROTATION = "todays-no-rotation";
+        String INVISIBLE = "todays-invisible";
+        String VS_AI = "todays-vs-ai";
+    }
     
     private static final String DIR = "data";
     
@@ -50,25 +54,25 @@ public class Database {
             dir.mkdirs();
         }
 
-        load(ALL_TIME_MARATHON, RecordList.RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_INVISIBLE, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.MARATHON, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.INVISIBLE, RecordList.RECORD_LIST_SUPPLIER);
         
-        load(ALL_TIME_GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
-        load(ALL_TIME_VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
         
-        load(TODAYS_MARATHON, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_INVISIBLE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.MARATHON, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.INVISIBLE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         
-        load(TODAYS_GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TODAYS_VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);        
+        load(TodaysKeys.GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);        
     }
     
     public <T extends Serializable> T get(final String key) {

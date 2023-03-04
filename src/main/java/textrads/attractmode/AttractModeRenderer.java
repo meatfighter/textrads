@@ -9,6 +9,7 @@ public class AttractModeRenderer {
     
     private final TitleScreenRenderer titleScreenRenderer = new TitleScreenRenderer();
     private final GameRenderer gameRenderer = new GameRenderer();
+    private final RecordsRenderer recordsRenderer = new RecordsRenderer();
     private final WinnersDontUseDrugsRenderer winnersDontUseDrugsRenderer = new WinnersDontUseDrugsRenderer();
     private final RecycleItDontTrashItRenderer recycleItDontTrashItRenderer = new RecycleItDontTrashItRenderer();
     private final HackThePlanetRenderer hackThePlanetRenderer = new HackThePlanetRenderer();    
@@ -21,6 +22,22 @@ public class AttractModeRenderer {
                 break;
             case DEMO:
                 gameRenderer.render(g, size, GameStateSource.getState());
+                break;
+            case RECORDS:
+                recordsRenderer.render(g, size, state.getRecordsState());
+                break;
+            case PSA:
+                switch (state.getPsa()) {
+                    case WINNERS_DONT_USE_DRUGS:
+                        winnersDontUseDrugsRenderer.render(g, size);
+                        break;
+                    case RECYCLE_IT_DONT_TRASH_IT:
+                        recycleItDontTrashItRenderer.render(g, size);
+                        break;
+                    case HACK_THE_PLANET:
+                        hackThePlanetRenderer.render(g, size);
+                        break;
+                }
                 break;
         }
     }

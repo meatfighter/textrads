@@ -68,7 +68,7 @@ public class Textrads {
                 false); // TODO
         
         database.init();
-        recordsState.init("All Time Best Vs. AI Records", database.get(Database.ALL_TIME_VS_AI), 
+        recordsState.init("All Time Best Vs. AI Records", database.get(Database.AllTimeKeys.VS_AI), 
                 new ExtendedRecordDifficultyFormatter());
         
         try (final Terminal terminal = TerminalUtil.createTerminal();
