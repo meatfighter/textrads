@@ -58,7 +58,7 @@ public class Textrads {
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.Mode.VS_AI, seed, 10, 0, 0, true);     
+        GameStateSource.getState().init(GameState.Mode.VS_AI, seed, 10, 0, 0, true, 0, 0);     
         
         ai.init(GameStateSource.getState().getMode(), seed, 
                 (short) GameStateSource.getState().getStates()[1].getLevel(), 

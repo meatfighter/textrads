@@ -1,5 +1,6 @@
 package textrads.attractmode;
 
+import textrads.PressEnterState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +58,10 @@ public class AttractModeState {
         
         AiState(final int index) {
             monoGameState = GameStateSource.getState().getStates()[index];
-            ai = AiSource.getAis()[index];
+            ai = AiSource.getAis()[index];            
+        }
+        
+        void reset() {
             moveTimer = Float.MAX_VALUE;
         }
         
@@ -109,6 +113,7 @@ public class AttractModeState {
     
     private final List<Byte> demoModes = new ArrayList<>();
     private final List<Psa> psas = new ArrayList<>();
+    private final PressEnterState pressEnterState = new PressEnterState();
     private final TitleScreenState titleScreenState = new TitleScreenState();
     private final GameState gameState = GameStateSource.getState();
     private final Random random = ThreadLocalRandom.current(); 
@@ -125,6 +130,7 @@ public class AttractModeState {
     private byte demoMode;
     private Psa psa;
     private int timer;
+    private boolean demoVsAi;
     private int demoModesIndex;
     private int recordsDescriptorsIndex;
     private int psasIndex;
@@ -136,6 +142,7 @@ public class AttractModeState {
     }
     
     private void initDemoModes() {
+        demoVsAi = random.nextBoolean();
         demoModes.clear();
         demoModes.add(GameState.Mode.MARATHON);
         demoModes.add(GameState.Mode.GARBAGE_HEAP);
@@ -143,7 +150,6 @@ public class AttractModeState {
         demoModes.add(GameState.Mode.FORTY_LINES);
         demoModes.add(GameState.Mode.NO_ROTATION);
         demoModes.add(GameState.Mode.INVISIBLE);
-        demoModes.add(GameState.Mode.VS_AI);
     }
     
     private void initRecordDescriptors() {
@@ -193,7 +199,8 @@ public class AttractModeState {
         }
     }
     
-    public void reset() {        
+    public void reset() {
+        pressEnterState.reset();
         titleScreenState.reset();
         mode = Mode.TITLE_SCREEN;
     }
@@ -217,12 +224,18 @@ public class AttractModeState {
     
     private void updateTitleScreen() {
         titleScreenState.update();
-        if (titleScreenState.getMode() == TitleScreenState.Mode.DONE) {
-            startDemo();            
+        switch (titleScreenState.getMode()) {
+            case PRESS_ENTER_FLASHING:
+                pressEnterState.update();
+                break;
+            case DONE:
+                startDemo();
+                break;                
         }
     }
 
     private void updateDemo() {
+        pressEnterState.update();
         aiStates[0].update();
         if (demoMode == GameState.Mode.VS_AI) {
             aiStates[1].update();
@@ -262,14 +275,16 @@ public class AttractModeState {
         final long seed = random.nextLong();
         final int garbageHeight = (demoMode == GameState.Mode.GARBAGE_HEAP) ? DEMO_GARBAGE_HEIGHT : 0;
         final int floorHeight = (demoMode == GameState.Mode.FORTY_LINES) ? DEMO_FLOOR_HEIGHT : 0;
-        gameState.init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, true);
+        gameState.init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, true, 0, 0);
+        aiStates[0].reset();
         if (demoMode == GameState.Mode.VS_AI) {
+            aiStates[1].reset();
             final boolean findBestMode = random.nextBoolean();
             aiStates[0].getAi().init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, DEMO_AI_DIFFICULTY, 
                     findBestMode);
             aiStates[1].getAi().init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, DEMO_AI_DIFFICULTY, 
                     !findBestMode);
-        } else {            
+        } else {              
             aiStates[0].getAi().init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, DEMO_AI_DIFFICULTY, true);
         }
         timer = FRAMES_PER_DEMO;
@@ -283,11 +298,16 @@ public class AttractModeState {
     }
 
     private void chooseDemoMode() {
+        demoVsAi = !demoVsAi;
+        if (demoVsAi) {
+            demoMode = GameState.Mode.VS_AI;
+            return;
+        }
         if (--demoModesIndex < 0) {
             demoModesIndex = demoModes.size() - 1;
             Collections.shuffle(demoModes, random);
         }        
-        demoMode = demoModes.get(demoModesIndex);        
+        demoMode = demoModes.get(demoModesIndex);
     }
     
     private void chooseRecords() {
@@ -310,6 +330,10 @@ public class AttractModeState {
     
     public Mode getMode() {
         return mode;
+    }
+
+    public PressEnterState getPressEnterState() {
+        return pressEnterState;
     }
 
     TitleScreenState getTitleScreenState() {

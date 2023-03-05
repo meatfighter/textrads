@@ -18,10 +18,10 @@ public class AttractModeRenderer {
         
         switch(state.getMode()) {
             case TITLE_SCREEN:
-                titleScreenRenderer.render(g, size, state.getTitleScreenState());
+                titleScreenRenderer.render(g, size, state.getTitleScreenState(), state.getPressEnterState());
                 break;
             case DEMO:
-                gameRenderer.render(g, size, GameStateSource.getState());
+                gameRenderer.render(g, size, GameStateSource.getState(), state.getPressEnterState());
                 break;
             case RECORDS:
                 recordsRenderer.render(g, size, state.getRecordsState());

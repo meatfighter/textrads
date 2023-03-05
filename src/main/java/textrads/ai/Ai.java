@@ -102,11 +102,13 @@ public class Ai {
             this.findBestMove = findBestMove;
             currentLevel = (short) startingLevel;
             garbageCounter = 0;
-            lockCounter = 0;
+            lockCounter = 0;            
             tetrominoRandomizer.setSeed(seed);
             garbageRandomizer.setSeed(seed);
+            garbageXs.clear();
             nexts.clear();
-            updateNexts();            
+            updateNexts();
+            moves.clear();
             Playfield.clearPlayfield(currentPlayfield);
             
             switch (gameMode) {
@@ -118,8 +120,7 @@ public class Ai {
                     currentLines = 40;
                     break;
                 case GameState.Mode.VS_AI:
-                    currentLines = 0;                        
-                    garbageXs.clear();
+                    currentLines = 0;                                            
                     updateGarbageXs();                    
                     break;
                 default:

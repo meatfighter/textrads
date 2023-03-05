@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import textrads.BlockText;
 import textrads.Colors;
+import textrads.PressEnterState;
 import textrads.util.GraphicsUtil;
 
 public class TitleScreenRenderer {
@@ -18,7 +19,8 @@ public class TitleScreenRenderer {
     private static final String COPYRIGHT_STRING = "\u00A9 2023 meatfighter.com";
     private static final String LICENSE_STRING = "This is free software licensed under GPLv3.";
     
-    public void render(final TextGraphics g, final TerminalSize size, final TitleScreenState state) {
+    public void render(final TextGraphics g, final TerminalSize size, final TitleScreenState state, 
+            final PressEnterState pressEnterState) {
 
         final boolean small = GraphicsUtil.isSmallTerminal(size);
         final int titleX = BlockText.computeCenterX(BlockText.TEXTRADS, size, small);
@@ -42,7 +44,7 @@ public class TitleScreenRenderer {
             case PRESS_ENTER_FLASHING:
                 BlockText.draw(BlockText.TEXTRADS, g, titleX, titleY, TITLE_COLOR, small);
 
-                if (state.isFlash()) {
+                if (pressEnterState.isFlash()) {
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, PRESS_START_COLOR);
                     GraphicsUtil.centerString(g, size, pressEnterY, PRESS_ENTER_STRING);
                 }

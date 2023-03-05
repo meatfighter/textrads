@@ -109,7 +109,7 @@ public class MonoGameState implements Serializable {
     private int score;
     private short level;
     private short lines;
-    private short wins;
+    private byte wins;
     private byte attackRows;
     private byte lastAttackRows;
     
@@ -153,9 +153,11 @@ public class MonoGameState implements Serializable {
             final int startingLevel,
             final int garbageHeight, 
             final int floorHeight,
-            final boolean skipCountdown) {
+            final boolean skipCountdown,
+            final int wins) {
         
         attackRows = 0;
+        lastAttackRows = 0;
         score = 0;
         level = (short) startingLevel;
         tetrominoType = 0;
@@ -174,6 +176,7 @@ public class MonoGameState implements Serializable {
         garbageX = -1;
         garbageCounter = 0;
         lockCounter = 0;
+        this.wins = (byte) wins;
         if (skipCountdown) {
             countdownTimer = 0;
             countdownValue = 0;
@@ -678,7 +681,7 @@ public class MonoGameState implements Serializable {
         return lines;
     }
 
-    public short getWins() {
+    public byte getWins() {
         return wins;
     }
 

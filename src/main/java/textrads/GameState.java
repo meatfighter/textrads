@@ -69,10 +69,12 @@ public class GameState implements Serializable {
             final int startingLevel,
             final int garbageHeight, 
             final int floorHeight,
-            final boolean skipCountdown) {
+            final boolean skipCountdown,
+            final int wins0,
+            final int wins1) {
         this.mode = mode;
-        states[0].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown);
-        states[1].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown);
+        states[0].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins0);
+        states[1].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins1);
     }
 
     public byte getMode() {
