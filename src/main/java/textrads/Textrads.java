@@ -2,12 +2,7 @@ package textrads;
 
 import textrads.attractmode.RecordsState;
 import textrads.attractmode.ExtendedRecordDifficultyFormatter;
-import textrads.attractmode.RecycleItDontTrashItRenderer;
 import textrads.attractmode.RecordsRenderer;
-import textrads.attractmode.HackThePlanetRenderer;
-import textrads.attractmode.TitleScreenRenderer;
-import textrads.attractmode.TitleScreenState;
-import textrads.attractmode.WinnersDontUseDrugsRenderer;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
@@ -53,8 +48,6 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        attractModeState.reset();
-        
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
@@ -78,6 +71,7 @@ public class Textrads {
             screen.setCursorPosition(null); // turn off cursor
             
             InputSource.setScreen(screen);
+            attractModeState.reset();
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();

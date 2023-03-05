@@ -1,5 +1,7 @@
 package textrads.attractmode;
 
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import textrads.PressEnterState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +11,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import textrads.GameState;
 import textrads.GameStateSource;
 import textrads.InputEvent;
+import textrads.InputSource;
 import textrads.MonoGameState;
+import textrads.Terminator;
 import textrads.Textrads;
 import textrads.ai.Ai;
 import textrads.ai.AiSource;
@@ -40,7 +44,7 @@ public class AttractModeState {
         DEMO,
         RECORDS,
         PSA,
-        DONE,
+        ENTER_PRESSED,
     }
     
     public static enum Psa {
@@ -200,12 +204,14 @@ public class AttractModeState {
     }
     
     public void reset() {
+        InputSource.clear();
         pressEnterState.reset();
         titleScreenState.reset();
         mode = Mode.TITLE_SCREEN;
     }
     
     public void update() {
+        pollForEnter();
         switch (mode) {
             case TITLE_SCREEN:
                 updateTitleScreen();
@@ -219,6 +225,23 @@ public class AttractModeState {
             case PSA:
                 updatePsa();
                 break;
+        }
+    }
+    
+    private void pollForEnter() {
+        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            }
+            switch (keyStroke.getKeyType()) {
+                case Enter:
+                    mode = Mode.ENTER_PRESSED;
+                    break;
+                case Escape:
+                    Terminator.setTerminate(true);
+                    break;
+            }
         }
     }
     
@@ -330,6 +353,10 @@ public class AttractModeState {
     
     public Mode getMode() {
         return mode;
+    }
+    
+    public boolean isEnterPressed() {
+        return mode == Mode.ENTER_PRESSED;
     }
 
     public PressEnterState getPressEnterState() {
