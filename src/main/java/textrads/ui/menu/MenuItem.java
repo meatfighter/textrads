@@ -3,13 +3,15 @@ package textrads.ui.menu;
 public class MenuItem {
     
     private final String description;
-    private final char accelerator;
+    private final char lowerCaseAccelerator;
+    private final char upperCaseAccelerator;
     private final int highlightIndex;
     
     // create spacer
     public MenuItem() {
         description = null;
-        accelerator = 0;
+        lowerCaseAccelerator = 0;
+        upperCaseAccelerator = 0;
         highlightIndex = 0;
     }
     
@@ -23,7 +25,8 @@ public class MenuItem {
     
     public MenuItem(final String description, final char accelerator, final int highlightIndex) {
         this.description = description;
-        this.accelerator = Character.toLowerCase(accelerator);
+        this.lowerCaseAccelerator = Character.toLowerCase(accelerator);
+        this.upperCaseAccelerator = Character.toUpperCase(accelerator);
         this.highlightIndex = highlightIndex;
     }
 
@@ -31,8 +34,12 @@ public class MenuItem {
         return description;
     }
 
-    public char getAccelerator() {
-        return accelerator;
+    public char getLowerCaseAccelerator() {
+        return lowerCaseAccelerator;
+    }
+
+    public char getUpperCaseAccelerator() {
+        return upperCaseAccelerator;
     }
 
     public int getHighlightIndex() {

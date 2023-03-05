@@ -1,6 +1,7 @@
 package textrads;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
 
@@ -15,11 +16,21 @@ public final class InputSource {
     }
     
     public static synchronized KeyStroke poll() {
+        KeyStroke keyStroke = null;
         try {
-            return screen.pollInput();
+            keyStroke = screen.pollInput();           
         } catch (final IOException ignored) {            
         }
-        return null;
+        if (keyStroke == null) {
+            return null;
+        }
+        if (keyStroke.getKeyType() == KeyType.Character && keyStroke.isCtrlDown()) {
+            final char c = keyStroke.getCharacter();
+            if (c == 'c' || c == 'C') {
+                Terminator.setTerminate(true);
+            }
+        }
+        return keyStroke;
     }
     
     public static synchronized void clear() {

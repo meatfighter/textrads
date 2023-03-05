@@ -34,13 +34,6 @@ public final class InputEventSource {
             if (keyStroke == null) {
                 break;
             }
-            if (keyStroke.getKeyType() == KeyType.Character && keyStroke.isCtrlDown()) {
-                final char c = keyStroke.getCharacter();
-                if (c == 'c' || c == 'C') {
-                    Terminator.setTerminate(true);
-                }
-                continue;
-            }
             final InputType inputType = inputMap.get(keyStroke);
             if (inputType == null) {
                 continue;

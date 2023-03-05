@@ -12,8 +12,10 @@ import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
+import textrads.ui.menu.MenuColumn;
+import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.MenuRenderer;
-import textrads.ui.menu.MenuState;
+import textrads.ui.menu.Menu;
 import textrads.util.TerminalUtil;
 
 public class Textrads {
@@ -36,7 +38,7 @@ public class Textrads {
     private float moveTimer;
     private final List<Byte> moves = new ArrayList<>(1024);
     
-    private final MenuState menuState = new MenuState();
+    private final Menu menuState = new Menu();
     private final MenuRenderer menuRenderer = new MenuRenderer();
     
     public void launch() throws Exception {
@@ -62,7 +64,34 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
             
-            menuState.init(null);
+            // TODO TESTING
+            final List<MenuItem> menuItems0 = new ArrayList<>();
+            menuItems0.add(new MenuItem("Marathon"));
+            menuItems0.add(new MenuItem("Constant Level"));
+            menuItems0.add(new MenuItem());
+            menuItems0.add(new MenuItem("Garbage Heap"));
+            menuItems0.add(new MenuItem("Rising Garbage"));
+            
+            final List<MenuItem> menuItems1 = new ArrayList<>();
+            menuItems1.add(new MenuItem("Three Minutes"));
+            menuItems1.add(new MenuItem("Forty Lines"));
+            menuItems1.add(new MenuItem());
+            menuItems1.add(new MenuItem("No Rotation"));
+            menuItems1.add(new MenuItem("Invisible"));
+            
+            final List<MenuItem> menuItems2 = new ArrayList<>();
+            menuItems2.add(new MenuItem("Vs. AI", 'A'));
+            menuItems2.add(new MenuItem("Vs. Human", 'H'));
+            menuItems2.add(new MenuItem());
+            menuItems2.add(new MenuItem());
+            menuItems2.add(new MenuItem("Keymapping"));
+            
+            final List<MenuColumn> menuColumns = new ArrayList<>();
+            menuColumns.add(new MenuColumn(menuItems0));
+            menuColumns.add(new MenuColumn(menuItems1));
+            menuColumns.add(new MenuColumn(menuItems2));
+            
+            menuState.init("Main", menuColumns);
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -186,9 +215,9 @@ public class Textrads {
 
 // ----------------
 
-//      attractModeState.update();
+      attractModeState.update();
 
-        menuState.update();
+//        menuState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -197,9 +226,9 @@ public class Textrads {
 
 //        recordsRender.render(g, size, recordsState);
 
-//        attractModeRenderer.render(g, size, attractModeState);
+        attractModeRenderer.render(g, size, attractModeState);
 
-        menuRenderer.render(g, size, menuState);
+//        menuRenderer.render(g, size, menuState);
     }
     
     public static void main(final String... args) throws Exception {

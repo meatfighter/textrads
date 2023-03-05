@@ -3,30 +3,39 @@ package textrads.ui.menu;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import java.util.List;
 import textrads.Colors;
 import textrads.util.GraphicsUtil;
 
 public class MenuRenderer {
     
-    final TextColor BACKGROUND_COLOR = Colors.BLACK;
-    final TextColor ACCELERATOR_COLOR = Colors.WHITE;
-    final TextColor DESCRIPTION_COLOR = Colors.GRAY;
-    final TextColor BUTTON_COLOR = Colors.GOLD;
+    public static final TextColor BACKGROUND_COLOR = Colors.BLACK;
+    private static final TextColor TITLE_COLOR = Colors.WHITE;
     
-    public void render(final TextGraphics g, final TerminalSize size, final MenuState state) {
+    private final MenuItemRenderer menuItemRenderer = new MenuItemRenderer();
+    private final BackExitRenderer backExitRenderer = new BackExitRenderer();
+    
+    public void render(final TextGraphics g, final TerminalSize size, final Menu menu) {
         
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
         g.fill(' ');
         
-        GraphicsUtil.setColor(g, BACKGROUND_COLOR, BUTTON_COLOR);
-        g.putString(10, 10, "[");
-        GraphicsUtil.setColor(g, BACKGROUND_COLOR, ACCELERATOR_COLOR);
-        g.putString(12, 10, "J");
-        GraphicsUtil.setColor(g, BACKGROUND_COLOR, BUTTON_COLOR);
-        g.putString(14, 10, "]");
-        GraphicsUtil.setColor(g, BACKGROUND_COLOR, ACCELERATOR_COLOR);
-        g.putString(16, 10, "J");
-        GraphicsUtil.setColor(g, BACKGROUND_COLOR, DESCRIPTION_COLOR);
-        g.putString(17, 10, "oin conference");
+        final int ox = (size.getColumns() - menu.getWidth()) / 2;
+        final int oy = (size.getRows() - menu.getHeight()) / 2;
+        
+        GraphicsUtil.setColor(g, BACKGROUND_COLOR, TITLE_COLOR);
+        GraphicsUtil.centerString(g, size, oy, menu.getTitle());
+        
+        final List<MenuColumn> menuColumns = menu.getMenuColumns();
+        for (int i = 0, x = ox, end = menuColumns.size(); i < end; ++i) {
+            final MenuColumn menuColumn = menuColumns.get(i);
+            final List<MenuItem> menuItems = menuColumn.getMenuItems();
+            for (int j = menuItems.size() - 1; j >= 0; --j) {
+                menuItemRenderer.render(g, size, menuItems.get(j), x, oy + 3 + 2 * j);
+            }
+            x += Menu.COLUMN_SPACER + menuColumn.getWidth();
+        }
+        
+        backExitRenderer.render(g, size, oy + menu.getHeight());
     }
 }
