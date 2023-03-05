@@ -1,8 +1,5 @@
 package textrads;
 
-import textrads.attractmode.RecordsState;
-import textrads.attractmode.ExtendedRecordDifficultyFormatter;
-import textrads.attractmode.RecordsRenderer;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
@@ -15,9 +12,8 @@ import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
-import textrads.db.Database;
-import textrads.netplay.Client;
-import textrads.netplay.Server;
+import textrads.ui.menu.MenuRenderer;
+import textrads.ui.menu.MenuState;
 import textrads.util.TerminalUtil;
 
 public class Textrads {
@@ -30,21 +26,18 @@ public class Textrads {
     public static final long NANOS_PER_FRAME = Math.round(1.0E9 / FRAMES_PER_SECOND);
     private static final long MIN_SLEEP_NANOS = TimeUnit.MICROSECONDS.toNanos(MIN_SLEEP_MICROS);
     
-    private final Server server = new Server();
-    private final Client client = new Client();
     private final GameRenderer playRenderer = new GameRenderer();
     private final InputEventList eventList = new InputEventList();
-    
-    private final Database database = new Database();
-    private final RecordsState recordsState = new RecordsState();
-    private final RecordsRenderer recordsRender = new RecordsRenderer();
     
     private final AttractModeState attractModeState = new AttractModeState();
     private final AttractModeRenderer attractModeRenderer = new AttractModeRenderer();
         
     private final Ai ai = new Ai();
     private float moveTimer;
-    private List<Byte> moves = new ArrayList<>(1024);
+    private final List<Byte> moves = new ArrayList<>(1024);
+    
+    private final MenuState menuState = new MenuState();
+    private final MenuRenderer menuRenderer = new MenuRenderer();
     
     public void launch() throws Exception {
         
@@ -60,10 +53,6 @@ public class Textrads {
                 15,
                 false); // TODO
         
-        database.init();
-        recordsState.init("All Time Best Vs. AI Records", database.get(Database.AllTimeKeys.VS_AI), 
-                new ExtendedRecordDifficultyFormatter());
-        
         try (final Terminal terminal = TerminalUtil.createTerminal();
                 final Screen screen = new TerminalScreen(terminal)) {
             
@@ -72,6 +61,8 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
+            
+            menuState.init(null);
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -195,7 +186,9 @@ public class Textrads {
 
 // ----------------
 
-      attractModeState.update();
+//      attractModeState.update();
+
+        menuState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -204,7 +197,9 @@ public class Textrads {
 
 //        recordsRender.render(g, size, recordsState);
 
-        attractModeRenderer.render(g, size, attractModeState);
+//        attractModeRenderer.render(g, size, attractModeState);
+
+        menuRenderer.render(g, size, menuState);
     }
     
     public static void main(final String... args) throws Exception {

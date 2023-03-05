@@ -13,7 +13,7 @@ public class TitleScreenRenderer {
     private static final TextColor BACKGROUND_COLOR = Colors.BLACK;
     private static final TextColor PRESS_START_COLOR = Colors.WHITE;
     private static final TextColor TITLE_COLOR = Colors.GOLD;
-    private static final TextColor COPYRIGHT_COLOR = new TextColor.Indexed(248);
+    private static final TextColor COPYRIGHT_COLOR = Colors.GRAY;
     
     private static final String PRESS_ENTER_STRING = "PRESS ENTER";
     private static final String COPYRIGHT_STRING = "\u00A9 2023 meatfighter.com";

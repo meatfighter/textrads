@@ -1,3 +1,26 @@
+Main > this > this
+
+[M] Marathon
+[C] Constant Level
+[G] Garbage Heap
+[R] Rising Garbage
+[T] Three Minutes
+[F] Forty Lines
+[N] No Rotation
+[I] Invisible
+[A] Vs. AI
+[H] Vs. Human
+
+[S] Settings
+
+[Esc] Back 
+[Ctrl+C] Exit
+
+
+
+
+
+
 I move around 5.5 frames/input.
 killed him at 25
 killed him at 20

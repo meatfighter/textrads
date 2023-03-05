@@ -13,7 +13,7 @@ public class RecordsRenderer {
     private static final TextColor FIRST_COLOR = new TextColor.Indexed(33);
     private static final TextColor SECOND_COLOR = new TextColor.Indexed(160);
     private static final TextColor THIRD_COLOR = Colors.WHITE;
-    private static final TextColor FOURTH_COLOR = new TextColor.Indexed(248);
+    private static final TextColor FOURTH_COLOR = Colors.GRAY;
     
     private static final TextColor[] RANK_COLORS = { FIRST_COLOR, SECOND_COLOR, THIRD_COLOR, FOURTH_COLOR };
     
