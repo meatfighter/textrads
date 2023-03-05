@@ -116,10 +116,10 @@ public final class GraphicsUtil {
     public static boolean isSmallTerminal(final TerminalSize size) {
         
         // standard size: 80 x 24
-        // 2p small size: 71 x 22
-        // 2p big size:  129 x 42
+        // 2p small size: 71 x 24
+        // 2p big size:  129 x 44
         
-        return size.getColumns() < 129 || size.getRows() < 42;
+        return size.getColumns() < 129 || size.getRows() < 44;
     }
     
     public static boolean isBigTerminal(final TerminalSize size) {

@@ -18,7 +18,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
 
     @Override
     public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
-            final int y, final boolean showWins, final PressEnterState pressEnterState) {
+            final int y, final boolean showWins) {
 
         GraphicsUtil.setColor(g, ATTACK_COLOR, BACKGROUND_COLOR);
         for (int i = state.getAttackRows() - 1; i >= 0; --i) {

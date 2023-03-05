@@ -1,10 +1,15 @@
 package textrads;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import textrads.util.GraphicsUtil;
 
 public class GameRenderer {
+    
+    private static final TextColor PRESS_START_COLOR = Colors.WHITE;
+    
+    private static final String PRESS_ENTER_STRING = "PRESS ENTER";
  
     private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
     private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
@@ -15,22 +20,24 @@ public class GameRenderer {
         GraphicsUtil.setColor(g, MonoGameRenderer.BACKGROUND_COLOR, MonoGameRenderer.BACKGROUND_COLOR);
         g.fill(' ');
         
-        MonoGameRenderer renderer = bigRenderer;
-        Dimensions dims = renderer.getDimensions();       
-        if (GraphicsUtil.isSmallTerminal(size)) {
-            renderer = smallRenderer;
-            dims = renderer.getDimensions();            
-        }
+        final MonoGameRenderer renderer = GraphicsUtil.isSmallTerminal(size) ? smallRenderer : bigRenderer;
+        final Dimensions dims = renderer.getDimensions();
+        final int width = dims.getWidth();
+        final int height = dims.getHeight() + (pressEnterState == null ? 0 : 2);
         
         final MonoGameState[] states = state.getStates();
+        final int y = (size.getRows() - height) / 2;
         if (state.getPlayers() == 1) {        
-            renderer.render(g, size, states[0], (size.getColumns() - dims.getWidth()) / 2, 
-                    (size.getRows() - dims.getHeight()) / 2, false, pressEnterState);
+            renderer.render(g, size, states[0], (size.getColumns() - width) / 2, y, false);
         } else {
-            final int x = (size.getColumns() - (2 * dims.getWidth() + 1)) / 2;
-            final int y = (size.getRows() - dims.getHeight()) / 2;
-            renderer.render(g, size, states[0], x, y, true, pressEnterState);
-            renderer.render(g, size, states[1], x + dims.getWidth() + 1, y, true, pressEnterState);
+            final int x = (size.getColumns() - (2 * width + 1)) / 2;            
+            renderer.render(g, size, states[0], x, y, true);
+            renderer.render(g, size, states[1], x + width + 1, y, true);
+        }
+        
+        if (pressEnterState != null && pressEnterState.isFlash()) {
+            GraphicsUtil.setColor(g, MonoGameRenderer.BACKGROUND_COLOR, PRESS_START_COLOR);
+            GraphicsUtil.centerString(g, size, (y + height + size.getRows() - 2) / 2, PRESS_ENTER_STRING);
         }
     }
 }

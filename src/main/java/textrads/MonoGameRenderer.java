@@ -41,5 +41,5 @@ public abstract class MonoGameRenderer {
     public abstract Dimensions getDimensions();
     
     public abstract void render(TextGraphics g, TerminalSize size, MonoGameState monoGameState, 
-            int x, int y, boolean showWins, PressEnterState pressEnterState);
+            int x, int y, boolean showWins);
 }
