@@ -215,9 +215,9 @@ public class Textrads {
 
 // ----------------
 
-      attractModeState.update();
+//      attractModeState.update();
 
-//        menuState.update();
+        menuState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -226,9 +226,9 @@ public class Textrads {
 
 //        recordsRender.render(g, size, recordsState);
 
-        attractModeRenderer.render(g, size, attractModeState);
+//        attractModeRenderer.render(g, size, attractModeState);
 
-//        menuRenderer.render(g, size, menuState);
+        menuRenderer.render(g, size, menuState);
     }
     
     public static void main(final String... args) throws Exception {

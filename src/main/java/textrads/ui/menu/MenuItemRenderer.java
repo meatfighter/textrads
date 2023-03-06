@@ -28,8 +28,8 @@ public class MenuItemRenderer {
         GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, ACCELERATOR_COLOR);
         g.setCharacter(x + 1, y, menuItem.getUpperCaseAccelerator());
         final int highlightIndex = menuItem.getHighlightIndex();
-        if (highlightIndex >= 0 && highlightIndex < description.length()) {
-            g.setCharacter(x + 4 + highlightIndex, y, description.charAt(highlightIndex));
-        }
+//        if (highlightIndex >= 0 && highlightIndex < description.length()) {
+//            g.setCharacter(x + 4 + highlightIndex, y, description.charAt(highlightIndex));
+//        }
     }
 }

@@ -1,5 +1,7 @@
 package textrads.ui.menu;
 
+// TODO GET RID OF HIGHLIGHT
+
 public class MenuItem {
     
     private final String description;
