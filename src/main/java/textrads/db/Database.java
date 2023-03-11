@@ -42,6 +42,10 @@ public class Database {
         String VS_AI = "todays-vs-ai";
     }
     
+    public static interface OtherKeys {
+        String PREFERENCES = "preferences";
+    }
+    
     private static final String DIR = "data";
     
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -72,7 +76,9 @@ public class Database {
         
         load(TodaysKeys.GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TodaysKeys.FORTY_LINES, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
-        load(TodaysKeys.VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);        
+        load(TodaysKeys.VS_AI, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        
+        load(OtherKeys.PREFERENCES, () -> new Preferences());
     }
     
     public <T extends Serializable> T get(final String key) {
