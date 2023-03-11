@@ -1,20 +1,15 @@
 package textrads.ui.menu;
 
-// TODO GET RID OF HIGHLIGHT
-
 public class MenuItem {
     
     private final String description;
-    private final char lowerCaseAccelerator;
-    private final char upperCaseAccelerator;
-    private final int highlightIndex;
+    private final char accelerator;
+    
+    private boolean selected;
     
     // create spacer
     public MenuItem() {
-        description = null;
-        lowerCaseAccelerator = 0;
-        upperCaseAccelerator = 0;
-        highlightIndex = 0;
+        this(null, (char) 0);
     }
     
     public MenuItem(final String description) {
@@ -22,32 +17,38 @@ public class MenuItem {
     }
     
     public MenuItem(final String description, final char accelerator) {
-        this(description, accelerator, description.toLowerCase().indexOf(Character.toLowerCase(accelerator)));
+        this.description = description;
+        this.accelerator = Character.toUpperCase(accelerator);
     }
     
-    public MenuItem(final String description, final char accelerator, final int highlightIndex) {
-        this.description = description;
-        this.lowerCaseAccelerator = Character.toLowerCase(accelerator);
-        this.upperCaseAccelerator = Character.toUpperCase(accelerator);
-        this.highlightIndex = highlightIndex;
+    public void reset() {
+        selected = false;
+    }    
+    
+    public boolean handleInput(final char c) {
+        if (accelerator != c) {
+            return false;
+        }
+        selected = true;
+        return true;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public char getLowerCaseAccelerator() {
-        return lowerCaseAccelerator;
+    public char getAccelerator() {
+        return accelerator;
     }
 
-    public char getUpperCaseAccelerator() {
-        return upperCaseAccelerator;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public int getHighlightIndex() {
-        return highlightIndex;
+    public void setSelected(final boolean selected) {
+        this.selected = selected;
     }
-    
+
     public boolean isSpacer() {
         return description == null;
     }

@@ -1,9 +1,10 @@
 package textrads;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import java.util.HashMap;
 import java.util.Map;
+
+// TODO THIS PROBABLY DOESN'T HAVE TO BE SYNCHRONIZED
 
 public final class InputEventSource {
 

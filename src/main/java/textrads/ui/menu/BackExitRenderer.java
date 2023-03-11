@@ -6,7 +6,7 @@ import textrads.util.GraphicsUtil;
 
 public class BackExitRenderer {
 
-    public void render(final TextGraphics g, final TerminalSize size, final int y) {
+    public void render(final TextGraphics g, final TerminalSize size, final BackExitState state, final int y) {
         
         final int x = (size.getColumns() - (21 + Menu.COLUMN_SPACER)) / 2;
         
@@ -18,8 +18,10 @@ public class BackExitRenderer {
         GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, MenuItemRenderer.ACCELERATOR_COLOR);
         g.putString(x + 1, y, "Esc");
         g.putString(x + 10 + Menu.COLUMN_SPACER, y, "Ctrl+C");
-        GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, MenuItemRenderer.DESCRIPTION_COLOR);
+        GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, 
+                state.isEscSelected() ? MenuItemRenderer.SELECTED_COLOR : MenuItemRenderer.DESCRIPTION_COLOR);
         g.putString(x + 6, y, "Back");
-        g.putString(x + 18 + Menu.COLUMN_SPACER, y, "Exit");
+        GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, MenuItemRenderer.DESCRIPTION_COLOR);
+        g.putString(x + 18 + Menu.COLUMN_SPACER, y, "Exit");        
     }
 }

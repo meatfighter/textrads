@@ -44,7 +44,11 @@ public final class InputMap {
             return shiftInputType;
         }
         if (keyStroke.getKeyType() == KeyType.Character) {
-            return charToInputTypeMap.get(Character.toLowerCase(keyStroke.getCharacter()));
+            final Character character = keyStroke.getCharacter();
+            if (character == null) {
+                return null;
+            }
+            return charToInputTypeMap.get(Character.toLowerCase(character));
         }
         return keyTypeToInputTypeMap.get(keyStroke.getKeyType());
     }

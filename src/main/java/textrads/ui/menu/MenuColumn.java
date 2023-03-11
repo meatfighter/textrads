@@ -20,6 +20,19 @@ public class MenuColumn {
         height = 1 + 2 * (menuItems.size() - 1);
     }
     
+    public void reset() {
+        menuItems.forEach(menuItem -> menuItem.reset());
+    }
+    
+    public boolean handleInput(final char c) {
+        for (final MenuItem menuItem : menuItems) {
+            if (menuItem.handleInput(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public List<MenuItem> getMenuItems() {
         return menuItems;
     }

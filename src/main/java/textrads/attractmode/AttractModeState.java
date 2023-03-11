@@ -198,8 +198,8 @@ public class AttractModeState {
     
     private void initPsas() {
         psas.clear();
-        for (final Psa psa : Psa.values()) {
-            psas.add(psa);
+        for (final Psa value : Psa.values()) {
+            psas.add(value);
         }
     }
     

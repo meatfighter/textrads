@@ -36,6 +36,6 @@ public class MenuRenderer {
             x += Menu.COLUMN_SPACER + menuColumn.getWidth();
         }
         
-        backExitRenderer.render(g, size, oy + menu.getHeight());
+        backExitRenderer.render(g, size, menu.getBackExitState(), oy + menu.getHeight());
     }
 }
