@@ -11,13 +11,14 @@ Main > this > this
 [A] Vs. AI
 [H] Vs. Human
 
-[S] Settings
 
-[Esc] Back 
-[Ctrl+C] Exit
+Level (0--29)?
+Difficulty (0--29)? 
+Height (1--12)?
 
+Enter your initials: AAA
 
-
+530 is default blink rate 
 
 
 
