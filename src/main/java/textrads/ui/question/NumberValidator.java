@@ -1,4 +1,4 @@
-package textrads.ui.textfield;
+package textrads.ui.question;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -6,10 +6,12 @@ public class NumberValidator implements TextFieldValidator {
 
     private final int minValue;
     private final int maxValue;
+    private final int maxLength;
     
     public NumberValidator(final int minValue, final int maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
+        maxLength = Integer.toString(maxValue).length();
     }
 
     @Override
@@ -31,5 +33,10 @@ public class NumberValidator implements TextFieldValidator {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public int getMaxLength() {
+        return maxLength;
     }
 }

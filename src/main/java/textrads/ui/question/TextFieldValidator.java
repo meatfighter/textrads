@@ -1,5 +1,6 @@
-package textrads.ui.textfield;
+package textrads.ui.question;
 
 public interface TextFieldValidator {
     boolean evaluate(String input);
+    int getMaxLength();
 }

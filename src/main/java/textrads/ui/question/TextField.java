@@ -1,4 +1,4 @@
-package textrads.ui.textfield;
+package textrads.ui.question;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import textrads.Textrads;
@@ -14,16 +14,13 @@ public class TextField {
     private final String message;
     private final TextFieldValidator validator;
     private final TextFieldTransformer transformer;
+    private final int width;
     
     private final StringBuilder value = new StringBuilder();
     private float frameCounter;
     private boolean cursorVisible;
     private boolean valueAvailable;
     private int cursorPosition;
-    
-    public TextField(final String message) {
-        this(message, null, null);
-    }
     
     public TextField(final String message, final TextFieldValidator validator) {
         this(message, validator, null);
@@ -33,6 +30,7 @@ public class TextField {
         this.message = message;
         this.validator = validator;
         this.transformer = transformer;
+        width = message.length() + 1 + validator.getMaxLength();
     }
     
     public void init(final String initialValue) {
@@ -86,7 +84,7 @@ public class TextField {
                     character = transformer.transform(character);
                 }
                 value.insert(cursorPosition, character);
-                if (validator == null || validator.evaluate(value.toString())) {
+                if (validator.evaluate(value.toString())) {
                     ++cursorPosition;
                 } else {
                     value.deleteCharAt(cursorPosition);
@@ -101,7 +99,7 @@ public class TextField {
                 resetCursor();
                 break;
             case Enter:
-                if (validator == null || validator.evaluate(value.toString())) {
+                if (validator.evaluate(value.toString())) {
                     valueAvailable = true;
                 }
                 resetCursor();
@@ -115,6 +113,10 @@ public class TextField {
                 resetCursor();
                 break;
         }
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     public String getMessage() {
