@@ -56,6 +56,7 @@ public class TextField {
     }
        
     public void handleInput(final KeyStroke keyStroke) {
+        
         switch (keyStroke.getKeyType()) {
             case ArrowLeft:
                 if (cursorPosition > 0) {
@@ -122,9 +123,13 @@ public class TextField {
     public String getMessage() {
         return message;
     }
+    
+    public void setCursorVisible(final boolean cursorVisible) {
+        this.cursorVisible = cursorVisible;
+    }
 
     public boolean isCursorVisible() {
-        return cursorVisible;
+        return cursorVisible && !enterPressed;
     }
 
     public int getCursorPosition() {

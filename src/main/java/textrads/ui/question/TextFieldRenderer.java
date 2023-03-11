@@ -17,11 +17,15 @@ public class TextFieldRenderer {
         GraphicsUtil.setColor(g, QuestionRenderer.BACKGROUND_COLOR, TEXT_COLOR);
         g.putString(x, y, textField.getMessage());
         
-        g.putString(x + textField.getMessage().length() + 1, y, textField.getValue());
+        final int valueX = x + textField.getMessage().length() + 1;
+        final String value = textField.getValue();
+        g.putString(valueX, y, value);
         
         if (textField.isCursorVisible()) {
-            GraphicsUtil.setColor(g, TEXT_COLOR, TEXT_COLOR);
-            g.setCharacter(x + textField.getMessage().length() + 2, y, ' ');
+            GraphicsUtil.setColor(g, TEXT_COLOR, QuestionRenderer.BACKGROUND_COLOR);
+            final int cursorPosition = textField.getCursorPosition();                        
+            g.setCharacter(valueX + cursorPosition, y, 
+                    (cursorPosition < value.length()) ? value.charAt(cursorPosition) : ' ');
         }
     }
 }

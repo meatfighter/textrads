@@ -18,6 +18,8 @@ Height (1--12)?
 
 Enter your initials: AAA
 
+Play again (Y/N)? 
+
 530 is default blink rate 
 
 

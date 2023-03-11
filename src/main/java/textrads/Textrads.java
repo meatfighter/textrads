@@ -16,6 +16,10 @@ import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.MenuRenderer;
 import textrads.ui.menu.Menu;
+import textrads.ui.question.NumberValidator;
+import textrads.ui.question.Question;
+import textrads.ui.question.QuestionRenderer;
+import textrads.ui.question.TextField;
 import textrads.util.TerminalUtil;
 
 public class Textrads {
@@ -41,6 +45,9 @@ public class Textrads {
     private final Menu menu = createMenu();
     private final MenuRenderer menuRenderer = new MenuRenderer();
     
+    private final Question question = createQuestion();
+    private final QuestionRenderer questionRenderer = new QuestionRenderer();
+    
     public void launch() throws Exception {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
@@ -63,8 +70,7 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
-            
-
+            question.init("10");
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -104,6 +110,10 @@ public class Textrads {
         } 
         
         System.exit(0);
+    }
+    
+    private static Question createQuestion() { // TODO TESTING
+        return new Question("Marathon", new TextField("Level (0--29)?", new NumberValidator(0, 29)));
     }
     
     private static Menu createMenu() { // TODO TESTING                
@@ -220,7 +230,9 @@ public class Textrads {
 
 //      attractModeState.update();
 
-        menu.update();
+//        menu.update();
+
+        question.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -231,7 +243,9 @@ public class Textrads {
 
 //        attractModeRenderer.render(g, size, attractModeState);
 
-        menuRenderer.render(g, size, menu);
+//        menuRenderer.render(g, size, menu);
+
+        questionRenderer.render(g, size, question);
     }
     
     public static void main(final String... args) throws Exception {

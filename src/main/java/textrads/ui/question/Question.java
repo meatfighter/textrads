@@ -29,11 +29,11 @@ public class Question {
         InputSource.clear();
     }
     
-    public void update() {
-        textField.update();
+    public void update() {        
         if (escPressed || textField.isEnterPressed()) {
             InputSource.clear();
-        } else {
+            textField.setCursorVisible(false);
+        } else {            
             for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
                 final KeyStroke keyStroke = InputSource.poll();
                 if (keyStroke == null) {
@@ -41,6 +41,7 @@ public class Question {
                 }
                 handleInput(keyStroke);
             }
+            textField.update();
         }
     }
     
@@ -49,8 +50,9 @@ public class Question {
             case Escape:
                 escPressed = true;
                 backExitState.setEscSelected(true);
+                textField.setCursorVisible(false);
                 break;
-            case Character:
+            default:
                 textField.handleInput(keyStroke);
                 break;
         }
