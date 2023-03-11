@@ -228,11 +228,11 @@ public class Textrads {
 
 // ----------------
 
-//      attractModeState.update();
+      attractModeState.update();
 
 //        menu.update();
 
-        question.update();
+//        question.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -241,11 +241,11 @@ public class Textrads {
 
 //        recordsRender.render(g, size, recordsState);
 
-//        attractModeRenderer.render(g, size, attractModeState);
+        attractModeRenderer.render(g, size, attractModeState);
 
 //        menuRenderer.render(g, size, menu);
 
-        questionRenderer.render(g, size, question);
+//        questionRenderer.render(g, size, question);
     }
     
     public static void main(final String... args) throws Exception {

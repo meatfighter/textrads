@@ -5,8 +5,10 @@ import textrads.InputSource;
 import textrads.ui.menu.BackExitState;
 
 public class Question {
-
+    
     private static final int HEIGHT = 9;
+    
+    private static final int ESC_FRAMES = 3;
     
     private final String title;
     private final TextField textField;
@@ -15,6 +17,7 @@ public class Question {
     private final BackExitState backExitState = new BackExitState();
     
     private boolean escPressed;
+    private int escTimer;
     
     public Question(final String title, final TextField textField) {
         this.title = title;
@@ -26,6 +29,7 @@ public class Question {
     public void init(final String initialValue) {
         textField.init(initialValue);
         escPressed = false;
+        escTimer = ESC_FRAMES;
         InputSource.clear();
     }
     
@@ -33,6 +37,9 @@ public class Question {
         if (escPressed || textField.isEnterPressed()) {
             InputSource.clear();
             textField.setCursorVisible(false);
+            if (escPressed && escTimer > 0) {
+                --escTimer;
+            }
         } else {            
             for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
                 final KeyStroke keyStroke = InputSource.poll();
@@ -59,7 +66,7 @@ public class Question {
     }
 
     public boolean isEscPressed() {
-        return escPressed;
+        return (escTimer == 0) ? escPressed : false;
     }
     
     public boolean isEnterPressed() {

@@ -8,6 +8,8 @@ public class Menu {
     
     public static final int COLUMN_SPACER = 6;
     
+    private static final int SELECTION_FRAMES = 3;
+    
     private final List<MenuColumn> menuColumns;
     private final int width;
     private final int height;
@@ -16,6 +18,7 @@ public class Menu {
     private final BackExitState backExitState = new BackExitState();
     
     private KeyStroke selection;
+    private int selectionTimer;
     
     public Menu(final String title, final List<MenuColumn> menuColumns) {
         this.menuColumns = menuColumns;
@@ -39,6 +42,7 @@ public class Menu {
     
     public void reset() {
         selection = null;
+        selectionTimer = SELECTION_FRAMES;
         menuColumns.forEach(menuColumn -> menuColumn.reset());
         backExitState.reset();
         InputSource.clear();
@@ -53,8 +57,11 @@ public class Menu {
                 }
                 handleInput(keyStroke);
             }
-        } else {
+        } else {            
             InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            }
         }
     }
     
@@ -82,7 +89,7 @@ public class Menu {
     }
     
     public KeyStroke getSelection() {
-        return selection;
+        return (selectionTimer == 0) ? selection : null;
     }
 
     public List<MenuColumn> getMenuColumns() {
