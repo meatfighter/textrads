@@ -20,12 +20,12 @@ public class QuestionRenderer {
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
         g.fill(' ');
         
-        final int ox = (size.getColumns() - question.getWidth()) / 2;
         final int oy = (size.getRows() - question.getHeight()) / 2;
 
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, TITLE_COLOR);
         GraphicsUtil.centerString(g, size, oy, question.getTitle());
         
-        
+        textFieldRenderer.render(g, size, question.getTextField(), oy + 3);
+        backExitRenderer.render(g, size, question.getBackExitState(), oy + question.getHeight());
     }
 }

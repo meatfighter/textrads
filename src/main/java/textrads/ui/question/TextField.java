@@ -19,7 +19,7 @@ public class TextField {
     private final StringBuilder value = new StringBuilder();
     private float frameCounter;
     private boolean cursorVisible;
-    private boolean valueAvailable;
+    private boolean enterPressed;
     private int cursorPosition;
     
     public TextField(final String message, final TextFieldValidator validator) {
@@ -35,7 +35,7 @@ public class TextField {
     
     public void init(final String initialValue) {
         resetCursor();
-        valueAvailable = false;
+        enterPressed = false;
         value.setLength(0);
         if (isNotBlank(initialValue)) {
             value.append(initialValue);
@@ -100,7 +100,7 @@ public class TextField {
                 break;
             case Enter:
                 if (validator.evaluate(value.toString())) {
-                    valueAvailable = true;
+                    enterPressed = true;
                 }
                 resetCursor();
                 break;
@@ -130,8 +130,12 @@ public class TextField {
     public int getCursorPosition() {
         return cursorPosition;
     }
+
+    public boolean isEnterPressed() {
+        return enterPressed;
+    }
     
     public String getValue() {
-        return valueAvailable ? value.toString() : null;
+        return value.toString();
     }
 }

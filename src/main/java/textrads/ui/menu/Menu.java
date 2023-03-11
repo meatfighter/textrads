@@ -45,12 +45,16 @@ public class Menu {
     }
     
     public void update() {
-        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
-            final KeyStroke keyStroke = InputSource.poll();
-            if (keyStroke == null) {
-                break;
+        if (selection == null) {
+            for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+                final KeyStroke keyStroke = InputSource.poll();
+                if (keyStroke == null) {
+                    break;
+                }
+                handleInput(keyStroke);
             }
-            handleInput(keyStroke);
+        } else {
+            InputSource.clear();
         }
     }
     
@@ -58,7 +62,7 @@ public class Menu {
         switch (keyStroke.getKeyType()) {
             case Escape:
                 selection = keyStroke;
-                backExitState.setEscSelected(true);                
+                backExitState.setEscSelected(true);
                 break;
             case Character: {
                 final Character character = keyStroke.getCharacter();

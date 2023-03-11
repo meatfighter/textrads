@@ -1,5 +1,7 @@
 package textrads.ui.question;
 
+import com.googlecode.lanterna.input.KeyStroke;
+import textrads.InputSource;
 import textrads.ui.menu.BackExitState;
 
 public class Question {
@@ -8,9 +10,11 @@ public class Question {
     
     private final String title;
     private final TextField textField;
-    private final int width;
+    private final int width;    
     
     private final BackExitState backExitState = new BackExitState();
+    
+    private boolean escPressed;
     
     public Question(final String title, final TextField textField) {
         this.title = title;
@@ -21,6 +25,47 @@ public class Question {
     
     public void init(final String initialValue) {
         textField.init(initialValue);
+        escPressed = false;
+        InputSource.clear();
+    }
+    
+    public void update() {
+        textField.update();
+        if (escPressed || textField.isEnterPressed()) {
+            InputSource.clear();
+        } else {
+            for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+                final KeyStroke keyStroke = InputSource.poll();
+                if (keyStroke == null) {
+                    break;
+                }
+                handleInput(keyStroke);
+            }
+        }
+    }
+    
+    private void handleInput(final KeyStroke keyStroke) {
+        switch (keyStroke.getKeyType()) {
+            case Escape:
+                escPressed = true;
+                backExitState.setEscSelected(true);
+                break;
+            case Character:
+                textField.handleInput(keyStroke);
+                break;
+        }
+    }
+
+    public boolean isEscPressed() {
+        return escPressed;
+    }
+    
+    public boolean isEnterPressed() {
+        return textField.isEnterPressed();
+    }
+    
+    public String getValue() {
+        return textField.getValue();
     }
 
     public int getWidth() {
