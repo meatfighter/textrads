@@ -16,6 +16,8 @@ import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.MenuRenderer;
 import textrads.ui.menu.Menu;
+import textrads.ui.question.CongratsScreenRenderer;
+import textrads.ui.question.CongratsScreenState;
 import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.QuestionRenderer;
@@ -48,6 +50,9 @@ public class Textrads {
     private final Question question = createQuestion();
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
     
+    private final CongratsScreenState congratsScreenState = new CongratsScreenState();
+    private final CongratsScreenRenderer congratsScreenRenderer = new CongratsScreenRenderer();
+    
     public void launch() throws Exception {
         
         InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
@@ -71,6 +76,8 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
             question.init("10");
+            congratsScreenState.init("Congratulations! You got Today's Best 3rd Place.", Images.SMALL_OWL, 
+                    Images.BIG_OWL, null);
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -232,7 +239,9 @@ public class Textrads {
 
 //        menu.update();
 
-        question.update();
+//        question.update();
+
+        congratsScreenState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -245,7 +254,9 @@ public class Textrads {
 
 //        menuRenderer.render(g, size, menu);
 
-        questionRenderer.render(g, size, question);
+//        questionRenderer.render(g, size, question);
+
+        congratsScreenRenderer.render(g, size, congratsScreenState);
     }
     
     public static void main(final String... args) throws Exception {
