@@ -84,11 +84,21 @@ public class TextField {
                 if (transformer != null) {
                     character = transformer.transform(character);
                 }
-                value.insert(cursorPosition, character);
-                if (validator.evaluate(value.toString())) {
-                    ++cursorPosition;
+                if (cursorPosition < value.length()) {
+                    final char backup = value.charAt(cursorPosition);
+                    value.setCharAt(cursorPosition, character);                
+                    if (validator.evaluate(value.toString())) {
+                        ++cursorPosition;
+                    } else {
+                        value.setCharAt(cursorPosition, backup);
+                    }
                 } else {
-                    value.deleteCharAt(cursorPosition);
+                    value.insert(cursorPosition, character);                
+                    if (validator.evaluate(value.toString())) {
+                        ++cursorPosition;
+                    } else {
+                        value.deleteCharAt(cursorPosition);
+                    }
                 }
                 resetCursor();
                 break;
