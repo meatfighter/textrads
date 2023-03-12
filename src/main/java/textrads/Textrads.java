@@ -76,8 +76,8 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
             question.init("10");
-            congratsScreenState.init("Congratulations! You got Today's Best 3rd Place.", Images.SMALL_CROCODILE, 
-                    Images.BIG_CROCODILE, null);
+            congratsScreenState.init("Congratulations! You got Today's Best 3rd Place.", Images.SMALL_GIRAFFE, 
+                    Images.BIG_GIRAFFE, null);
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();

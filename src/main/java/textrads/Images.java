@@ -39,4 +39,6 @@ public interface Images {
     TextImage SMALL_BADGER = GraphicsUtil.loadImage("small-badger");
     TextImage BIG_TURTLE = GraphicsUtil.loadImage("big-turtle");
     TextImage SMALL_TURTLE = GraphicsUtil.loadImage("small-turtle");
+    TextImage BIG_GIRAFFE = GraphicsUtil.loadImage("big-giraffe");
+    TextImage SMALL_GIRAFFE = GraphicsUtil.loadImage("small-giraffe");
 }
