@@ -6,140 +6,205 @@ public class Preferences implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private byte marathonLevel = -1;
+    private final byte marathonLevel;
     
-    private byte constantLevelLevel = -1;
+    private final byte constantLevelLevel;
     
-    private byte garbageHeapLevel = -1;
-    private byte garbageHeapHeight = -1;
+    private final byte garbageHeapLevel;
+    private final byte garbageHeapHeight;
     
-    private byte risingGarbageLevel = -1;
+    private final byte risingGarbageLevel;
     
-    private byte threeMinutesLevel = -1;
+    private final byte threeMinutesLevel;
     
-    private byte fortyLinesLevel = -1;
-    private byte fortyLinesHeight = -1;
+    private final byte fortyLinesLevel;
+    private final byte fortyLinesHeight;
     
-    private byte noRotationLevel = -1;
+    private final byte noRotationLevel;
     
-    private byte invisibleLevel = -1;
+    private final byte invisibleLevel;
     
-    private byte vsAiLevel = -1;
-    private byte vsAiDifficulty = -1;
+    private final byte vsAiLevel;
+    private final byte vsAiDifficulty;
     
-    private byte vsHumanLevel = -1;
+    private final byte vsHumanLevel;
     
-    private String initials;
+    private final String initials;
+    
+    public Preferences() {
+        this((byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1, 
+                (byte) -1, (byte) -1, (byte) -1, (byte) -1, null);
+    }
+
+    private Preferences(
+            final byte marathonLevel, 
+            final byte constantLevelLevel, 
+            final byte garbageHeapLevel, 
+            final byte garbageHeapHeight, 
+            final byte risingGarbageLevel, 
+            final byte threeMinutesLevel, 
+            final byte fortyLinesLevel, 
+            final byte fortyLinesHeight, 
+            final byte noRotationLevel, 
+            final byte invisibleLevel, 
+            final byte vsAiLevel, 
+            final byte vsAiDifficulty, 
+            final byte vsHumanLevel, 
+            final String initials) {
+        
+        this.marathonLevel = marathonLevel;
+        this.constantLevelLevel = constantLevelLevel;
+        this.garbageHeapLevel = garbageHeapLevel;
+        this.garbageHeapHeight = garbageHeapHeight;
+        this.risingGarbageLevel = risingGarbageLevel;
+        this.threeMinutesLevel = threeMinutesLevel;
+        this.fortyLinesLevel = fortyLinesLevel;
+        this.fortyLinesHeight = fortyLinesHeight;
+        this.noRotationLevel = noRotationLevel;
+        this.invisibleLevel = invisibleLevel;
+        this.vsAiLevel = vsAiLevel;
+        this.vsAiDifficulty = vsAiDifficulty;
+        this.vsHumanLevel = vsHumanLevel;
+        this.initials = initials;
+    }
 
     public byte getMarathonLevel() {
         return marathonLevel;
     }
-
-    public void setMarathonLevel(final byte marathonLevel) {
-        this.marathonLevel = marathonLevel;
+    
+    public Preferences setMarathonLevel(final byte marathonLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
     }
 
     public byte getConstantLevelLevel() {
         return constantLevelLevel;
     }
-
-    public void setConstantLevelLevel(final byte constantLevelLevel) {
-        this.constantLevelLevel = constantLevelLevel;
-    }
+    
+    public Preferences setConstantLevelLevel(final byte constantLevelLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getGarbageHeapLevel() {
         return garbageHeapLevel;
     }
-
-    public void setGarbageHeapLevel(final byte garbageHeapLevel) {
-        this.garbageHeapLevel = garbageHeapLevel;
-    }
+    
+    public Preferences setGarbageHeapLevel(final byte garbageHeapLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getGarbageHeapHeight() {
         return garbageHeapHeight;
     }
-
-    public void setGarbageHeapHeight(final byte garbageHeapHeight) {
-        this.garbageHeapHeight = garbageHeapHeight;
-    }
+    
+    public Preferences setGarbageHeapHeight(final byte garbageHeapHeight) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getRisingGarbageLevel() {
         return risingGarbageLevel;
     }
-
-    public void setRisingGarbageLevel(final byte risingGarbageLevel) {
-        this.risingGarbageLevel = risingGarbageLevel;
-    }
+    
+    public Preferences setRisingGarbageLevel(final byte risingGarbageLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getThreeMinutesLevel() {
         return threeMinutesLevel;
     }
-
-    public void setThreeMinutesLevel(final byte threeMinutesLevel) {
-        this.threeMinutesLevel = threeMinutesLevel;
-    }
+    
+    public Preferences setThreeMinutesLevel(final byte threeMinutesLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getFortyLinesLevel() {
         return fortyLinesLevel;
     }
-
-    public void setFortyLinesLevel(final byte fortyLinesLevel) {
-        this.fortyLinesLevel = fortyLinesLevel;
-    }
+    
+    public Preferences setFortyLinesLevel(final byte fortyLinesLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getFortyLinesHeight() {
         return fortyLinesHeight;
     }
-
-    public void setFortyLinesHeight(final byte fortyLinesHeight) {
-        this.fortyLinesHeight = fortyLinesHeight;
-    }
+    
+    public Preferences setFortyLinesHeight(final byte fortyLinesHeight) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getNoRotationLevel() {
         return noRotationLevel;
     }
-
-    public void setNoRotationLevel(final byte noRotationLevel) {
-        this.noRotationLevel = noRotationLevel;
-    }
+    
+    public Preferences setNoRotationLevel(final byte noRotationLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getInvisibleLevel() {
         return invisibleLevel;
     }
-
-    public void setInvisibleLevel(final byte invisibleLevel) {
-        this.invisibleLevel = invisibleLevel;
-    }
+    
+    public Preferences setInvisibleLevel(final byte invisibleLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getVsAiLevel() {
         return vsAiLevel;
     }
-
-    public void setVsAiLevel(final byte vsAiLevel) {
-        this.vsAiLevel = vsAiLevel;
-    }
+    
+    public Preferences setVsAiLevel(final byte vsAiLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getVsAiDifficulty() {
         return vsAiDifficulty;
     }
-
-    public void setVsAiDifficulty(final byte vsAiDifficulty) {
-        this.vsAiDifficulty = vsAiDifficulty;
-    }
+    
+    public Preferences setVsAiDifficulty(final byte vsAiDifficulty) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public byte getVsHumanLevel() {
         return vsHumanLevel;
     }
-
-    public void setVsHumanLevel(final byte vsHumanLevel) {
-        this.vsHumanLevel = vsHumanLevel;
-    }
+    
+    public Preferences setVsHumanLevel(final byte vsHumanLevel) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 
     public String getInitials() {
         return initials;
     }
-
-    public void setInitials(final String initials) {
-        this.initials = initials;
-    }
+    
+    public Preferences setInitials(final String initials) {
+        return new Preferences(marathonLevel, constantLevelLevel, garbageHeapLevel, garbageHeapHeight, 
+                risingGarbageLevel, threeMinutesLevel, fortyLinesLevel, fortyLinesHeight, noRotationLevel, 
+                invisibleLevel, vsAiLevel, vsAiDifficulty, vsHumanLevel, initials);
+    }    
 }

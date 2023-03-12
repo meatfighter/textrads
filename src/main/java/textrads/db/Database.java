@@ -81,6 +81,18 @@ public class Database {
         load(OtherKeys.PREFERENCES, () -> new Preferences());
     }
     
+    public RecordList<? super Record> get(final String key, final boolean todaysBest) {
+        final RecordList<? super Record> recordList = get(key);
+        if (todaysBest) {
+            final RecordList<? super Record> updatedRecordList = recordList.removeExpired();
+            if (recordList != updatedRecordList) {
+                saveAsync(key, updatedRecordList);
+                return updatedRecordList;
+            }            
+        }
+        return recordList;
+    }
+    
     public <T extends Serializable> T get(final String key) {
         return (T) values.get(key);
     }

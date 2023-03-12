@@ -1,3 +1,22 @@
+80x24
+160x48
+
+0
+1 Congratulations! You got Today's Best 3rd Place.
+2
+3 Enter your initials:
+4
+5  X
+..
+23 X
+24 X
+ 
+Congratulations! You got the All Time Best 3rd Place.
+
+80x20
+160x40
+
+
 Main > this > this
 
 [M] Marathon

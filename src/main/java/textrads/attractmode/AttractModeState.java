@@ -1,7 +1,6 @@
 package textrads.attractmode;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import textrads.PressEnterState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +18,8 @@ import textrads.ai.Ai;
 import textrads.ai.AiSource;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
+import textrads.db.Record;
+import textrads.db.RecordList;
 
 public class AttractModeState {
     
@@ -95,11 +96,14 @@ public class AttractModeState {
         private final String title;
         private final String key;
         private final AbstractRecordFormatter formatter;
+        private final boolean todaysBest;
 
-        public RecordsDescriptor(final String title, final String key, final AbstractRecordFormatter formatter) {
+        public RecordsDescriptor(final String title, final String key, final AbstractRecordFormatter formatter,
+                final boolean todaysBest) {
             this.title = title;
             this.key = key;
             this.formatter = formatter;
+            this.todaysBest = todaysBest;
         }
 
         public String getTitle() {
@@ -112,6 +116,10 @@ public class AttractModeState {
 
         public AbstractRecordFormatter getFormatter() {
             return formatter;
+        }
+
+        public boolean isTodaysBest() {
+            return todaysBest;
         }
     }
     
@@ -160,40 +168,40 @@ public class AttractModeState {
         recordsDescriptors.clear();
         
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Marathon Records", 
-                Database.AllTimeKeys.MARATHON, recordFormatter));
+                Database.AllTimeKeys.MARATHON, recordFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Constant Level Records", 
-                Database.AllTimeKeys.CONSTANT_LEVEL, recordFormatter));
+                Database.AllTimeKeys.CONSTANT_LEVEL, recordFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Rising Garbage Records", 
-                Database.AllTimeKeys.RISING_GARBAGE, recordFormatter));
+                Database.AllTimeKeys.RISING_GARBAGE, recordFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Three Minutes Records", 
-                Database.AllTimeKeys.THREE_MINUTES, recordFormatter));
+                Database.AllTimeKeys.THREE_MINUTES, recordFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Invisible Records", 
-                Database.AllTimeKeys.INVISIBLE, recordFormatter));
+                Database.AllTimeKeys.INVISIBLE, recordFormatter, false));
         
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Garbage Heap Records", 
-                Database.AllTimeKeys.GARBAGE_HEAP, extendedRecordHeightFormatter));
+                Database.AllTimeKeys.GARBAGE_HEAP, extendedRecordHeightFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Forty Lines Records", 
-                Database.AllTimeKeys.FORTY_LINES, extendedRecordHeightFormatter));
+                Database.AllTimeKeys.FORTY_LINES, extendedRecordHeightFormatter, false));
         recordsDescriptors.add(new RecordsDescriptor("All Time Best Vs. AI Records", 
-                Database.AllTimeKeys.VS_AI, extendedRecordDifficultyFormatter));
+                Database.AllTimeKeys.VS_AI, extendedRecordDifficultyFormatter, false));
         
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Marathon Records", 
-                Database.TodaysKeys.MARATHON, recordFormatter));
+                Database.TodaysKeys.MARATHON, recordFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Constant Level Records", 
-                Database.TodaysKeys.CONSTANT_LEVEL, recordFormatter));
+                Database.TodaysKeys.CONSTANT_LEVEL, recordFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Rising Garbage Records", 
-                Database.TodaysKeys.RISING_GARBAGE, recordFormatter));
+                Database.TodaysKeys.RISING_GARBAGE, recordFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Three Minutes Records", 
-                Database.TodaysKeys.THREE_MINUTES, recordFormatter));
+                Database.TodaysKeys.THREE_MINUTES, recordFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Invisible Records", 
-                Database.TodaysKeys.INVISIBLE, recordFormatter));
+                Database.TodaysKeys.INVISIBLE, recordFormatter, true));
         
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Garbage Heap Records", 
-                Database.TodaysKeys.GARBAGE_HEAP, extendedRecordHeightFormatter));
+                Database.TodaysKeys.GARBAGE_HEAP, extendedRecordHeightFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Forty Lines Records", 
-                Database.TodaysKeys.FORTY_LINES, extendedRecordHeightFormatter));
+                Database.TodaysKeys.FORTY_LINES, extendedRecordHeightFormatter, true));
         recordsDescriptors.add(new RecordsDescriptor("Today's Best Vs. AI Records", 
-                Database.TodaysKeys.VS_AI, extendedRecordDifficultyFormatter));
+                Database.TodaysKeys.VS_AI, extendedRecordDifficultyFormatter, true));
     }
     
     private void initPsas() {
@@ -338,9 +346,9 @@ public class AttractModeState {
             recordsDescriptorsIndex = recordsDescriptors.size() - 1;
             Collections.shuffle(recordsDescriptors, random);
         }
-        final RecordsDescriptor recordsDescriptor = recordsDescriptors.get(recordsDescriptorsIndex);
-        recordsState.init(recordsDescriptor.getTitle(), database.get(recordsDescriptor.getKey()), 
-                recordsDescriptor.getFormatter());
+        final RecordsDescriptor recordsDescriptor = recordsDescriptors.get(recordsDescriptorsIndex);        
+        recordsState.init(recordsDescriptor.getTitle(), database.get(recordsDescriptor.getKey(), 
+                recordsDescriptor.isTodaysBest()), recordsDescriptor.getFormatter());
     }
     
     private void choosePsa() {
