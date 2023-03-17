@@ -1,3 +1,23 @@
+           Key Mapping
+
+Shift Left              : arrow_left
+Shift Right             : arrow_right
+Soft Drop               : arrow_down
+Rotate Counterclockwise : z
+Rotate Clockwise        : x
+Pause                   : enter
+
+       [S] Set    [R] Reset
+
+    [Esc] Back  [Ctrl+C] Exit
+
+
+
+
+
+
+
+
 80x24
 160x48
 

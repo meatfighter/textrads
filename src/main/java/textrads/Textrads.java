@@ -36,7 +36,7 @@ public class Textrads {
     public static final long NANOS_PER_FRAME = Math.round(1.0E9 / FRAMES_PER_SECOND);
     private static final long MIN_SLEEP_NANOS = TimeUnit.MICROSECONDS.toNanos(MIN_SLEEP_MICROS);
     
-    private final GameRenderer playRenderer = new GameRenderer();
+    private final GameRenderer gameRenderer = new GameRenderer();
     private final InputEventList eventList = new InputEventList();
     
     private final AttractModeState attractModeState = new AttractModeState();
@@ -159,12 +159,12 @@ public class Textrads {
 //        client.update();
 //        server.update();
 //        
-//        final GameState state = GameStateSource.getState();
-//        InputEventSource.poll(eventList);
-//        for (int i = 0; i < eventList.size(); ++i) {
-//            state.handleInputEvent(eventList.get(i), 0);
-//        }
-//        state.update();
+        final GameState state = GameStateSource.getState();
+        InputEventSource.poll(eventList);
+        for (int i = 0; i < eventList.size(); ++i) {
+            state.handleInputEvent(eventList.get(i), 0);
+        }
+        state.update();
 
 // --------------------
 
@@ -244,18 +244,10 @@ public class Textrads {
 //        question.update();
 
 //        congratsScreenState.update();
-
-        while (true) {
-            final KeyStroke keyStroke = InputSource.poll();
-            if (keyStroke == null) {
-                break;
-            }
-            System.out.println(keyStroke);
-        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        playRenderer.render(g, size, GameStateSource.getState());
+        gameRenderer.render(g, size, GameStateSource.getState(), null);
 
 
 //        recordsRender.render(g, size, recordsState);
