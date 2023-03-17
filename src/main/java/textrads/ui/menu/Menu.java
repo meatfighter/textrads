@@ -7,22 +7,39 @@ import textrads.InputSource;
 public class Menu {
     
     public static final int COLUMN_SPACER = 6;
+
+    public static final int DEFAULT_TITLE_MARGIN = 3;
+    public static final int DEFAULT_BACK_EXIT_MARGIN = 5;
     
-    private static final int SELECTION_FRAMES = 3;
+    public static final int SELECTION_FRAMES = 3;
     
     private final List<MenuColumn> menuColumns;
     private final int width;
     private final int height;
     private final String title;
+    private final int titleMargin;
+    private final int backExitMargin;
     
     private final BackExitState backExitState = new BackExitState();
     
     private KeyStroke selection;
     private int selectionTimer;
     
-    public Menu(final String title, final List<MenuColumn> menuColumns) {
+    public Menu(final List<MenuColumn> menuColumns, final String title) {
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN);
+    }
+    
+    public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin) {
+        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN);
+    }
+    
+    public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
+            final int backExitMargin) {
+        
         this.menuColumns = menuColumns;
         this.title = title;
+        this.titleMargin = titleMargin;
+        this.backExitMargin = backExitMargin;
         
         int w = 0;
         int h = 0;
@@ -34,10 +51,9 @@ public class Menu {
             w += menuColumn.getWidth();
             h = Math.max(h, menuColumn.getHeight());
         }
-        h += 8;
         
         width = w;
-        height = h;
+        height = h + titleMargin + backExitMargin;
     }
     
     public void reset() {
@@ -102,6 +118,14 @@ public class Menu {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getTitleMargin() {
+        return titleMargin;
+    }
+
+    public int getBackExitMargin() {
+        return backExitMargin;
     }
 
     public String getTitle() {

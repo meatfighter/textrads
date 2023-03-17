@@ -6,5 +6,5 @@ public enum InputType {
     SOFT_DROP,
     ROTATE_CCW,
     ROTATE_CW,
-    PAUSE,
+    PAUSE;
 }

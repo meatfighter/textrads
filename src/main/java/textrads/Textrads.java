@@ -1,6 +1,6 @@
 package textrads;
 
-import textrads.db.KeyMap;
+import textrads.keymap.KeyMap;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -14,6 +14,10 @@ import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
+import textrads.keymap.KeyMapModeRenderer;
+import textrads.keymap.KeyMapModeState;
+import textrads.keymap.KeyMapScreenRenderer;
+import textrads.keymap.KeyMapScreenState;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.MenuRenderer;
@@ -55,6 +59,9 @@ public class Textrads {
     private final CongratsScreenState congratsScreenState = new CongratsScreenState();
     private final CongratsScreenRenderer congratsScreenRenderer = new CongratsScreenRenderer();
     
+    private final KeyMapModeState keyMapModeState = new KeyMapModeState();
+    private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
+    
     public void launch() throws Exception {
         
         InputEventSource.setKeyMap(new KeyMap()); // TODO LOAD INPUT MAP
@@ -80,6 +87,7 @@ public class Textrads {
             question.init("10");
             congratsScreenState.init("Congratulations! You got Today's Best 3rd Place.", Images.SMALL_GIRAFFE, 
                     Images.BIG_GIRAFFE, null);
+            keyMapModeState.reset(); // TODO
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -152,19 +160,19 @@ public class Textrads {
         menuColumns.add(new MenuColumn(menuItems1));
         menuColumns.add(new MenuColumn(menuItems2));
 
-        return new Menu("Main", menuColumns);
+        return new Menu(menuColumns, "Main");
     }
     
     private void update() {
 //        client.update();
 //        server.update();
 //        
-        final GameState state = GameStateSource.getState();
-        InputEventSource.poll(eventList);
-        for (int i = 0; i < eventList.size(); ++i) {
-            state.handleInputEvent(eventList.get(i), 0);
-        }
-        state.update();
+//        final GameState state = GameStateSource.getState();
+//        InputEventSource.poll(eventList);
+//        for (int i = 0; i < eventList.size(); ++i) {
+//            state.handleInputEvent(eventList.get(i), 0);
+//        }
+//        state.update();
 
 // --------------------
 
@@ -244,10 +252,12 @@ public class Textrads {
 //        question.update();
 
 //        congratsScreenState.update();
+
+        keyMapModeState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        gameRenderer.render(g, size, GameStateSource.getState(), null);
+//        gameRenderer.render(g, size, GameStateSource.getState(), null);
 
 
 //        recordsRender.render(g, size, recordsState);
@@ -259,6 +269,8 @@ public class Textrads {
 //        questionRenderer.render(g, size, question);
 
 //        congratsScreenRenderer.render(g, size, congratsScreenState);
+
+        keyMapModeRenderer.render(g, size, keyMapModeState);
     }
     
     public static void main(final String... args) throws Exception {

@@ -22,6 +22,7 @@ public class MenuRenderer {
         
         final int ox = (size.getColumns() - menu.getWidth()) / 2;
         final int oy = (size.getRows() - menu.getHeight()) / 2;
+        final int menuY = oy + menu.getTitleMargin();
         
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, TITLE_COLOR);
         GraphicsUtil.centerString(g, size, oy, menu.getTitle());
@@ -31,7 +32,7 @@ public class MenuRenderer {
             final MenuColumn menuColumn = menuColumns.get(i);
             final List<MenuItem> menuItems = menuColumn.getMenuItems();
             for (int j = menuItems.size() - 1; j >= 0; --j) {
-                menuItemRenderer.render(g, size, menuItems.get(j), x, oy + 3 + 2 * j);
+                menuItemRenderer.render(g, size, menuItems.get(j), x, menuY + 2 * j);
             }
             x += Menu.COLUMN_SPACER + menuColumn.getWidth();
         }

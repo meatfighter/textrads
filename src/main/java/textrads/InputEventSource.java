@@ -1,6 +1,6 @@
 package textrads;
 
-import textrads.db.KeyMap;
+import textrads.keymap.KeyMap;
 import com.googlecode.lanterna.input.KeyStroke;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,6 @@
 package textrads.db;
 
+import textrads.keymap.KeyMap;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
