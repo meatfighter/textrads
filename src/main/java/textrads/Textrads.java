@@ -1,7 +1,9 @@
 package textrads;
 
+import textrads.db.KeyMap;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -55,7 +57,7 @@ public class Textrads {
     
     public void launch() throws Exception {
         
-        InputEventSource.setInputMap(new InputMap()); // TODO LOAD INPUT MAP
+        InputEventSource.setKeyMap(new KeyMap()); // TODO LOAD INPUT MAP
 
         final long seed = ThreadLocalRandom.current().nextLong();
         GameStateSource.getState().init(GameState.Mode.VS_AI, seed, 10, 0, 0, true, 0, 0);     
@@ -241,7 +243,15 @@ public class Textrads {
 
 //        question.update();
 
-        congratsScreenState.update();
+//        congratsScreenState.update();
+
+        while (true) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            }
+            System.out.println(keyStroke);
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -256,7 +266,7 @@ public class Textrads {
 
 //        questionRenderer.render(g, size, question);
 
-        congratsScreenRenderer.render(g, size, congratsScreenState);
+//        congratsScreenRenderer.render(g, size, congratsScreenState);
     }
     
     public static void main(final String... args) throws Exception {

@@ -19,11 +19,8 @@ public interface InputEvent {
     byte SOFT_DROP_PRESSED = 9;
     byte SOFT_DROP_REPEATED = 10;
     
-    byte START_PAUSE_PRESSED = 11;
-    byte START_PAUSE_REPEATED = 12;
-    
-    byte QUIT_PRESSED = 13;
-    byte QUIT_REPEATED = 14;
+    byte PAUSE_PRESSED = 11;
+    byte PAUSE_REPEATED = 12;
     
     static String toString(final byte value) {
         switch (value) {
@@ -49,14 +46,10 @@ public interface InputEvent {
                 return "SOFT_DROP_PRESSED";
             case SOFT_DROP_REPEATED:
                 return "SOFT_DROP_REPEATED";
-            case START_PAUSE_PRESSED:
+            case PAUSE_PRESSED:
                 return "START_PAUSE_PRESSED";
-            case START_PAUSE_REPEATED:
+            case PAUSE_REPEATED:
                 return "START_PAUSE_REPEATED";
-            case QUIT_PRESSED:
-                return "QUIT_PRESSED";
-            case QUIT_REPEATED:
-                return "QUIT_REPEATED";
             default:
                 throw new IllegalArgumentException("Invalid value: " + value);
         }
@@ -80,10 +73,8 @@ public interface InputEvent {
                     return SHIFT_RIGHT_REPEATED;
                 case SOFT_DROP:
                     return SOFT_DROP_REPEATED;
-                case START_PAUSE:
-                    return START_PAUSE_REPEATED;
-                case QUIT:
-                    return QUIT_REPEATED;
+                case PAUSE:
+                    return PAUSE_REPEATED;
                 default:
                     return NOTHING_PRESSED;
             }
@@ -100,10 +91,8 @@ public interface InputEvent {
                 return SHIFT_RIGHT_PRESSED;
             case SOFT_DROP:
                 return SOFT_DROP_PRESSED;
-            case START_PAUSE:
-                return START_PAUSE_PRESSED;
-            case QUIT:
-                return QUIT_PRESSED;    
+            case PAUSE:
+                return PAUSE_PRESSED;   
             default:
                 return NOTHING_PRESSED;
         }

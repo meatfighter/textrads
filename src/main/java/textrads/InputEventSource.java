@@ -1,10 +1,9 @@
 package textrads;
 
+import textrads.db.KeyMap;
 import com.googlecode.lanterna.input.KeyStroke;
 import java.util.HashMap;
 import java.util.Map;
-
-// TODO THIS PROBABLY DOESN'T HAVE TO BE SYNCHRONIZED
 
 public final class InputEventSource {
 
@@ -14,7 +13,7 @@ public final class InputEventSource {
     
     private static final Map<InputType, Long> lastPressedTimes = new HashMap<>(); 
     
-    private static InputMap inputMap;
+    private static KeyMap keyMap;
     
     private static long updates;
     
@@ -24,8 +23,8 @@ public final class InputEventSource {
         }
     }
     
-    public static synchronized void setInputMap(final InputMap inputMap) {
-        InputEventSource.inputMap = inputMap;        
+    public static synchronized void setKeyMap(final KeyMap inputMap) {
+        InputEventSource.keyMap = inputMap;        
     }
     
     public static synchronized void poll(final InputEventList events) {
@@ -35,7 +34,7 @@ public final class InputEventSource {
             if (keyStroke == null) {
                 break;
             }
-            final InputType inputType = inputMap.get(keyStroke);
+            final InputType inputType = keyMap.get(keyStroke);
             if (inputType == null) {
                 continue;
             }
