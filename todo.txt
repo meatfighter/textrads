@@ -1,8 +1,43 @@
 Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
 
-           Game Over
 
-[Enter] Continue  [Ctrl+C] Exit
+
+
+               Game Over
+
+
+
+
+
+    [Enter] Continue  [Ctrl+C] Exit
+
+XXXX|XX
+0123456789012345678901234567890123456789
+
+XX+--------------+XX
+XX|              |XX
+XX|   Game Over  |XX
+XX|              |XX
+XX|              |XX
+XX|  [Enter] ->  |XX
+XX|              |XX
+XX| [Ctrl+C]  X  |XX  
+XX|              |XX
+XX+--------------+XX
+01234567890123456789
+
+
+
+XXXXXXXX+----------------------+XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|      Game Over       |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|   [Enter] Continue   |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX+----------------------+XXXXXXXX
 0123456789012345678901234567890123456789
 
 
