@@ -11,9 +11,8 @@ public class CongratsScreenRenderer {
     
     private static final TextColor BACKGROUND_COLOR = Colors.BLACK;
     private static final TextColor TITLE_COLOR = Colors.WHITE;
-    private static final TextColor INITIALS_COLOR = Colors.GOLD;
     
-    private final TextFieldRenderer textFieldRenderer = new TextFieldRenderer(INITIALS_COLOR);
+    private final TextFieldRenderer textFieldRenderer = new TextFieldRenderer();
     
     public void render(final TextGraphics g, final TerminalSize size, final CongratsScreenState state) {
         

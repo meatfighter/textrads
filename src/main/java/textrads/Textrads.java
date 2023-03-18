@@ -1,6 +1,5 @@
 package textrads;
 
-import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -38,7 +37,9 @@ public class Textrads {
     public static enum State {
         ATTRACT,
         MAIN_MENU,
-        GAME_CONFIG,
+        LEVEL_CONFIG,
+        HEIGHT_CONFIG,
+        DIFFICULTY_CONFIG,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -60,7 +61,9 @@ public class Textrads {
     private State state = State.ATTRACT;
     
     private byte gameMode;
-    private int gameConfigIndex;
+    private byte level;
+    private byte height;
+    private byte difficulty;
         
     public void launch() throws Exception {
         
@@ -155,8 +158,14 @@ public class Textrads {
             case MAIN_MENU:
                 updateMainMenu();
                 break;
-            case GAME_CONFIG:
-                updateGameConfig();
+            case LEVEL_CONFIG:
+                updateLevelConfig();
+                break;
+            case HEIGHT_CONFIG:
+                updateHeightConfig();
+                break;
+            case DIFFICULTY_CONFIG:
+                updateDifficultyConfig();
                 break;
         }
     }
@@ -169,8 +178,14 @@ public class Textrads {
             case MAIN_MENU:
                 renderMainMenu(g, size);
                 break;
-            case GAME_CONFIG:
-                renderGameConfig(g, size);
+            case LEVEL_CONFIG:
+                renderLevelConfig(g, size);
+                break;
+            case HEIGHT_CONFIG:
+                renderHeightConfig(g, size);
+                break;
+            case DIFFICULTY_CONFIG:
+                renderDifficultyConfig(g, size);
                 break;
         }
     }
@@ -235,35 +250,113 @@ public class Textrads {
                         gameMode = GameState.Mode.VS_HUMAN;
                         break;
                 }
-                state = State.GAME_CONFIG;
-                gameConfigIndex = 0;
-                final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-                final byte level = preferences.getLevel(gameMode);                
-                levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
+                gotoLevelConfig();
                 break;
             }
         }
     }
     
+    private void gotoLevelConfig() {
+        state = State.LEVEL_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        level = preferences.getLevel(gameMode);                
+        levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
+    }
+    
+    private void gotoHeightConfig() {
+        state = State.HEIGHT_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        height = preferences.getChallenge(gameMode);                
+        heightQuestion.init(GameState.Mode.toString(gameMode), (height >= 0) ? Integer.toString(height) : "");
+    }
+    
+    private void gotoDifficultyConfig() {
+        state = State.HEIGHT_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        difficulty = preferences.getChallenge(gameMode);                
+        difficultyQuestion.init(GameState.Mode.toString(gameMode), 
+                (difficulty >= 0) ? Integer.toString(difficulty) : "");
+    }    
+    
     private void renderMainMenu(final TextGraphics g, final TerminalSize size) {
         menuRenderer.render(g, size, mainMenu);
     }
     
-    private void updateGameConfig() {
-        switch (gameConfigIndex) {
-            case 0:
-                levelQuestion.update();
-                break;
+    private void updateLevelConfig() {
+        levelQuestion.update();
+        
+        if (levelQuestion.isEscPressed()) {
+            state = State.MAIN_MENU;
+            mainMenu.reset();
+            return;
         }
+            
+        if (!levelQuestion.isEnterPressed()) {
+            return;
+        }
+        
+        level = Byte.parseByte(levelQuestion.getValue());
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setLevel(gameMode, level));
+        
+        switch (gameMode) {
+            case GameState.Mode.GARBAGE_HEAP:
+            case GameState.Mode.FORTY_LINES:
+                gotoHeightConfig();
+                break;
+            case GameState.Mode.VS_AI:
+                gotoDifficultyConfig();
+                break;
+            default:
+                break;
+        }                
     }
     
-    private void renderGameConfig(final TextGraphics g, final TerminalSize size) {
-        switch (gameConfigIndex) {
-            case 0:
-                questionRenderer.render(g, size, levelQuestion);
-                break;
-        }
+    private void renderLevelConfig(final TextGraphics g, final TerminalSize size) {
+        questionRenderer.render(g, size, levelQuestion);
     }
+    
+    private void updateHeightConfig() {
+        heightQuestion.update();
+        
+        if (heightQuestion.isEscPressed()) {
+            gotoLevelConfig();
+            return;
+        }
+        
+        if (!heightQuestion.isEnterPressed()) {
+            return;
+        }  
+        
+        height = Byte.parseByte(heightQuestion.getValue());
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, height));        
+    }
+    
+    private void renderHeightConfig(final TextGraphics g, final TerminalSize size) {
+        questionRenderer.render(g, size, heightQuestion);
+    }
+    
+    private void updateDifficultyConfig() {
+        difficultyQuestion.update();
+        
+        if (difficultyQuestion.isEscPressed()) {
+            gotoLevelConfig();
+            return;
+        }
+        
+        if (!difficultyQuestion.isEnterPressed()) {
+            return;
+        }
+        
+        difficulty = Byte.parseByte(difficultyQuestion.getValue());
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, difficulty));
+    }
+    
+    private void renderDifficultyConfig(final TextGraphics g, final TerminalSize size) {
+        questionRenderer.render(g, size, difficultyQuestion);
+    }    
     
     public static void main(final String... args) throws Exception {
         new Textrads().launch();
