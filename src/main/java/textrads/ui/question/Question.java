@@ -9,24 +9,22 @@ public class Question {
     private static final int HEIGHT = 9;
     
     private static final int ESC_FRAMES = 3;
-    
-    private final String title;
+        
     private final TextField textField;
-    private final int width;    
-    
     private final BackExitState backExitState = new BackExitState();
     
+    private String title;
+    private int width;    
     private boolean escPressed;
     private int escTimer;
     
-    public Question(final String title, final TextField textField) {
-        this.title = title;
+    public Question(final TextField textField) {
         this.textField = textField;
-        
-        width = Math.max(title.length(), textField.getWidth());
     }
     
-    public void init(final String initialValue) {
+    public void init(final String title, final String initialValue) {
+        this.title = title;
+        width = Math.max(title.length(), textField.getWidth());
         textField.init(initialValue);
         escPressed = false;
         escTimer = ESC_FRAMES;

@@ -1,6 +1,6 @@
 package textrads;
 
-import textrads.keymap.KeyMap;
+import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -9,21 +9,16 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import textrads.ai.Ai;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
-import textrads.keymap.KeyMapModeRenderer;
-import textrads.keymap.KeyMapModeState;
-import textrads.keymap.KeyMapScreenRenderer;
-import textrads.keymap.KeyMapScreenState;
+import textrads.db.Database;
+import textrads.db.DatabaseSource;
+import textrads.db.Preferences;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
-import textrads.ui.menu.MenuRenderer;
 import textrads.ui.menu.Menu;
-import textrads.ui.question.CongratsScreenRenderer;
-import textrads.ui.question.CongratsScreenState;
+import textrads.ui.menu.MenuRenderer;
 import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.QuestionRenderer;
@@ -40,42 +35,37 @@ public class Textrads {
     public static final long NANOS_PER_FRAME = Math.round(1.0E9 / FRAMES_PER_SECOND);
     private static final long MIN_SLEEP_NANOS = TimeUnit.MICROSECONDS.toNanos(MIN_SLEEP_MICROS);
     
-    private final GameRenderer gameRenderer = new GameRenderer();
-    private final InputEventList eventList = new InputEventList();
+    public static enum State {
+        ATTRACT,
+        MAIN_MENU,
+        GAME_CONFIG,
+    }
+    
+    private final Database database = DatabaseSource.getDatabase();
     
     private final AttractModeState attractModeState = new AttractModeState();
     private final AttractModeRenderer attractModeRenderer = new AttractModeRenderer();
-        
-    private final Ai ai = new Ai();
-    private float moveTimer;
-    private final List<Byte> moves = new ArrayList<>(1024);
     
-    private final Menu menu = createMenu();
+    private final Menu mainMenu = createMainMenu();
     private final MenuRenderer menuRenderer = new MenuRenderer();
     
-    private final Question question = createQuestion();
+    private final Question levelQuestion = new Question(new TextField("Level (0\u2500\u250029)?", 
+            new NumberValidator(0, 29)));
+    private final Question difficultyQuestion = new Question(new TextField("Difficulty (0\u2500\u250029)?", 
+            new NumberValidator(0, 29))); 
+    private final Question heightQuestion = new Question(new TextField("Height (1\u2500\u250012)?", 
+            new NumberValidator(1, 12)));
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
     
-    private final CongratsScreenState congratsScreenState = new CongratsScreenState();
-    private final CongratsScreenRenderer congratsScreenRenderer = new CongratsScreenRenderer();
+    private State state = State.ATTRACT;
     
-    private final KeyMapModeState keyMapModeState = new KeyMapModeState();
-    private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
-    
+    private byte gameMode;
+    private int gameConfigIndex;
+        
     public void launch() throws Exception {
         
-        InputEventSource.setKeyMap(new KeyMap()); // TODO LOAD INPUT MAP
+        InputEventSource.setKeyMap(database.get(Database.OtherKeys.KEY_MAP));
 
-        final long seed = ThreadLocalRandom.current().nextLong();
-        GameStateSource.getState().init(GameState.Mode.VS_AI, seed, 10, 0, 0, true, 0, 0);     
-        
-        ai.init(GameStateSource.getState().getMode(), seed, 
-                (short) GameStateSource.getState().getStates()[1].getLevel(), 
-                0, 
-                GameStateSource.getState().getStates()[1].getFloorHeight(), 
-                15,
-                false); // TODO
-        
         try (final Terminal terminal = TerminalUtil.createTerminal();
                 final Screen screen = new TerminalScreen(terminal)) {
             
@@ -84,10 +74,8 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
-            question.init("10");
-            congratsScreenState.init("Congratulations! You got Today's Best 3rd Place.", Images.SMALL_GIRAFFE, 
-                    Images.BIG_GIRAFFE, null);
-            keyMapModeState.reset(); // TODO
+
+            
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -129,11 +117,7 @@ public class Textrads {
         System.exit(0);
     }
     
-    private static Question createQuestion() { // TODO TESTING
-        return new Question("Marathon", new TextField("Level (0--29)?", new NumberValidator(0, 29)));
-    }
-    
-    private static Menu createMenu() { // TODO TESTING                
+    private Menu createMainMenu() {
         final List<MenuItem> menuItems0 = new ArrayList<>();
         menuItems0.add(new MenuItem("Marathon"));
         menuItems0.add(new MenuItem("Constant Level"));
@@ -164,113 +148,121 @@ public class Textrads {
     }
     
     private void update() {
-//        client.update();
-//        server.update();
-//        
-//        final GameState state = GameStateSource.getState();
-//        InputEventSource.poll(eventList);
-//        for (int i = 0; i < eventList.size(); ++i) {
-//            state.handleInputEvent(eventList.get(i), 0);
-//        }
-//        state.update();
-
-// --------------------
-
-//        {
-//            final GameState state = GameStateSource.getState();
-//            InputEventSource.poll(eventList);
-//            for (int i = 0; i < eventList.size(); ++i) {  
-//                state.handleInputEvent(eventList.get(i), 0);
-//            }
-//        }
-//
-//        {
-//            final MonoGameState state = GameStateSource.getState().getStates()[1];
-//            final float framesPerMove = Ai.getFramesPerMove(15);
-//            
-//            if (state.isJustSpawned()) { 
-//                moveTimer = framesPerMove;
-//                ai.getMoves(moves, state.getLastAttackRows());
-//            } 
-//                        
-//            --moveTimer;            
-//            while (moveTimer <= 0) {
-//                moveTimer += framesPerMove;
-//                if (moves.isEmpty()) {
-//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-//                } else {                    
-//                    state.handleInputEvent(moves.remove(0));
-//                }
-//            }                
-//        }
-//                
-//        GameStateSource.getState().update();
-
-// --------------------
-
-//        InputEventSource.clear();
-//        titleScreenState.update();
-//        recordsState.update();
-
-// --------------------
-
-//        {
-//            final GameState state = GameStateSource.getState();
-//            InputEventSource.poll(eventList);
-//            for (int i = 0; i < eventList.size(); ++i) {
-//                state.handleInputEvent(eventList.get(i), 0);
-//            }
-//        }
-//
-//        {
-//            final MonoGameState state = GameStateSource.getState().getStates()[0];
-//            
-//            if (state.isJustSpawned()) { 
-//                moveTimer = state.getFramesPerGravityDrop() / 2;
-//                ai.getMoves(moves, state.getLastAttackRows());
-//            } 
-//                        
-//            --moveTimer;            
-//            while (moveTimer <= 0) {
-//                moveTimer += state.getFramesPerGravityDrop() / 2;
-//                if (moves.isEmpty()) {
-//                    state.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
-//                } else {                    
-//                    state.handleInputEvent(moves.remove(0));
-//                }
-//            }                
-//        }
-//                
-//        GameStateSource.getState().update();
-
-// ----------------
-
-//      attractModeState.update();
-
-//        menu.update();
-
-//        question.update();
-
-//        congratsScreenState.update();
-
-        keyMapModeState.update();
+        switch (state) {
+            case ATTRACT:
+                updateAttractMode();
+                break;
+            case MAIN_MENU:
+                updateMainMenu();
+                break;
+            case GAME_CONFIG:
+                updateGameConfig();
+                break;
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        gameRenderer.render(g, size, GameStateSource.getState(), null);
-
-
-//        recordsRender.render(g, size, recordsState);
-
-//        attractModeRenderer.render(g, size, attractModeState);
-
-//        menuRenderer.render(g, size, menu);
-
-//        questionRenderer.render(g, size, question);
-
-//        congratsScreenRenderer.render(g, size, congratsScreenState);
-
-        keyMapModeRenderer.render(g, size, keyMapModeState);
+        switch (state) {
+            case ATTRACT:
+                renderAttractMode(g, size);
+                break;
+            case MAIN_MENU:
+                renderMainMenu(g, size);
+                break;
+            case GAME_CONFIG:
+                renderGameConfig(g, size);
+                break;
+        }
+    }
+    
+    private void updateAttractMode() {
+        attractModeState.update();
+        if (attractModeState.isEnterPressed()) {
+            state = State.MAIN_MENU;
+            mainMenu.reset();
+        }
+    }
+    
+    private void renderAttractMode(final TextGraphics g, final TerminalSize size) {
+        attractModeRenderer.render(g, size, attractModeState);
+    }
+    
+    private void updateMainMenu() {
+        mainMenu.update();
+        final KeyStroke selection = mainMenu.getSelection();
+        if (selection == null) {
+            return;
+        }
+        switch (selection.getKeyType()) {
+            case Escape:
+                state = State.ATTRACT;
+                attractModeState.reset();
+                break;
+            case Character: {
+                final Character c = selection.getCharacter();
+                if (c == null) {
+                    break;
+                }
+                switch (Character.toUpperCase(c)) {
+                    case 'M':
+                        gameMode = GameState.Mode.MARATHON;
+                        break;
+                    case 'C':
+                        gameMode = GameState.Mode.CONSTANT_LEVEL;
+                        break;
+                    case 'G':
+                        gameMode = GameState.Mode.GARBAGE_HEAP;
+                        break;
+                    case 'R':
+                        gameMode = GameState.Mode.RISING_GARBAGE;
+                        break;
+                    case 'T':
+                        gameMode = GameState.Mode.THREE_MINUTES;
+                        break;
+                    case 'F':
+                        gameMode = GameState.Mode.FORTY_LINES;
+                        break;
+                    case 'N':
+                        gameMode = GameState.Mode.NO_ROTATION;
+                        break;
+                    case 'I':
+                        gameMode = GameState.Mode.INVISIBLE;
+                        break;
+                    case 'A':
+                        gameMode = GameState.Mode.VS_AI;
+                        break;
+                    case 'H':
+                        gameMode = GameState.Mode.VS_HUMAN;
+                        break;
+                }
+                state = State.GAME_CONFIG;
+                gameConfigIndex = 0;
+                final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+                final byte level = preferences.getLevel(gameMode);                
+                levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
+                break;
+            }
+        }
+    }
+    
+    private void renderMainMenu(final TextGraphics g, final TerminalSize size) {
+        menuRenderer.render(g, size, mainMenu);
+    }
+    
+    private void updateGameConfig() {
+        switch (gameConfigIndex) {
+            case 0:
+                levelQuestion.update();
+                break;
+        }
+    }
+    
+    private void renderGameConfig(final TextGraphics g, final TerminalSize size) {
+        switch (gameConfigIndex) {
+            case 0:
+                questionRenderer.render(g, size, levelQuestion);
+                break;
+        }
     }
     
     public static void main(final String... args) throws Exception {

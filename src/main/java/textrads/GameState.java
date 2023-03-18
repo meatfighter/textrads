@@ -21,7 +21,34 @@ public class GameState implements Serializable {
         byte NO_ROTATION = 6;
         byte INVISIBLE = 7;
         byte VS_AI = 8;
-        byte VS_HUMAN = 9;    
+        byte VS_HUMAN = 9;
+        
+        static String toString(final byte mode) {
+            switch (mode) {
+                case MARATHON:
+                    return "Marathon";
+                case CONSTANT_LEVEL:
+                    return "Constant Level";
+                case GARBAGE_HEAP:
+                    return "Garbage Heap";
+                case RISING_GARBAGE:
+                    return "Rising Garbage";
+                case THREE_MINUTES:
+                    return "Three Minutes";
+                case FORTY_LINES:
+                    return "Forty Lines";
+                case NO_ROTATION:
+                    return "No Rotation";
+                case INVISIBLE:
+                    return "Invisible";
+                case VS_AI:
+                    return "Vs. AI";
+                case VS_HUMAN:
+                    return "Vs. Human";
+                default:
+                    return null;
+            }
+        }
     }
 
     private static final int MIN_OBJECT_SIZE = 64 * 1024;
