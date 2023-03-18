@@ -1,17 +1,35 @@
-           Key Mapping
+Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
 
-Shift Left              : arrow_left
-Shift Right             : arrow_right
-Soft Drop               : arrow_down
-Rotate Counterclockwise : z
-Rotate Clockwise        : x
-Pause                   : enter
+           Game Over
 
-       [S] Set    [R] Reset
-
-    [Esc] Back  [Ctrl+C] Exit
+[Enter] Continue  [Ctrl+C] Exit
+0123456789012345678901234567890123456789
 
 
+
+Three Minutes:
+
+     Game Over / Time Up
+
+[Enter] Continue  [Ctrl+C] Exit
+
+
+
+Garbage Heap / Forty Lines:
+
+    Game Over / Success!
+
+[Enter] Continue  [Ctrl+C] Exit
+
+
+
+Vs. AI / Vs. Human
+
+   You Win! / You Lose
+
+[Enter] Continue  
+[Esc] Give Up
+[Ctrl+C] Exit
 
 
 
