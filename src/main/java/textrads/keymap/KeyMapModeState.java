@@ -1,6 +1,8 @@
 package textrads.keymap;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import textrads.InputEventSource;
+import textrads.InputSource;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.ui.menu.Menu;
@@ -17,12 +19,17 @@ public class KeyMapModeState {
     private final PressKeyScreenState pressKeyScreenState = new PressKeyScreenState();
     
     private State state;
-    private boolean escPressed;
+    private Key[] keys;
+    private int keyIndex;
+    private boolean escPressed;    
     
     public void reset() {
         state = State.KEY_MAP_SCREEN;
+        keys = null;
+        keyIndex = 0;
         escPressed = false;
         keyMapScreenState.init(database.get(Database.OtherKeys.KEY_MAP));
+        InputSource.clear();
     }
     
     public void update() {
@@ -57,10 +64,10 @@ public class KeyMapModeState {
                 }
                 switch (Character.toUpperCase(c)) {
                     case 'S':
-                        setKeyMap();
+                        handleSet();
                         break;
                     case 'R':
-                        resetKeyMap();
+                        handleReset();
                         break;
                 }
                 break;
@@ -68,20 +75,40 @@ public class KeyMapModeState {
         }
     }
     
-    private void setKeyMap() {
-        keyMapScreenState.getMenu().reset();
-        state = State.PRESS_KEY_SCREEN;        
-        pressKeyScreenState.init(KeyMapScreenState.KEYS[0]); // TODO
+    private void handleSet() {        
+        state = State.PRESS_KEY_SCREEN;
+        keyIndex = 0;
+        keys = new Key[KeyMap.DEFAULT_KEYS.length];
+        pressKeyScreenState.init(0);
     }
     
-    private void resetKeyMap() {
+    private void handleReset() {
         final KeyMap keyMap = new KeyMap();
+        InputEventSource.setKeyMap(keyMap);
         keyMapScreenState.init(keyMap);
         database.saveAsync(Database.OtherKeys.KEY_MAP, keyMap);
     }
     
     private void updatePressKeyScreen() {
-        pressKeyScreenState.update(); // TODO
+        pressKeyScreenState.update();
+        final KeyStroke keyStroke = pressKeyScreenState.getSelection();
+        if (keyStroke != null) {
+            keys[keyIndex++] = new Key(keyStroke);
+            if (keyIndex == keys.length) {
+                final KeyMap keyMap = new KeyMap(keys);
+                InputEventSource.setKeyMap(keyMap);
+                keyMapScreenState.init(keyMap);
+                database.saveAsync(Database.OtherKeys.KEY_MAP, keyMap);
+                                
+                state = State.KEY_MAP_SCREEN;                
+                keys = null;
+                keyIndex = 0;
+                escPressed = false;
+                keyMapScreenState.getMenu().reset();                
+            } else {
+                pressKeyScreenState.init(keyIndex);
+            }
+        }
     }
 
     public State getState() {

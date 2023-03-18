@@ -8,17 +8,28 @@ import textrads.ui.menu.MenuItem;
 
 public class KeyMapScreenState {
     
-    public static final String[] KEYS = {
+    public static final String[] ACTIONS = {
         "Shift Left",
         "Shift Right",
         "Soft Drop",
         "Rotate Counterclockwise",
         "Rotate Clockwise",
         "Pause",
+        "Give Up",
     };
+    
+    public static final int MAX_ACTION_LENGTH;
+    
+    static {
+        int length = 0;
+        for (final String action : ACTIONS) {
+            length = Math.max(length, action.length());
+        }
+        MAX_ACTION_LENGTH = length;
+    }
 
     private final Menu menu;
-    private final String[] values = new String[KEYS.length];
+    private final String[] keys = new String[ACTIONS.length];
     
     private int width;
     
@@ -36,22 +47,22 @@ public class KeyMapScreenState {
         menuColumns.add(setMenuColumn);
         menuColumns.add(resetMenuColumn);
         
-        menu = new Menu(menuColumns, "Key Mapping", 9, 3);
+        menu = new Menu(menuColumns, "Key Mapping", 10, 3);
     }
     
     public void init(final KeyMap keyMap) {
-        final KeyDescription[] keyDescriptions = keyMap.getKeyDescriptions();
+        final Key[] keyDescriptions = keyMap.getKeys();
         width = 0;
-        for (int i = KEYS.length - 1; i >= 0; --i) {
-            values[i] = keyDescriptions[i].toString();
-            width = Math.max(width, values[i].length());
+        for (int i = ACTIONS.length - 1; i >= 0; --i) {
+            keys[i] = keyDescriptions[i].toString();
+            width = Math.max(width, keys[i].length());
         }
-        width += 3 + KEYS[3].length();
+        width += 3 + MAX_ACTION_LENGTH;
         menu.reset();
     }
 
-    public String[] getValues() {
-        return values;
+    public String[] getKeys() {
+        return keys;
     }
 
     public int getWidth() {

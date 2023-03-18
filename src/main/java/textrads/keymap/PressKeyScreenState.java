@@ -6,13 +6,15 @@ import static textrads.ui.menu.Menu.SELECTION_FRAMES;
 
 public class PressKeyScreenState {
     
-    private String name;
+    private String action;
+    private String defaultKey;
     
     private KeyStroke selection;
     private int selectionTimer;
     
-    public void init(final String name) {
-        this.name = name;
+    public void init(final int keyIndex) {
+        this.action = KeyMapScreenState.ACTIONS[keyIndex];
+        this.defaultKey = KeyMap.DEFAULT_KEYS[keyIndex].toString();
         selection = null;
         selectionTimer = SELECTION_FRAMES;
         InputSource.clear();
@@ -43,11 +45,15 @@ public class PressKeyScreenState {
         return (selectionTimer == 0) ? selection : null;
     }
 
-    public boolean isHighlight() {
+    public boolean isKeyPressed() {
         return selection != null;
     }
     
-    public String getName() {
-        return name;
+    public String getAction() {
+        return action;
+    }
+
+    public String getDefaultKey() {
+        return defaultKey;
     }
 }

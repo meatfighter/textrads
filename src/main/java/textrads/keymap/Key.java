@@ -7,26 +7,26 @@ import java.util.Objects;
 
 import static org.apache.commons.lang3.CharUtils.isAsciiPrintable;
 
-public class KeyDescription implements Serializable {
+public class Key implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
     private final KeyType keyType;
     private final Character character;
     
-    public KeyDescription(final KeyStroke keyStroke) {
+    public Key(final KeyStroke keyStroke) {
         this(keyStroke.getKeyType(), keyStroke.getCharacter());
     }
     
-    public KeyDescription(final KeyType keyType) {
+    public Key(final KeyType keyType) {
         this(keyType, null);
     }
     
-    public KeyDescription(final char c) {
+    public Key(final char c) {
         this(KeyType.Character, c);
     }
     
-    public KeyDescription(final KeyType keyType, final Character character) {
+    public Key(final KeyType keyType, final Character character) {
         this.keyType = keyType;
         this.character = character;
     }
@@ -62,7 +62,7 @@ public class KeyDescription implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final KeyDescription other = (KeyDescription) obj;
+        final Key other = (Key) obj;
         if (this.keyType != other.keyType) {
             return false;
         }
@@ -76,18 +76,21 @@ public class KeyDescription implements Serializable {
         }
         switch (keyType) {
             case ArrowDown:
-                return "Arrow Down";
+                return "Down Arrow";
             case ArrowRight:
-                return "Arrow Right";
+                return "Right Arrow";
             case ArrowLeft:
-                return "Arrow Left";
+                return "Left Arrow";
             case ArrowUp:
-                return "Arrow Up";
+                return "Up Arrow";
             case Backspace:
                 return "Backspace";
             case Character: {
                 if (character == null || !isAsciiPrintable(character)) {
                     return "";
+                }
+                if (character == ' ') {
+                    return "Space Bar";
                 }
                 return String.valueOf(Character.toUpperCase(character));
             }

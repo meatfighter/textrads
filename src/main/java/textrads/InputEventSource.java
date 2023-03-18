@@ -23,8 +23,8 @@ public final class InputEventSource {
         }
     }
     
-    public static synchronized void setKeyMap(final KeyMap inputMap) {
-        InputEventSource.keyMap = inputMap;        
+    public static synchronized void setKeyMap(final KeyMap keyMap) {
+        InputEventSource.keyMap = keyMap;        
     }
     
     public static synchronized void poll(final InputEventList events) {
