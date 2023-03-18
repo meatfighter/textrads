@@ -92,22 +92,31 @@ public class KeyMapModeState {
     private void updatePressKeyScreen() {
         pressKeyScreenState.update();
         final KeyStroke keyStroke = pressKeyScreenState.getSelection();
-        if (keyStroke != null) {
-            keys[keyIndex++] = new Key(keyStroke);
-            if (keyIndex == keys.length) {
-                final KeyMap keyMap = new KeyMap(keys);
-                InputEventSource.setKeyMap(keyMap);
-                keyMapScreenState.init(keyMap);
-                database.saveAsync(Database.OtherKeys.KEY_MAP, keyMap);
-                                
-                state = State.KEY_MAP_SCREEN;                
-                keys = null;
-                keyIndex = 0;
-                escPressed = false;
-                keyMapScreenState.getMenu().reset();                
-            } else {
-                pressKeyScreenState.init(keyIndex);
+        if (keyStroke != null) {            
+            final Key key = new Key(keyStroke);
+            for (int i = keyIndex - 1; i >= 0; --i) {
+                if (keys[i].equals(key)) {
+                    pressKeyScreenState.init(keyIndex);
+                    return;
+                }
             }
+            
+            keys[keyIndex] = key;            
+            if (++keyIndex < keys.length) {
+                pressKeyScreenState.init(keyIndex);
+                return;
+            }
+                        
+            final KeyMap keyMap = new KeyMap(keys);
+            InputEventSource.setKeyMap(keyMap);
+            keyMapScreenState.init(keyMap);
+            database.saveAsync(Database.OtherKeys.KEY_MAP, keyMap);
+
+            state = State.KEY_MAP_SCREEN;                
+            keys = null;
+            keyIndex = 0;
+            escPressed = false;
+            keyMapScreenState.getMenu().reset();
         }
     }
 
