@@ -16,7 +16,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>textrads.Textrads</mainClass>
+                            <mainClass>textrads.app.Textrads</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

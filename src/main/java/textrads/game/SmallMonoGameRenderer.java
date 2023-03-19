@@ -28,6 +28,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
             final int y, final boolean showWins) {
 
+        final byte gameMode = state.getGameState().getMode();
+        
         GraphicsUtil.setColor(g, ATTACK_COLOR, BACKGROUND_COLOR);
         for (int i = state.getAttackRows() - 1; i >= 0; --i) {
             g.setCharacter(x + 1, y + 20 - i, ' ');
@@ -93,7 +95,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                 g.putString(x + 3, y + MonoGameState.PLAYFIELD_HEIGHT - i, "                    ");
             }
         }
-        if (state.getGameState().getMode() != GameState.Mode.INVISIBLE) {
+        if (gameMode != GameState.Mode.INVISIBLE) {
             for (int i = MonoGameState.PLAYFIELD_HEIGHT - 1 - floorHeight; i >= 0; --i) {
                 final byte[] row = playfield[i];
                 for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
@@ -148,18 +150,20 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
             }
             case MonoGameState.Mode.END: {
                 final int t = state.getEndTimer();
-                if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
-                    drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
-                            state.getTetrominoType(), state.getTetrominoRotation(),
-                            BLOCK_COLORS[state.getTetrominoType() + 1]);
-                } else if (t >= 90) {
-                    GraphicsUtil.setColor(g, LOST_COLOR, BACKGROUND_COLOR);
-                    for (int i = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89)); 
-                            i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
-                        g.putString(x + 3, y + 1 + i, "                    ");
+                if (!state.isWon()) {
+                    if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
+                        drawTetromino(g, x + 3 + 2 * state.getTetrominoX(), y + 1 + state.getTetrominoY(), 
+                                state.getTetrominoType(), state.getTetrominoRotation(),
+                                BLOCK_COLORS[state.getTetrominoType() + 1]);
+                    } else if (t >= 90) {
+                        GraphicsUtil.setColor(g, LOST_COLOR, BACKGROUND_COLOR);
+                        for (int i = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89)); 
+                                i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
+                            g.putString(x + 3, y + 1 + i, "                    ");
+                        }
                     }
                 }
-                if (t >= 110) {
+                if (state.isWon() || t >= 110) {
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
                     for (int i = 7; i >= 0; --i) {
                         g.putString(x + 6, y + 7 + i, "              ");
@@ -178,7 +182,29 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         g.setCharacter(x + 20, y + 7 + i, Symbols.SINGLE_LINE_VERTICAL);
                     }
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
-                    g.putString(x + 9, y + 8, "Game Over");
+                    
+                    if (gameMode == GameState.Mode.VS_AI) {
+                        if (state.isWon()) {
+                            if (state.getWins() == 3) {
+                                g.putString(x + 9, y + 8, "Success!"); // TODO COLORS
+                            } else {
+                                g.putString(x + 9, y + 8, "Won Round");
+                            }
+                        } else {
+                            if (state.getOpponent().getWins() == 3) {
+                                g.putString(x + 9, y + 8, "Game Over");
+                            } else {
+                                g.putString(x + 8, y + 8, "Lost Round");
+                            }                            
+                        }
+                    } else if (gameMode == GameState.Mode.THREE_MINUTES && state.isWon()) {
+                        g.putString(x + 10, y + 8, "Time Up");
+                    } else if (gameMode == GameState.Mode.FORTY_LINES && state.isWon()) {
+                        g.putString(x + 9, y + 8, "Success!"); // TODO COLORS
+                    } else {
+                        g.putString(x + 9, y + 8, "Game Over");
+                    }
+                    
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, MenuItemRenderer.BUTTON_COLOR);
                     g.setCharacter(x + 8, y + 11, '[');
                     g.setCharacter(x + 14, y + 11, ']');
@@ -189,7 +215,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                     g.putString(x + 8, y + 13, "Ctrl+C");
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, state.isContinueSelected() 
                             ? MenuItemRenderer.SELECTED_COLOR : MenuItemRenderer.DESCRIPTION_COLOR);
-                    g.setCharacter(x + 16, y + 11, Symbols.ARROW_RIGHT);
+                    g.putString(x + 16, y + 11, "\u2500>");
                     g.setCharacter(x + 17, y + 13, 'X');
                 }                
                 break;

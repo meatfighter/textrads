@@ -191,10 +191,7 @@ public class MonoGameState implements Serializable {
         } else {
             countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
             countdownValue = 3;            
-            //mode = Mode.COUNTDOWN;
-            
-            // TODO TESTING
-            mode = Mode.END;
+            mode = Mode.COUNTDOWN;
         }        
         this.floorHeight = (byte) floorHeight;
         updates = (gameState.getMode() == GameState.Mode.THREE_MINUTES) ? FRAMES_PER_THREE_MINUTES : 0; 
@@ -212,7 +209,8 @@ public class MonoGameState implements Serializable {
         
         switch (gameState.getMode()) {
             case GameState.Mode.GARBAGE_HEAP:
-                lines = 25;
+                //lines = 25;
+                lines = 1; // TODO TESTING
                 createGarbageHeap(garbageHeight);
                 break;
             case GameState.Mode.FORTY_LINES:
@@ -516,6 +514,11 @@ public class MonoGameState implements Serializable {
     private void updateClearingLines() {
         if (--lineClearTimer < 0) {
             clearLines();
+            if (lines == 0 && (gameState.getMode() == GameState.Mode.GARBAGE_HEAP 
+                    || gameState.getMode() == GameState.Mode.FORTY_LINES)) {
+                setWon(true);
+                return;
+            }
             conditionallyRaiseGarbage();
             if (attackRows > 0) {
                 mode = Mode.ADDING_ATTACK_GARBAGE;
@@ -569,6 +572,9 @@ public class MonoGameState implements Serializable {
         final byte gameMode = gameState.getMode();
         if (gameMode == GameState.Mode.GARBAGE_HEAP || gameMode == GameState.Mode.FORTY_LINES) {
             lines -= lineYs.size();
+            if (lines <= 0) {
+                lines = 0;                
+            }
         } else {
             lines += lineYs.size();
         }
@@ -624,6 +630,10 @@ public class MonoGameState implements Serializable {
             default:
                 return false;
         }
+    }
+
+    public MonoGameState getOpponent() {
+        return opponent;
     }
 
     public void setOpponent(final MonoGameState opponent) {
@@ -740,6 +750,9 @@ public class MonoGameState implements Serializable {
     
     public void setWon(final boolean won) {
         this.won = won;
+        if (won) {
+            ++wins;
+        }
         mode = Mode.END;
     }    
 
