@@ -18,8 +18,6 @@ import textrads.ai.Ai;
 import textrads.ai.AiSource;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
-import textrads.db.Record;
-import textrads.db.RecordList;
 
 public class AttractModeState {
     

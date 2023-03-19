@@ -8,7 +8,10 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import textrads.ai.Ai;
+import textrads.ai.AiSource;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
 import textrads.db.Database;
@@ -40,9 +43,15 @@ public class Textrads {
         LEVEL_CONFIG,
         HEIGHT_CONFIG,
         DIFFICULTY_CONFIG,
+        PLAY,
     }
     
     private final Database database = DatabaseSource.getDatabase();
+    private final InputEventList eventList = new InputEventList();
+
+    private final Ai ai = AiSource.getAis()[1];
+    private float moveTimer;
+    private final List<Byte> moves = new ArrayList<>(1024);
     
     private final AttractModeState attractModeState = new AttractModeState();
     private final AttractModeRenderer attractModeRenderer = new AttractModeRenderer();
@@ -58,12 +67,14 @@ public class Textrads {
             new NumberValidator(1, 12)));
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
     
+    private final GameRenderer gameRenderer = new GameRenderer();
+    
     private State state = State.ATTRACT;
     
     private byte gameMode;
     private byte level;
-    private byte height;
-    private byte difficulty;
+    private byte challenge;
+    private float framesPerMove;
         
     public void launch() throws Exception {
         
@@ -167,6 +178,9 @@ public class Textrads {
             case DIFFICULTY_CONFIG:
                 updateDifficultyConfig();
                 break;
+            case PLAY:
+                updatePlay();
+                break;
         }
     }
     
@@ -186,6 +200,9 @@ public class Textrads {
                 break;
             case DIFFICULTY_CONFIG:
                 renderDifficultyConfig(g, size);
+                break;
+            case PLAY:
+                renderPlay(g, size);
                 break;
         }
     }
@@ -256,28 +273,6 @@ public class Textrads {
         }
     }
     
-    private void gotoLevelConfig() {
-        state = State.LEVEL_CONFIG;
-        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        level = preferences.getLevel(gameMode);                
-        levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
-    }
-    
-    private void gotoHeightConfig() {
-        state = State.HEIGHT_CONFIG;
-        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        height = preferences.getChallenge(gameMode);                
-        heightQuestion.init(GameState.Mode.toString(gameMode), (height >= 0) ? Integer.toString(height) : "");
-    }
-    
-    private void gotoDifficultyConfig() {
-        state = State.HEIGHT_CONFIG;
-        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        difficulty = preferences.getChallenge(gameMode);                
-        difficultyQuestion.init(GameState.Mode.toString(gameMode), 
-                (difficulty >= 0) ? Integer.toString(difficulty) : "");
-    }    
-    
     private void renderMainMenu(final TextGraphics g, final TerminalSize size) {
         menuRenderer.render(g, size, mainMenu);
     }
@@ -308,13 +303,28 @@ public class Textrads {
                 gotoDifficultyConfig();
                 break;
             default:
+                gotoPlay();
                 break;
         }                
     }
     
+    private void gotoLevelConfig() {
+        state = State.LEVEL_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        level = preferences.getLevel(gameMode);                
+        levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
+    }    
+    
     private void renderLevelConfig(final TextGraphics g, final TerminalSize size) {
         questionRenderer.render(g, size, levelQuestion);
     }
+    
+    private void gotoHeightConfig() {
+        state = State.HEIGHT_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        challenge = preferences.getChallenge(gameMode);                
+        heightQuestion.init(GameState.Mode.toString(gameMode), (challenge >= 0) ? Integer.toString(challenge) : "");
+    }    
     
     private void updateHeightConfig() {
         heightQuestion.update();
@@ -328,14 +338,23 @@ public class Textrads {
             return;
         }  
         
-        height = Byte.parseByte(heightQuestion.getValue());
+        challenge = Byte.parseByte(heightQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, height));        
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
+        gotoPlay();
     }
     
     private void renderHeightConfig(final TextGraphics g, final TerminalSize size) {
         questionRenderer.render(g, size, heightQuestion);
     }
+    
+    private void gotoDifficultyConfig() {
+        state = State.DIFFICULTY_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        challenge = preferences.getChallenge(gameMode);                
+        difficultyQuestion.init(GameState.Mode.toString(gameMode), 
+                (challenge >= 0) ? Integer.toString(challenge) : "");
+    }    
     
     private void updateDifficultyConfig() {
         difficultyQuestion.update();
@@ -349,14 +368,61 @@ public class Textrads {
             return;
         }
         
-        difficulty = Byte.parseByte(difficultyQuestion.getValue());
+        challenge = Byte.parseByte(difficultyQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, difficulty));
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
+        gotoPlay();
     }
     
     private void renderDifficultyConfig(final TextGraphics g, final TerminalSize size) {
         questionRenderer.render(g, size, difficultyQuestion);
-    }    
+    } 
+    
+    private void gotoPlay() {
+        state = State.PLAY;
+        final GameState gameState = GameStateSource.getState();
+        final long seed = ThreadLocalRandom.current().nextLong();
+        gameState.init(gameMode, seed, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
+                (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, 0, 0);
+        if (gameMode == GameState.Mode.VS_AI) {
+            ai.init(GameState.Mode.VS_AI, seed, level, 0, 0, challenge, true);
+            framesPerMove = Ai.getFramesPerMove(challenge);
+            moveTimer = Float.MAX_VALUE;
+        }
+    }
+    
+    private void updatePlay() {
+        final GameState gameState = GameStateSource.getState();
+        InputEventSource.poll(eventList);
+        for (int i = 0, end = eventList.size(); i < end; ++i) {
+            gameState.handleInputEvent(eventList.get(i), 0);
+        }
+        
+        if (gameMode == GameState.Mode.VS_AI) {
+            final MonoGameState monoGameState = gameState.getStates()[1];
+            
+            if (monoGameState.isJustSpawned()) { 
+                moveTimer = framesPerMove;
+                ai.getMoves(moves, monoGameState.getLastAttackRows());
+            } 
+                        
+            --moveTimer;            
+            while (moveTimer <= 0) {
+                moveTimer += framesPerMove;
+                if (moves.isEmpty()) {
+                    monoGameState.handleInputEvent(InputEvent.SOFT_DROP_PRESSED);
+                } else {                    
+                    monoGameState.handleInputEvent(moves.remove(0));
+                }
+            }
+        }        
+        
+        gameState.update();        
+    }
+    
+    private void renderPlay(final TextGraphics g, final TerminalSize size) {
+        gameRenderer.render(g, size, GameStateSource.getState(), null);
+    }
     
     public static void main(final String... args) throws Exception {
         new Textrads().launch();
