@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import textrads.play.GameState;
-import textrads.play.MonoGameState;
-import static textrads.play.MonoGameState.GARBAGE_LINES;
-import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
+import textrads.game.GameState;
+import textrads.game.MonoGameState;
+import static textrads.game.MonoGameState.GARBAGE_LINES;
+import static textrads.game.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.game.MonoGameState.PLAYFIELD_WIDTH;
 
 public class Ai {
     

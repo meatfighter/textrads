@@ -9,10 +9,10 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
-import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
-import static textrads.play.MonoGameState.SPAWN_X;
-import static textrads.play.MonoGameState.SPAWN_Y;
+import static textrads.game.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.game.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.game.MonoGameState.SPAWN_X;
+import static textrads.game.MonoGameState.SPAWN_Y;
 import static textrads.app.Tetromino.TETROMINOES;
 import static textrads.ai.Playfield.createPlayfield;
 import static textrads.ai.Playfield.lock;

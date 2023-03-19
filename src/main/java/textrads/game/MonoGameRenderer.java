@@ -1,4 +1,4 @@
-package textrads.play;
+package textrads.game;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;

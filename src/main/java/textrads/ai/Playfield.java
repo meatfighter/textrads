@@ -3,8 +3,8 @@ package textrads.ai;
 import textrads.ui.common.Offset;
 import textrads.app.Tetromino;
 
-import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.game.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.game.MonoGameState.PLAYFIELD_WIDTH;
 import static textrads.app.Tetromino.TETROMINOES;
 
 public interface Playfield {

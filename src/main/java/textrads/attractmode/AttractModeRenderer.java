@@ -2,8 +2,8 @@ package textrads.attractmode;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import textrads.play.GameRenderer;
-import textrads.play.GameStateSource;
+import textrads.game.GameRenderer;
+import textrads.game.GameStateSource;
 
 public class AttractModeRenderer {
     

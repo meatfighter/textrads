@@ -1,4 +1,4 @@
-package textrads.play;
+package textrads.game;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -603,6 +603,18 @@ public class MonoGameState implements Serializable {
         lostTimer = 0; 
         justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
         mode = justSpawned ? Mode.TETROMINO_FALLING : Mode.LOST;
+    }
+    
+    public boolean isPausible() {
+        switch (mode) {
+            case Mode.SPAWN:
+            case Mode.TETROMINO_FALLING:
+            case Mode.CLEARING_LINES:
+            case Mode.ADDING_ATTACK_GARBAGE:            
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void setOpponent(final MonoGameState opponent) {

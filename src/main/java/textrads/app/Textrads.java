@@ -4,10 +4,10 @@ import textrads.input.InputEvent;
 import textrads.input.InputEventList;
 import textrads.input.InputSource;
 import textrads.input.InputEventSource;
-import textrads.play.GameRenderer;
-import textrads.play.MonoGameState;
-import textrads.play.GameStateSource;
-import textrads.play.GameState;
+import textrads.game.GameRenderer;
+import textrads.game.MonoGameState;
+import textrads.game.GameStateSource;
+import textrads.game.GameState;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -406,7 +406,7 @@ public class Textrads {
             gameState.handleInputEvent(eventList.get(i), 0);
         }
         
-        if (gameMode == GameState.Mode.VS_AI) {
+        if (gameMode == GameState.Mode.VS_AI && !gameState.isPaused()) {
             final MonoGameState monoGameState = gameState.getStates()[1];
             
             if (monoGameState.isJustSpawned()) { 
@@ -425,7 +425,7 @@ public class Textrads {
             }
         }        
         
-        gameState.update();        
+        gameState.update();
     }
     
     private void renderPlay(final TextGraphics g, final TerminalSize size) {

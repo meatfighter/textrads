@@ -1,4 +1,4 @@
-package textrads.play;
+package textrads.game;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
@@ -11,8 +11,10 @@ import textrads.util.GraphicsUtil;
 public class GameRenderer {
     
     private static final TextColor PRESS_START_COLOR = Colors.WHITE;
+    private static final TextColor PAUSE_COLOR = new TextColor.Indexed(104);
     
     private static final String PRESS_ENTER_STRING = "PRESS ENTER";
+    private static final String PAUSE_STRING = "PAUSE";
  
     private final MonoGameRenderer bigRenderer = new BigMonoGameRenderer();
     private final MonoGameRenderer smallRenderer = new SmallMonoGameRenderer();
@@ -22,6 +24,12 @@ public class GameRenderer {
         
         GraphicsUtil.setColor(g, MonoGameRenderer.BACKGROUND_COLOR, MonoGameRenderer.BACKGROUND_COLOR);
         g.fill(' ');
+        
+        if (state.isPaused()) {
+            GraphicsUtil.setColor(g, MonoGameRenderer.BACKGROUND_COLOR, PAUSE_COLOR);
+            GraphicsUtil.centerString(g, size, (size.getRows() - 1) / 2, PAUSE_STRING);
+            return;
+        }
         
         final MonoGameRenderer renderer = GraphicsUtil.isSmallTerminal(size) ? smallRenderer : bigRenderer;
         final Dimensions dims = renderer.getDimensions();

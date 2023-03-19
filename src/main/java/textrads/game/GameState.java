@@ -1,4 +1,4 @@
-package textrads.play;
+package textrads.game;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import textrads.input.InputEvent;
+import textrads.input.InputType;
 
 public class GameState implements Serializable {
     
@@ -64,10 +66,16 @@ public class GameState implements Serializable {
     }
     
     public void handleInputEvent(final byte event, final int player) {
+        if (event == InputEvent.PAUSE_PRESSED && states[player].isPausible()) {
+            paused = !paused;
+        }
         states[player].handleInputEvent(event);
     }
     
-    public void update() {        
+    public void update() {
+        if (paused) {
+            return;
+        }
         states[0].update();
         if (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) {
             states[1].update();

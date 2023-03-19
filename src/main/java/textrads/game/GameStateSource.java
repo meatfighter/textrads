@@ -1,4 +1,4 @@
-package textrads.play;
+package textrads.game;
 
 import java.io.IOException;
 
