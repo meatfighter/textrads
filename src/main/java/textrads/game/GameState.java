@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import textrads.input.InputEvent;
-import textrads.input.InputType;
 
 public class GameState implements Serializable {
     
@@ -68,7 +67,8 @@ public class GameState implements Serializable {
     public void handleInputEvent(final byte event, final int player) {
         if (event == InputEvent.PAUSE_PRESSED && states[player].isPausible()) {
             paused = !paused;
-        }
+            return;
+        } 
         states[player].handleInputEvent(event);
     }
     
@@ -81,7 +81,17 @@ public class GameState implements Serializable {
             states[1].update();
         }
     }
-
+    
+    public boolean isEnd() {
+        switch (mode) {
+            case Mode.VS_AI:
+            case Mode.VS_HUMAN:
+                return states[0].isEnd() && states[1].isEnd();
+            default:
+                return states[0].isEnd();
+        }
+    }
+    
     public MonoGameState[] getStates() {
         return states;
     }

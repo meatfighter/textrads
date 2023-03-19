@@ -9,6 +9,7 @@ import textrads.ui.common.BlockText;
 import textrads.ui.common.Dimensions;
 import textrads.ui.common.Offset;
 import textrads.app.Tetromino;
+import textrads.ui.menu.MenuItemRenderer;
 import textrads.util.GraphicsUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {
@@ -143,29 +144,58 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                 if (timer >= 36 || timer >= 6 && timer <= 20) {
                     GraphicsUtil.setColor(g, FLASH_COLOR, BACKGROUND_COLOR);
                     for (final int lineY : state.getLineYs()) {
-                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {
-                            g.putString(x + 4 + 4 * j, y + 2 * lineY + 1, "    ");
-                            g.putString(x + 4 + 4 * j, y + 2 * lineY + 2, "    ");
-                        }
+                        g.putString(x + 4, y + 2 * lineY + 1, "                                        ");
+                        g.putString(x + 4, y + 2 * lineY + 2, "                                        ");
                     }
                 }
                 break;
             }
-            case MonoGameState.Mode.LOST: {
-                final int t = state.getLostTimer();
+            case MonoGameState.Mode.END: {
+                final int t = state.getEndTimer();
                 if (t < 15 || (t >= 30 && t < 45) || (t >= 60 && t < 75)) {
                     drawTetromino(g, x + 4 + 4 * state.getTetrominoX(), y + 1 + 2 * state.getTetrominoY(), 
                             state.getTetrominoType(), state.getTetrominoRotation(),
                             BLOCK_COLORS[state.getTetrominoType() + 1]);                    
                 } else if (t >= 90) {
-                    GraphicsUtil.setColor(g, GAME_OVER_COLOR, BACKGROUND_COLOR);
-                    final int start = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89));
-                    for (int i = start; i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
-                        for (int j = MonoGameState.PLAYFIELD_WIDTH - 1; j >= 0; --j) {                            
-                            g.putString(x + 4 + 4 * j, y + 1 + 2 * i, "    ");
-                            g.putString(x + 4 + 4 * j, y + 2 + 2 * i, "    ");
-                        }
+                    GraphicsUtil.setColor(g, LOST_COLOR, BACKGROUND_COLOR);
+                    for (int i = Math.max(0, MonoGameState.PLAYFIELD_HEIGHT - (t - 89)); 
+                            i < MonoGameState.PLAYFIELD_HEIGHT; ++i) {
+                        g.putString(x + 4, y + 1 + 2 * i, "                                        ");
+                        g.putString(x + 4, y + 2 + 2 * i, "                                        ");
                     }
+                }
+                if (t >= 110) {
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
+                    for (int i = 7; i >= 0; --i) {
+                        g.putString(x + 13, y + 17 + i, "                      ");
+                    }
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, LINE_COLOR);
+                    g.setCharacter(x + 12, y + 16, Symbols.SINGLE_LINE_TOP_LEFT_CORNER);
+                    g.setCharacter(x + 35, y + 16, Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
+                    g.setCharacter(x + 12, y + 25, Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER);
+                    g.setCharacter(x + 35, y + 25, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);
+                    for (int i = 21; i >= 0; --i) {
+                        g.setCharacter(x + 13 + i, y + 16, Symbols.SINGLE_LINE_HORIZONTAL);
+                        g.setCharacter(x + 13 + i, y + 25, Symbols.SINGLE_LINE_HORIZONTAL);
+                    }
+                    for (int i = 7; i >= 0; --i) {
+                        g.setCharacter(x + 12, y + 17 + i, Symbols.SINGLE_LINE_VERTICAL);
+                        g.setCharacter(x + 35, y + 17 + i, Symbols.SINGLE_LINE_VERTICAL);
+                    }
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
+                    g.putString(x + 19, y + 18, "Game Over");
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, MenuItemRenderer.BUTTON_COLOR);
+                    g.setCharacter(x + 16, y + 21, '[');
+                    g.setCharacter(x + 22, y + 21, ']');
+                    g.setCharacter(x + 15, y + 23, '[');
+                    g.setCharacter(x + 22, y + 23, ']');
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, MenuItemRenderer.ACCELERATOR_COLOR);
+                    g.putString(x + 17, y + 21, "Enter");
+                    g.putString(x + 16, y + 23, "Ctrl+C");
+                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, state.isContinueSelected() 
+                            ? MenuItemRenderer.SELECTED_COLOR : MenuItemRenderer.DESCRIPTION_COLOR);
+                    g.putString(x + 24, y + 21, "Continue");
+                    g.putString(x + 24, y + 23, "Exit");
                 }
                 break;
             }

@@ -21,14 +21,12 @@ public class MonoGameState implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static interface Mode {
-        byte DISABLED = 0;
-        byte COUNTDOWN = 1;
-        byte SPAWN = 2;
-        byte TETROMINO_FALLING = 3;
-        byte CLEARING_LINES = 4;
-        byte ADDING_ATTACK_GARBAGE = 5;        
-        byte WON = 6;
-        byte LOST = 7;
+        byte COUNTDOWN = 0;
+        byte SPAWN = 1;
+        byte TETROMINO_FALLING = 2;
+        byte CLEARING_LINES = 3;
+        byte ADDING_ATTACK_GARBAGE = 4;        
+        byte END = 5;
     }
     
     private static final long MAX_SCORE = 999_999_999L;
@@ -128,8 +126,7 @@ public class MonoGameState implements Serializable {
     private byte lockTimer;
     private boolean dropFailed;
     
-    private byte lineClearTimer;
-    private byte lostTimer;
+    private byte lineClearTimer;    
     
     private boolean justSpawned;
     private boolean rejectSoftDropRepeated;
@@ -141,6 +138,10 @@ public class MonoGameState implements Serializable {
     private byte countdownValue;
     
     private byte mode;
+    
+    private byte endTimer;
+    private boolean won;
+    private boolean continueSelected;
     
     private byte floorHeight;
     
@@ -174,13 +175,15 @@ public class MonoGameState implements Serializable {
         lockTimer = 0;
         dropFailed = false;
         lineClearTimer = 0;
-        lostTimer = 0;
+        endTimer = 0;
+        won = false;
+        continueSelected = false;
         justSpawned = false;
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
         lockCounter = 0;
-        this.wins = (byte) wins;
+        this.wins = (byte) wins;        
         if (skipCountdown) {
             countdownTimer = 0;
             countdownValue = 0;
@@ -188,7 +191,10 @@ public class MonoGameState implements Serializable {
         } else {
             countdownTimer = (byte) Textrads.FRAMES_PER_SECOND;
             countdownValue = 3;            
-            mode = Mode.COUNTDOWN;
+            //mode = Mode.COUNTDOWN;
+            
+            // TODO TESTING
+            mode = Mode.END;
         }        
         this.floorHeight = (byte) floorHeight;
         updates = (gameState.getMode() == GameState.Mode.THREE_MINUTES) ? FRAMES_PER_THREE_MINUTES : 0; 
@@ -453,10 +459,7 @@ public class MonoGameState implements Serializable {
     
     public void update() {
         justSpawned = false;
-        if (opponent.getMode() == Mode.LOST) {
-            mode = Mode.WON;
-        }
-        if (!(mode == Mode.COUNTDOWN || mode == Mode.LOST || mode == Mode.WON)) {
+        if (!(mode == Mode.COUNTDOWN || mode == Mode.END)) {
             if (gameState.getMode() == GameState.Mode.THREE_MINUTES) {
                 --updates;
             } else {
@@ -479,8 +482,8 @@ public class MonoGameState implements Serializable {
             case Mode.ADDING_ATTACK_GARBAGE:
                 updateAddingAttackGarbage();
                 break;
-            case Mode.LOST:
-                updateLost();
+            case Mode.END:
+                updateEnd();
                 break;
         }
     }
@@ -550,9 +553,9 @@ public class MonoGameState implements Serializable {
         }
     }
     
-    private void updateLost() {
-        if (lostTimer < Byte.MAX_VALUE) {
-            ++lostTimer;
+    private void updateEnd() {
+        if (endTimer < Byte.MAX_VALUE) {
+            ++endTimer;
         }
     }
     
@@ -600,9 +603,15 @@ public class MonoGameState implements Serializable {
         tetrominoX = SPAWN_X;
         tetrominoY = SPAWN_Y;
         tetrominoRotation = SPAWN_ROTATION;
-        lostTimer = 0; 
+        endTimer = 0; 
         justSpawned = testPosition(tetrominoRotation, tetrominoX, tetrominoY);
-        mode = justSpawned ? Mode.TETROMINO_FALLING : Mode.LOST;
+        if (justSpawned) {
+            mode = Mode.TETROMINO_FALLING;
+        } else {
+            mode = Mode.END;
+            won = false;
+            opponent.setWon(true);
+        }
     }
     
     public boolean isPausible() {
@@ -644,7 +653,7 @@ public class MonoGameState implements Serializable {
     public void setAttackRows(final int rows) {
         attackRows = (byte) Math.min(PLAYFIELD_HEIGHT, rows);
     }
-
+    
     public byte getTetrominoType() {
         return tetrominoType;
     }
@@ -681,8 +690,8 @@ public class MonoGameState implements Serializable {
         return lineYs;
     }
 
-    public byte getLostTimer() {
-        return lostTimer;
+    public byte getEndTimer() {
+        return endTimer;
     }
 
     public int getScore() {
@@ -727,5 +736,26 @@ public class MonoGameState implements Serializable {
 
     public byte getFloorHeight() {
         return floorHeight;
+    }
+    
+    public void setWon(final boolean won) {
+        this.won = won;
+        mode = Mode.END;
+    }    
+
+    public boolean isWon() {
+        return won;
+    }
+    
+    public void setContinueSelected(final boolean continueSelected) {
+        this.continueSelected = continueSelected;
+    }
+
+    public boolean isContinueSelected() {
+        return continueSelected;
+    }
+    
+    public boolean isEnd() {
+        return mode == Mode.END && (won || endTimer >= 110);
     }
 }

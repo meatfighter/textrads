@@ -52,6 +52,7 @@ public class Textrads {
         HEIGHT_CONFIG,
         DIFFICULTY_CONFIG,
         PLAY,
+        END,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -96,8 +97,9 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
-
             
+            // TODO TESTING
+            GameStateSource.getState().init(GameState.Mode.MARATHON, 0, 0, 0, 0, false, 0, 0);
                         
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -190,29 +192,33 @@ public class Textrads {
                 updatePlay();
                 break;
         }
+
+        GameStateSource.getState().update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        switch (state) {
-            case ATTRACT:
-                renderAttractMode(g, size);
-                break;
-            case MAIN_MENU:
-                renderMainMenu(g, size);
-                break;
-            case LEVEL_CONFIG:
-                renderLevelConfig(g, size);
-                break;
-            case HEIGHT_CONFIG:
-                renderHeightConfig(g, size);
-                break;
-            case DIFFICULTY_CONFIG:
-                renderDifficultyConfig(g, size);
-                break;
-            case PLAY:
-                renderPlay(g, size);
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                renderAttractMode(g, size);
+//                break;
+//            case MAIN_MENU:
+//                renderMainMenu(g, size);
+//                break;
+//            case LEVEL_CONFIG:
+//                renderLevelConfig(g, size);
+//                break;
+//            case HEIGHT_CONFIG:
+//                renderHeightConfig(g, size);
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                renderDifficultyConfig(g, size);
+//                break;
+//            case PLAY:
+//                renderPlay(g, size);
+//                break;
+//        }
+
+        gameRenderer.render(g, size, GameStateSource.getState(), null);
     }
     
     private void updateAttractMode() {

@@ -289,7 +289,7 @@ public class AttractModeState {
     }
     
     private boolean checkLost(final int index) {
-        return gameState.getStates()[index].getLostTimer() > 110;
+        return gameState.getStates()[index].getEndTimer() > 110;
     }
     
     private void startRecords() {

@@ -1,9 +1,47 @@
 Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
 
+  00000000001111111111
+  01234567890123456789
+0 XX+--------------+XX
+1 XX|              |XX
+2 XX|   Game Over  |XX
+3 XX|              |XX
+4 XX|              |XX
+5 XX|  [Enter] ->  |XX
+6 XX|              |XX
+7 XX| [Ctrl+C]  X  |XX  
+8 XX|              |XX
+9 XX+--------------+XX
+  01234567890123456789
+  00000000001111111111
+
+
+  0000000000111111111122222222223333333333
+  0123456789012345678901234567890123456789
+0 XXXXXXXX+----------------------+XXXXXXXX
+1 XXXXXXXX|                      |XXXXXXXX
+2 XXXXXXXX|      Game Over       |XXXXXXXX
+3 XXXXXXXX|                      |XXXXXXXX
+4 XXXXXXXX|                      |XXXXXXXX
+5 XXXXXXXX|   [Enter] Continue   |XXXXXXXX
+6 XXXXXXXX|                      |XXXXXXXX
+7 XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+8 XXXXXXXX|                      |XXXXXXXX
+9 XXXXXXXX+----------------------+XXXXXXXX
+  0123456789012345678901234567890123456789
+  0000000000111111111122222222223333333333
+
+
+Three Minutes:
+
+     Game Over / Time Up
+
+[Enter] Continue  [Ctrl+C] Exit
+
 
 XX+--------------+XX
 XX|              |XX
-XX|   Game Over  |XX
+XX|    Time Up   |XX
 XX|              |XX
 XX|              |XX
 XX|  [Enter] ->  |XX
@@ -17,7 +55,7 @@ XX+--------------+XX
 
 XXXXXXXX+----------------------+XXXXXXXX
 XXXXXXXX|                      |XXXXXXXX
-XXXXXXXX|      Game Over       |XXXXXXXX
+XXXXXXXX|       Time Up        |XXXXXXXX
 XXXXXXXX|                      |XXXXXXXX
 XXXXXXXX|                      |XXXXXXXX
 XXXXXXXX|   [Enter] Continue   |XXXXXXXX
@@ -29,19 +67,39 @@ XXXXXXXX+----------------------+XXXXXXXX
 
 
 
-Three Minutes:
-
-     Game Over / Time Up
-
-[Enter] Continue  [Ctrl+C] Exit
-
-
 
 Garbage Heap / Forty Lines:
 
     Game Over / Success!
 
 [Enter] Continue  [Ctrl+C] Exit
+
+
+XX+--------------+XX
+XX|              |XX
+XX|   Success!   |XX
+XX|              |XX
+XX|              |XX
+XX|  [Enter] ->  |XX
+XX|              |XX
+XX| [Ctrl+C]  X  |XX  
+XX|              |XX
+XX+--------------+XX
+01234567890123456789
+
+
+
+XXXXXXXX+----------------------+XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|       Success!       |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|   [Enter] Continue   |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX+----------------------+XXXXXXXX
+0123456789012345678901234567890123456789
 
 
 
@@ -56,6 +114,57 @@ Vs. AI / Vs. Human
 
 
 
+XX+--------------+XX
+XX|              |XX
+XX|   Round Won  |XX
+XX|              |XX
+XX|              |XX
+XX|  [Enter] ->  |XX
+XX|              |XX
+XX| [Ctrl+C]  X  |XX  
+XX|              |XX
+XX+--------------+XX
+01234567890123456789
+
+
+
+XXXXXXXX+----------------------+XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|      Round Won       |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|   [Enter] Continue   |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX+----------------------+XXXXXXXX
+0123456789012345678901234567890123456789
+
+XX+--------------+XX
+XX|              |XX
+XX|  Round Lost  |XX
+XX|              |XX
+XX|              |XX
+XX|  [Enter] ->  |XX
+XX|              |XX
+XX| [Ctrl+C]  X  |XX  
+XX|              |XX
+XX+--------------+XX
+01234567890123456789
+
+
+
+XXXXXXXX+----------------------+XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|      Round Lost      |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|   [Enter] Continue   |XXXXXXXX
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+XXXXXXXX|                      |XXXXXXXX
+XXXXXXXX+----------------------+XXXXXXXX
+0123456789012345678901234567890123456789
 
 
 80x24

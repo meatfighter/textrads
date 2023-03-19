@@ -26,7 +26,9 @@ public abstract class MonoGameRenderer {
     static final TextColor I_COLOR = new TextColor.Indexed(36);
     
     static final TextColor GARBAGE_COLOR = new TextColor.Indexed(238);
-    static final TextColor GAME_OVER_COLOR = new TextColor.Indexed(238);
+    
+    static final TextColor LOST_COLOR = new TextColor.Indexed(238);
+    static final TextColor END_TITLE_COLOR = Colors.WHITE;
     
     static final TextColor[] BLOCK_COLORS = {
         EMPTY_COLOR,   // 0
