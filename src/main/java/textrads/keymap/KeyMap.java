@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import textrads.InputType;
+import textrads.input.InputType;
 
 public class KeyMap implements Serializable {
     

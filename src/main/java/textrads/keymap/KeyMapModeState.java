@@ -1,8 +1,8 @@
 package textrads.keymap;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.InputEventSource;
-import textrads.InputSource;
+import textrads.input.InputEventSource;
+import textrads.input.InputSource;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.ui.menu.Menu;

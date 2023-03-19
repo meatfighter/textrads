@@ -1,7 +1,7 @@
 package textrads.ui.question;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.InputSource;
+import textrads.input.InputSource;
 import textrads.ui.menu.BackExitState;
 
 public class Question {

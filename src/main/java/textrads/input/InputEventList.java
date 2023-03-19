@@ -1,4 +1,4 @@
-package textrads;
+package textrads.input;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -2,7 +2,7 @@ package textrads.ui.menu;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import java.util.List;
-import textrads.InputSource;
+import textrads.input.InputSource;
 
 public class Menu {
     

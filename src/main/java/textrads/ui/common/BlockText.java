@@ -1,4 +1,4 @@
-package textrads;
+package textrads.ui.common;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;

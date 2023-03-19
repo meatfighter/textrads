@@ -1,4 +1,4 @@
-package textrads;
+package textrads.play;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

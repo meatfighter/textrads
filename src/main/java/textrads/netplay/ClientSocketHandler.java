@@ -6,11 +6,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import textrads.GameState;
-import textrads.GameStateSource;
-import textrads.InputEventList;
-import textrads.InputEventSource;
-import textrads.Textrads;
+import textrads.play.GameState;
+import textrads.play.GameStateSource;
+import textrads.input.InputEventList;
+import textrads.input.InputEventSource;
+import textrads.app.Textrads;
 import textrads.util.ThreadUtil;
 
 public class ClientSocketHandler {

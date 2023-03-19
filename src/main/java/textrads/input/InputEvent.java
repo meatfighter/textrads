@@ -1,4 +1,4 @@
-package textrads;
+package textrads.input;
 
 public interface InputEvent {
     

@@ -1,6 +1,6 @@
 package textrads.netplay;
 
-import textrads.Textrads;
+import textrads.app.Textrads;
 
 public class Queue {
     

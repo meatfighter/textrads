@@ -1,9 +1,10 @@
-package textrads;
+package textrads.input;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import java.io.IOException;
+import textrads.app.Terminator;
 
 public final class InputSource {
     

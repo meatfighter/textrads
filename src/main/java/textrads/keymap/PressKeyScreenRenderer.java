@@ -3,7 +3,7 @@ package textrads.keymap;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import textrads.Colors;
+import textrads.ui.common.Colors;
 import textrads.util.GraphicsUtil;
 
 public class PressKeyScreenRenderer {

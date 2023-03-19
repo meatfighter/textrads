@@ -1,8 +1,10 @@
-package textrads;
+package textrads.play;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import textrads.ui.common.Colors;
+import textrads.ui.common.Dimensions;
 
 public abstract class MonoGameRenderer {
     

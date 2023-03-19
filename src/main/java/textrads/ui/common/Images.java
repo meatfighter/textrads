@@ -1,4 +1,4 @@
-package textrads;
+package textrads.ui.common;
 
 import com.googlecode.lanterna.graphics.TextImage;
 import textrads.util.GraphicsUtil;

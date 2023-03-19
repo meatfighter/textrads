@@ -1,4 +1,4 @@
-package textrads;
+package textrads.play;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -11,6 +11,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import textrads.input.InputEvent;
+import textrads.ui.common.Offset;
+import textrads.app.Tetromino;
+import textrads.app.Textrads;
 
 public class MonoGameState implements Serializable {
     

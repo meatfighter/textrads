@@ -1,9 +1,10 @@
-package textrads;
+package textrads.input;
 
 import textrads.keymap.KeyMap;
 import com.googlecode.lanterna.input.KeyStroke;
 import java.util.HashMap;
 import java.util.Map;
+import textrads.app.Textrads;
 
 public final class InputEventSource {
 

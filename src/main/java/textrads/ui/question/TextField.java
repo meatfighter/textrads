@@ -1,7 +1,7 @@
 package textrads.ui.question;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.Textrads;
+import textrads.app.Textrads;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 

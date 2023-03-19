@@ -2,10 +2,10 @@ package textrads.ai;
 
 // Flood fills the playfield starting from the Tetrimino seed point to
 
-import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.MonoGameState.PLAYFIELD_WIDTH;
-import static textrads.MonoGameState.SPAWN_X;
-import static textrads.MonoGameState.SPAWN_Y;
+import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.play.MonoGameState.SPAWN_X;
+import static textrads.play.MonoGameState.SPAWN_Y;
 import static textrads.ai.Playfield.copy;
 import static textrads.ai.Playfield.createPlayfield;
 

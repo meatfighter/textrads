@@ -1,7 +1,7 @@
 package textrads.keymap;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.InputSource;
+import textrads.input.InputSource;
 import static textrads.ui.menu.Menu.SELECTION_FRAMES;
 
 public class PressKeyScreenState {

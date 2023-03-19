@@ -1,9 +1,10 @@
-package textrads;
+package textrads.app;
 
+import textrads.ui.common.Offset;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
 
 public final class Tetromino {
 

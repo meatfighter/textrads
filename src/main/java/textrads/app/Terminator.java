@@ -1,4 +1,4 @@
-package textrads;
+package textrads.app;
 
 public final class Terminator {
     

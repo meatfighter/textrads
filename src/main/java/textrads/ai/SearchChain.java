@@ -4,16 +4,16 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import textrads.Offset;
+import textrads.ui.common.Offset;
 import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
-import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.MonoGameState.PLAYFIELD_WIDTH;
-import static textrads.MonoGameState.SPAWN_X;
-import static textrads.MonoGameState.SPAWN_Y;
-import static textrads.Tetromino.TETROMINOES;
+import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
+import static textrads.play.MonoGameState.SPAWN_X;
+import static textrads.play.MonoGameState.SPAWN_Y;
+import static textrads.app.Tetromino.TETROMINOES;
 import static textrads.ai.Playfield.createPlayfield;
 import static textrads.ai.Playfield.lock;
 

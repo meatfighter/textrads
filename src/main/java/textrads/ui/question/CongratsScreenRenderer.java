@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.graphics.TextImage;
-import textrads.Colors;
+import textrads.ui.common.Colors;
 import textrads.util.GraphicsUtil;
 
 public class CongratsScreenRenderer {

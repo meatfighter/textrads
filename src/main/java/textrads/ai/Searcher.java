@@ -2,16 +2,16 @@ package textrads.ai;
 
 import java.util.Collections;
 import java.util.List;
-import textrads.GameState;
+import textrads.play.GameState;
 
-import textrads.InputEvent;
-import textrads.Offset;
-import textrads.Tetromino;
+import textrads.input.InputEvent;
+import textrads.ui.common.Offset;
+import textrads.app.Tetromino;
 
-import static textrads.MonoGameState.SPAWN_ROTATION;
-import static textrads.MonoGameState.SPAWN_X;
-import static textrads.MonoGameState.SPAWN_Y;
-import static textrads.Tetromino.TETROMINOES;
+import static textrads.play.MonoGameState.SPAWN_ROTATION;
+import static textrads.play.MonoGameState.SPAWN_X;
+import static textrads.play.MonoGameState.SPAWN_Y;
+import static textrads.app.Tetromino.TETROMINOES;
 
 public final class Searcher {
     

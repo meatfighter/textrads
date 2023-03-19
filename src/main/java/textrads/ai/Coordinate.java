@@ -1,8 +1,8 @@
 package textrads.ai;
 
-import static textrads.MonoGameState.PLAYFIELD_HEIGHT;
-import static textrads.MonoGameState.PLAYFIELD_WIDTH;
-import textrads.Tetromino;
+import static textrads.play.MonoGameState.PLAYFIELD_HEIGHT;
+import static textrads.play.MonoGameState.PLAYFIELD_WIDTH;
+import textrads.app.Tetromino;
 
 public class Coordinate {
     

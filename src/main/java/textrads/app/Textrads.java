@@ -1,5 +1,13 @@
-package textrads;
+package textrads.app;
 
+import textrads.input.InputEvent;
+import textrads.input.InputEventList;
+import textrads.input.InputSource;
+import textrads.input.InputEventSource;
+import textrads.play.GameRenderer;
+import textrads.play.MonoGameState;
+import textrads.play.GameStateSource;
+import textrads.play.GameState;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;

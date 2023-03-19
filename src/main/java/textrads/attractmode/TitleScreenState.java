@@ -1,6 +1,6 @@
 package textrads.attractmode;
 
-import textrads.Textrads;
+import textrads.app.Textrads;
 
 public class TitleScreenState {
     

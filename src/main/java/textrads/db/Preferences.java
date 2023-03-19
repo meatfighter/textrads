@@ -1,7 +1,7 @@
 package textrads.db;
 
 import java.io.Serializable;
-import textrads.GameState;
+import textrads.play.GameState;
 
 public class Preferences implements Serializable {
     

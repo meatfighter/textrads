@@ -1,10 +1,14 @@
-package textrads;
+package textrads.play;
 
 import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import java.util.List;
+import textrads.ui.common.BlockText;
+import textrads.ui.common.Dimensions;
+import textrads.ui.common.Offset;
+import textrads.app.Tetromino;
 import textrads.util.GraphicsUtil;
 
 public class BigMonoGameRenderer extends MonoGameRenderer {

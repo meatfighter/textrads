@@ -2,7 +2,7 @@ package textrads.ui.question;
 
 import com.googlecode.lanterna.graphics.TextImage;
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.InputSource;
+import textrads.input.InputSource;
 
 public class CongratsScreenState {
     

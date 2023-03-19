@@ -3,7 +3,7 @@ package textrads.netplay;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import textrads.InputEventList;
+import textrads.input.InputEventList;
 import textrads.util.IOUtil;
 
 public class Element {

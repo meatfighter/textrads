@@ -1,7 +1,7 @@
 package textrads.attractmode;
 
 import java.util.List;
-import textrads.Textrads;
+import textrads.app.Textrads;
 import textrads.db.Record;
 import textrads.db.RecordList;
 

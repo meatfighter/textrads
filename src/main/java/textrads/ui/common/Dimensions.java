@@ -1,4 +1,4 @@
-package textrads;
+package textrads.ui.common;
 
 public class Dimensions {
 

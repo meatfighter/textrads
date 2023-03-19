@@ -1,6 +1,6 @@
 package textrads.db;
 
-import textrads.Textrads;
+import textrads.app.Textrads;
 
 public enum DefaultRecordMaker implements RecordMaker<Record> {
     RECORD {

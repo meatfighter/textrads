@@ -1,19 +1,18 @@
 package textrads.attractmode;
 
 import com.googlecode.lanterna.input.KeyStroke;
-import textrads.PressEnterState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import textrads.GameState;
-import textrads.GameStateSource;
-import textrads.InputEvent;
-import textrads.InputSource;
-import textrads.MonoGameState;
-import textrads.Terminator;
-import textrads.Textrads;
+import textrads.play.GameState;
+import textrads.play.GameStateSource;
+import textrads.input.InputEvent;
+import textrads.input.InputSource;
+import textrads.play.MonoGameState;
+import textrads.app.Terminator;
+import textrads.app.Textrads;
 import textrads.ai.Ai;
 import textrads.ai.AiSource;
 import textrads.db.Database;

@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
-import textrads.Terminator;
+import textrads.app.Terminator;
 
 public final class TerminalUtil {
     

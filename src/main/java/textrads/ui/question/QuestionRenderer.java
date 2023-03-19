@@ -3,7 +3,7 @@ package textrads.ui.question;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import textrads.Colors;
+import textrads.ui.common.Colors;
 import textrads.ui.menu.BackExitRenderer;
 import textrads.util.GraphicsUtil;
 
