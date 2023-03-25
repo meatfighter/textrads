@@ -190,7 +190,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                     if (gameMode == GameState.Mode.VS_AI) {
                         if (state.isWon()) {
                             if (state.getWins() == 3) {
-                                GraphicsUtil.setColor(g, BACKGROUND_COLOR, Colors.SUCCESS[gameState.getSuccessIndex()]);
+                                GraphicsUtil.setColor(g, BACKGROUND_COLOR, 
+                                        ((gameState.getSuccessIndex() >> 3) & 1) == 0 ? Colors.WHITE : Colors.GOLD);
                                 g.putString(x + 9, y + 8, "Success!");
                             } else {
                                 GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
@@ -209,7 +210,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         g.putString(x + 10, y + 8, "Time Up");
                     } else if ((gameMode == GameState.Mode.FORTY_LINES || gameMode == GameState.Mode.GARBAGE_HEAP) 
                             && state.isWon()) {
-                        GraphicsUtil.setColor(g, BACKGROUND_COLOR, Colors.SUCCESS[gameState.getSuccessIndex()]);
+                        GraphicsUtil.setColor(g, BACKGROUND_COLOR, 
+                                ((gameState.getSuccessIndex() >> 3) & 1) == 0 ? Colors.WHITE : Colors.GOLD);
                         g.putString(x + 9, y + 8, "Success!");
                     } else {
                         GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);

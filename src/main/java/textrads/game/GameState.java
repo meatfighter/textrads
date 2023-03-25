@@ -78,15 +78,11 @@ public class GameState implements Serializable {
         if (paused) {
             return;
         }
-        if (successIndex == 0) {
-            successIndex = (byte) (Colors.SUCCESS.length - 1);
-        } else {
-            --successIndex;
-        }
         states[0].update();
         if (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) {
             states[1].update();
         }
+        ++successIndex;
     }
     
     public boolean isEnd() {
