@@ -26,10 +26,13 @@ import textrads.attractmode.AttractModeState;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.Preferences;
+import textrads.ui.common.Images;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuRenderer;
+import textrads.ui.question.CongratsScreenRenderer;
+import textrads.ui.question.CongratsScreenState;
 import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.QuestionRenderer;
@@ -79,6 +82,9 @@ public class Textrads {
             new NumberValidator(1, 12)));
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
     
+    private final CongratsScreenState congratsScreenState = new CongratsScreenState();
+    private final CongratsScreenRenderer congratsScreenRenderer = new CongratsScreenRenderer();
+    
     private final GameRenderer gameRenderer = new GameRenderer();
     
     private State state = State.ATTRACT;
@@ -104,6 +110,9 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
                         
+                // TODO TESTING
+                congratsScreenState.init("Testing", null);
+
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
             
@@ -175,55 +184,59 @@ public class Textrads {
     }
     
     private void update() {
-        switch (state) {
-            case ATTRACT:
-                updateAttractMode();
-                break;
-            case MAIN_MENU:
-                updateMainMenu();
-                break;
-            case LEVEL_CONFIG:
-                updateLevelConfig();
-                break;
-            case HEIGHT_CONFIG:
-                updateHeightConfig();
-                break;
-            case DIFFICULTY_CONFIG:
-                updateDifficultyConfig();
-                break;
-            case PLAY:
-                updatePlay();
-                break;
-            case CONTINUE:
-                updateContinue();
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                updateAttractMode();
+//                break;
+//            case MAIN_MENU:
+//                updateMainMenu();
+//                break;
+//            case LEVEL_CONFIG:
+//                updateLevelConfig();
+//                break;
+//            case HEIGHT_CONFIG:
+//                updateHeightConfig();
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                updateDifficultyConfig();
+//                break;
+//            case PLAY:
+//                updatePlay();
+//                break;
+//            case CONTINUE:
+//                updateContinue();
+//                break;
+//        }
+
+        congratsScreenState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        switch (state) {
-            case ATTRACT:
-                renderAttractMode(g, size);
-                break;
-            case MAIN_MENU:
-                renderMainMenu(g, size);
-                break;
-            case LEVEL_CONFIG:
-                renderLevelConfig(g, size);
-                break;
-            case HEIGHT_CONFIG:
-                renderHeightConfig(g, size);
-                break;
-            case DIFFICULTY_CONFIG:
-                renderDifficultyConfig(g, size);
-                break;
-            case PLAY:
-                renderPlay(g, size);
-                break;
-            case CONTINUE:
-                renderContinue(g, size);
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                renderAttractMode(g, size);
+//                break;
+//            case MAIN_MENU:
+//                renderMainMenu(g, size);
+//                break;
+//            case LEVEL_CONFIG:
+//                renderLevelConfig(g, size);
+//                break;
+//            case HEIGHT_CONFIG:
+//                renderHeightConfig(g, size);
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                renderDifficultyConfig(g, size);
+//                break;
+//            case PLAY:
+//                renderPlay(g, size);
+//                break;
+//            case CONTINUE:
+//                renderContinue(g, size);
+//                break;
+//        }
+
+        congratsScreenRenderer.render(g, size, congratsScreenState);
     }
     
     private void updateAttractMode() {
