@@ -35,7 +35,13 @@ public class KeyMap implements Serializable {
         final Map<KeyStroke, InputType> map = new HashMap<>();
         final InputType[] inputTypes = InputType.values();        
         for (int i = inputTypes.length - 1; i >= 0; --i) {
-            map.put(keys[i].toKeyStroke(), inputTypes[i]);
+            final Character character = keys[i].getCharacter();
+            if (character == null) {
+                map.put(new KeyStroke(keys[i].getKeyType()), inputTypes[i]);
+            } else {
+                map.put(new KeyStroke(Character.toLowerCase(character), false, false, false), inputTypes[i]);
+                map.put(new KeyStroke(Character.toUpperCase(character), false, false, false), inputTypes[i]);
+            }
         }
         keyStrokeToInputTypeMap = Collections.unmodifiableMap(map);
     }

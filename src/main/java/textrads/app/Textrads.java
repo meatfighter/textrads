@@ -11,6 +11,7 @@ import textrads.game.GameState;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -52,6 +53,8 @@ public class Textrads {
         HEIGHT_CONFIG,
         DIFFICULTY_CONFIG,
         PLAY,
+        CONTINUE,
+        GIVE_UP,
         END,
     }
     
@@ -84,6 +87,9 @@ public class Textrads {
     private byte level;
     private byte challenge;
     private float framesPerMove;
+    private int selectionTimer;
+    private int wins0;
+    private int wins1;
         
     public void launch() throws Exception {
         
@@ -188,6 +194,9 @@ public class Textrads {
             case PLAY:
                 updatePlay();
                 break;
+            case CONTINUE:
+                updateContinue();
+                break;
         }
     }
     
@@ -211,19 +220,26 @@ public class Textrads {
             case PLAY:
                 renderPlay(g, size);
                 break;
+            case CONTINUE:
+                renderContinue(g, size);
+                break;
         }
     }
     
     private void updateAttractMode() {
         attractModeState.update();
         if (attractModeState.isEnterPressed()) {
-            state = State.MAIN_MENU;
-            mainMenu.reset();
+            gotoMainMenu();
         }
     }
     
     private void renderAttractMode(final TextGraphics g, final TerminalSize size) {
         attractModeRenderer.render(g, size, attractModeState);
+    }
+    
+    private void gotoMainMenu() {
+        state = State.MAIN_MENU;
+        mainMenu.reset();
     }
     
     private void updateMainMenu() {
@@ -284,6 +300,13 @@ public class Textrads {
         menuRenderer.render(g, size, mainMenu);
     }
     
+    private void gotoLevelConfig() {
+        state = State.LEVEL_CONFIG;
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
+        level = preferences.getLevel(gameMode);                
+        levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
+    }    
+    
     private void updateLevelConfig() {
         levelQuestion.update();
         
@@ -310,17 +333,11 @@ public class Textrads {
                 gotoDifficultyConfig();
                 break;
             default:
+                wins0 = wins1 = 0;
                 gotoPlay();
                 break;
         }                
     }
-    
-    private void gotoLevelConfig() {
-        state = State.LEVEL_CONFIG;
-        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        level = preferences.getLevel(gameMode);                
-        levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
-    }    
     
     private void renderLevelConfig(final TextGraphics g, final TerminalSize size) {
         questionRenderer.render(g, size, levelQuestion);
@@ -348,6 +365,7 @@ public class Textrads {
         challenge = Byte.parseByte(heightQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
+        wins0 = wins1 = 0;
         gotoPlay();
     }
     
@@ -378,6 +396,7 @@ public class Textrads {
         challenge = Byte.parseByte(difficultyQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
+        wins0 = wins1 = 0;
         gotoPlay();
     }
     
@@ -390,7 +409,7 @@ public class Textrads {
         final GameState gameState = GameStateSource.getState();
         final long seed = ThreadLocalRandom.current().nextLong();
         gameState.init(gameMode, seed, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
-                (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, 0, 0);
+                (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, wins0, wins1);
         if (gameMode == GameState.Mode.VS_AI) {
             ai.init(GameState.Mode.VS_AI, seed, level, 0, 0, challenge, true);
             framesPerMove = Ai.getFramesPerMove(challenge);
@@ -400,6 +419,11 @@ public class Textrads {
     
     private void updatePlay() {
         final GameState gameState = GameStateSource.getState();
+        if (gameState.isContinueMessage()) {
+            gotoContinue();
+            return;
+        }
+            
         InputEventSource.poll(eventList);
         for (int i = 0, end = eventList.size(); i < end; ++i) {
             gameState.handleInputEvent(eventList.get(i), 0);
@@ -425,10 +449,60 @@ public class Textrads {
         }        
         
         gameState.update();
-    }
+    }    
     
     private void renderPlay(final TextGraphics g, final TerminalSize size) {
         gameRenderer.render(g, size, GameStateSource.getState(), null);
+    }
+
+    private void gotoContinue() {
+        state = State.CONTINUE;
+        InputSource.clear();
+        GameStateSource.getState().setSelection((byte) -1);
+        selectionTimer = Menu.SELECTION_FRAMES;
+    }
+    
+    private void updateContinue() {
+        final GameState gameState = GameStateSource.getState();
+        if (gameState.getSelection() >= 0) {
+            InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            } else {
+                handleContinue();
+            }
+            return;
+        } 
+        
+        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            } 
+            if (keyStroke.getKeyType() == KeyType.Enter) {
+                gameState.setSelection((byte) 0);
+            }
+        }
+    }
+    
+    private void renderContinue(final TextGraphics g, final TerminalSize size) {
+        gameRenderer.render(g, size, GameStateSource.getState(), null);
+    }
+    
+    private void handleContinue() {
+        final GameState gameState = GameStateSource.getState();
+        if (gameMode == GameState.Mode.VS_AI || gameMode == GameState.Mode.VS_HUMAN) {
+            final MonoGameState[] states = gameState.getStates();
+            wins0 = states[0].getWins();
+            wins1 = states[1].getWins();
+            if (wins0 < 3 && wins1 < 3) {
+                gotoPlay();
+                return;
+            }
+            if (gameMode == GameState.Mode.VS_AI && wins0 < 3) {
+                gotoDifficultyConfig();
+            }
+        }
     }
     
     public static void main(final String... args) throws Exception {

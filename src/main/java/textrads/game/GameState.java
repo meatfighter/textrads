@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import textrads.input.InputEvent;
-import textrads.ui.common.Colors;
 
 public class GameState implements Serializable {
     
@@ -59,7 +58,8 @@ public class GameState implements Serializable {
     
     private boolean paused;
     private byte mode;
-    private byte successIndex;
+    private byte selection;
+    private byte selectionTimer;
     
     public GameState() {
         states[0].setOpponent(states[1]);
@@ -82,7 +82,10 @@ public class GameState implements Serializable {
         if (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) {
             states[1].update();
         }
-        ++successIndex;
+    }
+    
+    public boolean isContinueMessage() {
+        return (states[0].isWon() && mode != GameState.Mode.VS_AI) || states[0].getEndTimer() >= 110;
     }
     
     public boolean isEnd() {
@@ -127,18 +130,22 @@ public class GameState implements Serializable {
                 
         paused = false;
         this.mode = mode;
-        successIndex = 0;
+        selection = -1;
         
         states[0].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins0);
         states[1].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins1);
     }
 
-    public byte getSuccessIndex() {
-        return successIndex;
-    }
-
     public byte getMode() {
         return mode;
+    }
+
+    public byte getSelection() {
+        return selection;
+    }
+
+    public void setSelection(final byte selection) {
+        this.selection = selection;
     }
     
     public byte[] toByteArray() throws IOException {

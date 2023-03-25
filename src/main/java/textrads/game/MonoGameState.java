@@ -141,7 +141,6 @@ public class MonoGameState implements Serializable {
     
     private byte endTimer;
     private boolean won;
-    private boolean continueSelected;
     
     private byte floorHeight;
     
@@ -177,7 +176,6 @@ public class MonoGameState implements Serializable {
         lineClearTimer = 0;
         endTimer = 0;
         won = false;
-        continueSelected = false;
         justSpawned = false;
         rejectSoftDropRepeated = false;
         garbageX = -1;
@@ -759,14 +757,6 @@ public class MonoGameState implements Serializable {
 
     public boolean isWon() {
         return won;
-    }
-    
-    public void setContinueSelected(final boolean continueSelected) {
-        this.continueSelected = continueSelected;
-    }
-
-    public boolean isContinueSelected() {
-        return continueSelected;
     }
     
     public boolean isEnd() {

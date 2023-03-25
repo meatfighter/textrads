@@ -39,10 +39,6 @@ public class Key implements Serializable {
         return character;
     }
     
-    public KeyStroke toKeyStroke() {
-        return (character == null) ? new KeyStroke(keyType) : new KeyStroke(character, false, false, false);
-    }
-
     @Override
     public int hashCode() {
         int hash = 3;
