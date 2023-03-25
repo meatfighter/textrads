@@ -31,7 +31,7 @@ public class MonoGameState implements Serializable {
     
     private static final long MAX_SCORE = 999_999_999L;
     
-    private static final int FRAMES_PER_THREE_MINUTES = Textrads.FRAMES_PER_SECOND * 60 * 3;
+    private static final int FRAMES_PER_THREE_MINUTES = /*Textrads.FRAMES_PER_SECOND **/ 60/* * 3*/; // TODO TESTING
     
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
@@ -214,7 +214,7 @@ public class MonoGameState implements Serializable {
                 createGarbageHeap(garbageHeight);
                 break;
             case GameState.Mode.FORTY_LINES:
-                lines = 40;
+                lines = 1; // TODO TESTING 40;
                 break;
             default:
                 lines = 0;
@@ -459,7 +459,9 @@ public class MonoGameState implements Serializable {
         justSpawned = false;
         if (!(mode == Mode.COUNTDOWN || mode == Mode.END)) {
             if (gameState.getMode() == GameState.Mode.THREE_MINUTES) {
-                --updates;
+                if (--updates == 0) {
+                    setWon(true);
+                }
             } else {
                 ++updates;
             }
@@ -614,8 +616,7 @@ public class MonoGameState implements Serializable {
         if (justSpawned) {
             mode = Mode.TETROMINO_FALLING;
         } else {
-            mode = Mode.END;
-            won = false;
+            setWon(false);
             opponent.setWon(true);
         }
     }

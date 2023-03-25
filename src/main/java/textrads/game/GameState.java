@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import textrads.input.InputEvent;
+import textrads.ui.common.Colors;
 
 public class GameState implements Serializable {
     
@@ -58,6 +59,7 @@ public class GameState implements Serializable {
     
     private boolean paused;
     private byte mode;
+    private byte successIndex;
     
     public GameState() {
         states[0].setOpponent(states[1]);
@@ -76,6 +78,11 @@ public class GameState implements Serializable {
         if (paused) {
             return;
         }
+        if (successIndex == 0) {
+            successIndex = (byte) (Colors.SUCCESS.length - 1);
+        } else {
+            --successIndex;
+        }
         states[0].update();
         if (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) {
             states[1].update();
@@ -90,6 +97,10 @@ public class GameState implements Serializable {
             default:
                 return states[0].isEnd();
         }
+    }
+    
+    public int getIndex(final MonoGameState state) {
+        return (state == states[0]) ? 0 : 1;
     }
     
     public MonoGameState[] getStates() {
@@ -117,9 +128,17 @@ public class GameState implements Serializable {
             final boolean skipCountdown,
             final int wins0,
             final int wins1) {
+                
+        paused = false;
         this.mode = mode;
+        successIndex = 0;
+        
         states[0].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins0);
         states[1].init(seed, startingLevel, garbageHeight, floorHeight, skipCountdown, wins1);
+    }
+
+    public byte getSuccessIndex() {
+        return successIndex;
     }
 
     public byte getMode() {

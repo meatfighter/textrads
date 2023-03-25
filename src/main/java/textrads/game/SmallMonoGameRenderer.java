@@ -12,6 +12,7 @@ import textrads.app.Tetromino;
 import static textrads.game.MonoGameRenderer.BACKGROUND_COLOR;
 import static textrads.game.MonoGameRenderer.END_TITLE_COLOR;
 import static textrads.game.MonoGameRenderer.LINE_COLOR;
+import textrads.ui.common.Colors;
 import textrads.ui.menu.MenuItemRenderer;
 import textrads.util.GraphicsUtil;
 
@@ -28,7 +29,8 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
     public void render(final TextGraphics g, final TerminalSize size, final MonoGameState state, final int x, 
             final int y, final boolean showWins) {
 
-        final byte gameMode = state.getGameState().getMode();
+        final GameState gameState = state.getGameState();
+        final byte gameMode = gameState.getMode();
         
         GraphicsUtil.setColor(g, ATTACK_COLOR, BACKGROUND_COLOR);
         for (int i = state.getAttackRows() - 1; i >= 0; --i) {
@@ -163,7 +165,10 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         }
                     }
                 }
-                if (state.isWon() || t >= 110) {
+                if (gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) {
+                    break;
+                }
+                if ((state.isWon() && gameMode != GameState.Mode.VS_AI) || t >= 110) {
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
                     for (int i = 7; i >= 0; --i) {
                         g.putString(x + 6, y + 7 + i, "              ");
@@ -181,27 +186,33 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         g.setCharacter(x + 5, y + 7 + i, Symbols.SINGLE_LINE_VERTICAL);
                         g.setCharacter(x + 20, y + 7 + i, Symbols.SINGLE_LINE_VERTICAL);
                     }
-                    GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
                     
                     if (gameMode == GameState.Mode.VS_AI) {
                         if (state.isWon()) {
                             if (state.getWins() == 3) {
-                                g.putString(x + 9, y + 8, "Success!"); // TODO COLORS
+                                GraphicsUtil.setColor(g, BACKGROUND_COLOR, Colors.SUCCESS[gameState.getSuccessIndex()]);
+                                g.putString(x + 9, y + 8, "Success!");
                             } else {
-                                g.putString(x + 9, y + 8, "Won Round");
+                                GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
+                                g.putString(x + 9, y + 8, "Round Won");
                             }
                         } else {
-                            if (state.getOpponent().getWins() == 3) {
+                            GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
+                            if (state.getOpponent().getWins() == 3) {                                
                                 g.putString(x + 9, y + 8, "Game Over");
                             } else {
-                                g.putString(x + 8, y + 8, "Lost Round");
+                                g.putString(x + 8, y + 8, "Round Lost");
                             }                            
                         }
                     } else if (gameMode == GameState.Mode.THREE_MINUTES && state.isWon()) {
+                        GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
                         g.putString(x + 10, y + 8, "Time Up");
-                    } else if (gameMode == GameState.Mode.FORTY_LINES && state.isWon()) {
-                        g.putString(x + 9, y + 8, "Success!"); // TODO COLORS
+                    } else if ((gameMode == GameState.Mode.FORTY_LINES || gameMode == GameState.Mode.GARBAGE_HEAP) 
+                            && state.isWon()) {
+                        GraphicsUtil.setColor(g, BACKGROUND_COLOR, Colors.SUCCESS[gameState.getSuccessIndex()]);
+                        g.putString(x + 9, y + 8, "Success!");
                     } else {
+                        GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
                         g.putString(x + 9, y + 8, "Game Over");
                     }
                     
