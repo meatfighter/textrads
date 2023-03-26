@@ -26,7 +26,6 @@ import textrads.attractmode.AttractModeState;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.Preferences;
-import textrads.ui.common.Images;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.Menu;
@@ -56,9 +55,8 @@ public class Textrads {
         HEIGHT_CONFIG,
         DIFFICULTY_CONFIG,
         PLAY,
-        CONTINUE,
         GIVE_UP,
-        END,
+        CONTINUE,        
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -72,6 +70,7 @@ public class Textrads {
     private final AttractModeRenderer attractModeRenderer = new AttractModeRenderer();
     
     private final Menu mainMenu = createMainMenu();
+    private final Menu giveUpMenu = createGiveUpMenu();
     private final MenuRenderer menuRenderer = new MenuRenderer();
     
     private final Question levelQuestion = new Question(new TextField("Level (0\u2500\u250029)?", 
@@ -109,9 +108,6 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
-                        
-                // TODO TESTING
-                congratsScreenState.init("Testing", null);
 
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -183,60 +179,76 @@ public class Textrads {
         return new Menu(menuColumns, "Main");
     }
     
+    private Menu createGiveUpMenu() {
+        final List<MenuItem> menuItems0 = new ArrayList<>();
+        menuItems0.add(new MenuItem("Yes"));
+        
+        final List<MenuItem> menuItems1 = new ArrayList<>();
+        menuItems1.add(new MenuItem("No"));
+        
+        final List<MenuColumn> menuColumns = new ArrayList<>();
+        menuColumns.add(new MenuColumn(menuItems0));
+        menuColumns.add(new MenuColumn(menuItems1));
+        
+        return new Menu(menuColumns, "Give Up?", false);
+    }
+    
     private void update() {
-//        switch (state) {
-//            case ATTRACT:
-//                updateAttractMode();
-//                break;
-//            case MAIN_MENU:
-//                updateMainMenu();
-//                break;
-//            case LEVEL_CONFIG:
-//                updateLevelConfig();
-//                break;
-//            case HEIGHT_CONFIG:
-//                updateHeightConfig();
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                updateDifficultyConfig();
-//                break;
-//            case PLAY:
-//                updatePlay();
-//                break;
-//            case CONTINUE:
-//                updateContinue();
-//                break;
-//        }
-
-        congratsScreenState.update();
+        switch (state) {
+            case ATTRACT:
+                updateAttractMode();
+                break;
+            case MAIN_MENU:
+                updateMainMenu();
+                break;
+            case LEVEL_CONFIG:
+                updateLevelConfig();
+                break;
+            case HEIGHT_CONFIG:
+                updateHeightConfig();
+                break;
+            case DIFFICULTY_CONFIG:
+                updateDifficultyConfig();
+                break;
+            case PLAY:
+                updatePlay();
+                break;
+            case GIVE_UP:
+                updateGiveUp();
+                break;
+            case CONTINUE:
+                updateContinue();
+                break;
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        switch (state) {
-//            case ATTRACT:
-//                renderAttractMode(g, size);
-//                break;
-//            case MAIN_MENU:
-//                renderMainMenu(g, size);
-//                break;
-//            case LEVEL_CONFIG:
-//                renderLevelConfig(g, size);
-//                break;
-//            case HEIGHT_CONFIG:
-//                renderHeightConfig(g, size);
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                renderDifficultyConfig(g, size);
-//                break;
-//            case PLAY:
-//                renderPlay(g, size);
-//                break;
-//            case CONTINUE:
-//                renderContinue(g, size);
-//                break;
-//        }
-
-        congratsScreenRenderer.render(g, size, congratsScreenState);
+        switch (state) {
+            case ATTRACT:
+                renderAttractMode(g, size);
+                break;
+            case MAIN_MENU:
+                renderMainMenu(g, size);
+                break;
+            case LEVEL_CONFIG:
+                renderLevelConfig(g, size);
+                break;
+            case HEIGHT_CONFIG:
+                renderHeightConfig(g, size);
+                break;
+            case DIFFICULTY_CONFIG:
+                renderDifficultyConfig(g, size);
+                break;
+            case PLAY:
+                renderPlay(g, size);
+                break;
+            case GIVE_UP:
+                renderGiveUp(g, size);
+                break;
+            case CONTINUE:
+                renderContinue(g, size);
+                break;
+        }
     }
     
     private void updateAttractMode() {
@@ -439,7 +451,12 @@ public class Textrads {
             
         InputEventSource.poll(eventList);
         for (int i = 0, end = eventList.size(); i < end; ++i) {
-            gameState.handleInputEvent(eventList.get(i), 0);
+            final byte event = eventList.get(i);
+            if (event == InputEvent.GIVE_UP_PRESSED) {
+                gotoGiveUp();
+                return;
+            }
+            gameState.handleInputEvent(event, 0);
         }
         
         if (gameMode == GameState.Mode.VS_AI && !gameState.isPaused()) {
@@ -466,6 +483,50 @@ public class Textrads {
     
     private void renderPlay(final TextGraphics g, final TerminalSize size) {
         gameRenderer.render(g, size, GameStateSource.getState(), null);
+    }
+    
+    private void gotoGiveUp() {
+        state = State.GIVE_UP;
+        giveUpMenu.reset();        
+    }
+    
+    private void updateGiveUp() {
+        giveUpMenu.update();
+        final KeyStroke selection = giveUpMenu.getSelection();
+        if (selection == null || selection.getKeyType() != KeyType.Character) {
+            return;
+        }
+        final Character c = selection.getCharacter();
+        if (c == null) {
+            return;
+        }
+        switch (Character.toUpperCase(c)) {
+            case 'Y':
+                returnToMenu();
+                break;
+            case 'N':
+                state = State.PLAY;
+                break;
+        }
+    }
+    
+    private void returnToMenu() {
+        switch (gameMode) {
+            case GameState.Mode.GARBAGE_HEAP:
+            case GameState.Mode.FORTY_LINES:
+                gotoHeightConfig();
+                break;
+            case GameState.Mode.VS_AI:
+                gotoDifficultyConfig();
+                break;
+            default:
+                gotoLevelConfig();
+                break;
+        }
+    }
+    
+    private void renderGiveUp(final TextGraphics g, final TerminalSize size) {
+        menuRenderer.render(g, size, giveUpMenu);
     }
 
     private void gotoContinue() {

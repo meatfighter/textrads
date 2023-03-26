@@ -20,26 +20,42 @@ public class Menu {
     private final int titleMargin;
     private final int backExitMargin;
     
-    private final BackExitState backExitState = new BackExitState();
+    private final BackExitState backExitState;
     
     private KeyStroke selection;
     private int selectionTimer;
     
     public Menu(final List<MenuColumn> menuColumns, final String title) {
-        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN);
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, true);
+    }    
+
+    public Menu(final List<MenuColumn> menuColumns, final String title, final boolean escapeEnabled) {
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, escapeEnabled);
     }
     
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin) {
-        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN);
+        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, true);
+    }
+    
+    public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
+            final boolean escapeEnabled) {
+        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, escapeEnabled);
     }
     
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
             final int backExitMargin) {
+        this(menuColumns, title, titleMargin, backExitMargin, true);
+    }
+    
+    public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
+            final int backExitMargin, final boolean escapeEnabled) {
         
         this.menuColumns = menuColumns;
         this.title = title;
         this.titleMargin = titleMargin;
         this.backExitMargin = backExitMargin;
+        
+        backExitState = new BackExitState(escapeEnabled);
         
         int w = 0;
         int h = 0;
@@ -84,8 +100,10 @@ public class Menu {
     private void handleInput(final KeyStroke keyStroke) {
         switch (keyStroke.getKeyType()) {
             case Escape:
-                selection = keyStroke;
-                backExitState.setEscSelected(true);
+                if (backExitState.isEscapeEnabled()) {
+                    selection = keyStroke;
+                    backExitState.setEscSelected(true);
+                }
                 break;
             case Character: {
                 final Character character = keyStroke.getCharacter();
