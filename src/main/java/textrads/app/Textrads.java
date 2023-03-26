@@ -21,8 +21,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import textrads.ai.Ai;
 import textrads.ai.AiSource;
+import textrads.attractmode.AbstractRecordFormatter;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
+import textrads.attractmode.ExtendedRecordHeightFormatter;
 import textrads.attractmode.RecordFormatter;
 import textrads.attractmode.RecordsRenderer;
 import textrads.attractmode.RecordsState;
@@ -89,16 +91,17 @@ public class Textrads {
     private final Question heightQuestion = new Question(new TextField("Height (1\u2500\u250012)?", 
             new NumberValidator(1, 12)));
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
+
+    private final GameRenderer gameRenderer = new GameRenderer();
     
     private final CongratsScreenState congratsScreenState = new CongratsScreenState();
     private final CongratsScreenRenderer congratsScreenRenderer = new CongratsScreenRenderer();
     
-    private final GameRenderer gameRenderer = new GameRenderer();
-    
-    // TODO TESTING
     private final ContinueExitState continueExitState = new ContinueExitState();
     private final RecordsState recordsState = new RecordsState();
     private final RecordsRenderer recordsRenderer = new RecordsRenderer();
+    private final RecordFormatter recordFormatter = new RecordFormatter();
+    private final ExtendedRecordHeightFormatter extendedRecordHeightFormatter = new ExtendedRecordHeightFormatter(); 
     
     private State state = State.ATTRACT;
     
@@ -109,6 +112,14 @@ public class Textrads {
     private int selectionTimer;
     private int wins0;
     private int wins1;
+    private String gameModeName;
+    private String allTimesKey;
+    private String todaysKey;
+    private RecordList<? super Record> allTimesList;
+    private RecordList<? super Record> todaysList;    
+    private int allTimesIndex;
+    private int todaysIndex;
+    private AbstractRecordFormatter formatter;
         
     public void launch() throws Exception {
         
@@ -211,63 +222,73 @@ public class Textrads {
     }
     
     private void update() {
-//        switch (state) {
-//            case ATTRACT:
-//                updateAttractMode();
-//                break;
-//            case MAIN_MENU:
-//                updateMainMenu();
-//                break;
-//            case LEVEL_CONFIG:
-//                updateLevelConfig();
-//                break;
-//            case HEIGHT_CONFIG:
-//                updateHeightConfig();
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                updateDifficultyConfig();
-//                break;
-//            case PLAY:
-//                updatePlay();
-//                break;
-//            case GIVE_UP:
-//                updateGiveUp();
-//                break;
-//            case CONTINUE:
-//                updateContinue();
-//                break;
-//        }
-        recordsState.update();
+        switch (state) {
+            case ATTRACT:
+                updateAttractMode();
+                break;
+            case MAIN_MENU:
+                updateMainMenu();
+                break;
+            case LEVEL_CONFIG:
+                updateLevelConfig();
+                break;
+            case HEIGHT_CONFIG:
+                updateHeightConfig();
+                break;
+            case DIFFICULTY_CONFIG:
+                updateDifficultyConfig();
+                break;
+            case PLAY:
+                updatePlay();
+                break;
+            case GIVE_UP:
+                updateGiveUp();
+                break;
+            case CONTINUE:
+                updateContinue();
+                break;
+            case CONGRATS:
+                updateCongrats();
+                break;
+            case RECORDS:
+                updateRecords();
+                break;
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        switch (state) {
-//            case ATTRACT:
-//                renderAttractMode(g, size);
-//                break;
-//            case MAIN_MENU:
-//                renderMainMenu(g, size);
-//                break;
-//            case LEVEL_CONFIG:
-//                renderLevelConfig(g, size);
-//                break;
-//            case HEIGHT_CONFIG:
-//                renderHeightConfig(g, size);
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                renderDifficultyConfig(g, size);
-//                break;
-//            case PLAY:
-//                renderPlay(g, size);
-//                break;
-//            case GIVE_UP:
-//                renderGiveUp(g, size);
-//                break;
-//            case CONTINUE:
-//                renderContinue(g, size);
-//                break;
-//        }
-        recordsRenderer.render(g, size, recordsState, continueExitState);
+        switch (state) {
+            case ATTRACT:
+                renderAttractMode(g, size);
+                break;
+            case MAIN_MENU:
+                renderMainMenu(g, size);
+                break;
+            case LEVEL_CONFIG:
+                renderLevelConfig(g, size);
+                break;
+            case HEIGHT_CONFIG:
+                renderHeightConfig(g, size);
+                break;
+            case DIFFICULTY_CONFIG:
+                renderDifficultyConfig(g, size);
+                break;
+            case PLAY:
+                renderPlay(g, size);
+                break;
+            case GIVE_UP:
+                renderGiveUp(g, size);
+                break;
+            case CONTINUE:
+                renderContinue(g, size);
+                break;
+            case CONGRATS:
+                renderCongrats(g, size);
+                break;
+            case RECORDS:
+                renderRecords(g, size);
+                break;                
+        }
     }
     
     private void updateAttractMode() {
@@ -574,6 +595,7 @@ public class Textrads {
             } 
             if (keyStroke.getKeyType() == KeyType.Enter) {
                 gameState.setSelection((byte) 0);
+                break;
             }
         }
     }
@@ -599,44 +621,46 @@ public class Textrads {
             }
         }
         
-        final String allTimesKey;
-        final String todaysKey;
         switch (gameMode) {
             case GameState.Mode.MARATHON:
+                gameModeName = "Marathon";
                 allTimesKey = Database.AllTimeKeys.MARATHON;
-                todaysKey = Database.TodaysKeys.MARATHON;
+                todaysKey = Database.TodaysKeys.MARATHON;                
                 break;
             case GameState.Mode.CONSTANT_LEVEL:
+                gameModeName = "Constant Level";
                 allTimesKey = Database.AllTimeKeys.CONSTANT_LEVEL;
                 todaysKey = Database.TodaysKeys.CONSTANT_LEVEL;                
                 break;
             case GameState.Mode.RISING_GARBAGE:
+                gameModeName = "Rising Garbage";
                 allTimesKey = Database.AllTimeKeys.RISING_GARBAGE;
                 todaysKey = Database.TodaysKeys.RISING_GARBAGE;
                 break;
             case GameState.Mode.THREE_MINUTES:
+                gameModeName = "Three Minutes";
                 allTimesKey = Database.AllTimeKeys.THREE_MINUTES;
                 todaysKey = Database.TodaysKeys.THREE_MINUTES;
                 break;
             case GameState.Mode.INVISIBLE:
+                gameModeName = "Invisible";
                 allTimesKey = Database.AllTimeKeys.INVISIBLE;
                 todaysKey = Database.TodaysKeys.INVISIBLE;
                 break;
             case GameState.Mode.GARBAGE_HEAP:
+                gameModeName = "Garbage Heap";
                 allTimesKey = Database.AllTimeKeys.GARBAGE_HEAP;
                 todaysKey = Database.TodaysKeys.GARBAGE_HEAP;
                 break;
             case GameState.Mode.FORTY_LINES:
+                gameModeName = "Forty Lines";
                 allTimesKey = Database.AllTimeKeys.FORTY_LINES;
                 todaysKey = Database.TodaysKeys.FORTY_LINES;
                 break;
             case GameState.Mode.VS_AI:
+                gameModeName = "Vs. AI";
                 allTimesKey = Database.AllTimeKeys.VS_AI;
                 todaysKey = Database.TodaysKeys.VS_AI;
-                break;
-            default:
-                allTimesKey = null;
-                todaysKey = null;
                 break;
         }
         
@@ -648,32 +672,144 @@ public class Textrads {
             case GameState.Mode.VS_AI:
                 record = new ExtendedRecord("AAA", challenge, monoGameState.getLevel(), monoGameState.getUpdates(), 
                         monoGameState.getScore(), System.currentTimeMillis());
+                formatter = extendedRecordHeightFormatter;
                 break;
             default:
                 record = new Record("AAA", monoGameState.getScore(), monoGameState.getLevel(), 
                         System.currentTimeMillis());
+                formatter = recordFormatter;
                 break;
         }
         
-        final RecordList<? super Record> allTimesList = database.get(allTimesKey, false);
-        final int allTimesIndex = allTimesList.findIndex(record);
+        allTimesList = database.get(allTimesKey, false);
+        allTimesIndex = allTimesList.findIndex(record);
         
-        final RecordList<? super Record> todaysList = database.get(todaysKey, true);
-        final int todaysIndex = todaysList.findIndex(record);
+        todaysList = database.get(todaysKey, true);
+        todaysIndex = todaysList.findIndex(record);
      
-        
+        if (allTimesIndex < RecordList.COUNT || todaysIndex < RecordList.COUNT) {
+            gotoCongrats();
+        } else {
+            returnToMenu();
+        }
     }
     
-    private void gotoCongrats() {
+    private void gotoCongrats() {    
         
+        final String prefix;
+        final int index;
+        if (allTimesIndex < RecordList.COUNT) {
+            prefix = "the All Time";
+            index = allTimesIndex;
+        } else {
+            prefix = "Today's";
+            index = todaysIndex;
+        }
+        
+        final String place;
+        switch (index) {
+            case 0:
+                place = "1st";
+                break;
+            case 1:
+                place = "2nd";
+                break;
+            case 2:
+                place = "3rd";
+                break;
+            default:
+                place = String.format("%dth", index + 1);
+                break;
+        }
+        
+        final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);        
+        congratsScreenState.init(String.format("Congratulations! You got %s Best %s Place.", prefix, place), 
+                preferences.getInitials());
+        state = State.CONGRATS;
     }
     
     private void updateCongrats() {
+        congratsScreenState.update();
+        if (!congratsScreenState.isEnterPressed()) {
+            return;
+        }
         
+        final MonoGameState monoGameState = GameStateSource.getState().getStates()[0];
+        final Record record;
+        switch (gameMode) {
+            case GameState.Mode.GARBAGE_HEAP:
+            case GameState.Mode.FORTY_LINES:
+            case GameState.Mode.VS_AI:
+                record = new ExtendedRecord(congratsScreenState.getInitials(), challenge, monoGameState.getLevel(), 
+                        monoGameState.getUpdates(), monoGameState.getScore(), System.currentTimeMillis());
+                break;
+            default:
+                record = new Record(congratsScreenState.getInitials(), monoGameState.getScore(), 
+                        monoGameState.getLevel(), System.currentTimeMillis());
+                break;
+        }        
+        
+        if (allTimesIndex < RecordList.COUNT) {
+            allTimesList = allTimesList.insert(allTimesIndex, record);
+            database.saveAsync(allTimesKey, allTimesList);
+        }
+        if (todaysIndex < RecordList.COUNT) {
+            todaysList = todaysList.insert(todaysIndex, record);
+            database.saveAsync(todaysKey, todaysList);
+        }
+        
+        gotoRecords();
     }
     
     private void renderCongrats(final TextGraphics g, final TerminalSize size) {
+        congratsScreenRenderer.render(g, size, congratsScreenState);
+    }
+    
+    private void gotoRecords() {
+        final String prefix;
+        final RecordList<? super Record> recordList;
+        if (allTimesIndex < RecordList.COUNT) {
+            prefix = "All Time";
+            recordList = allTimesList;
+        } else {
+            prefix = "Today's";
+            recordList = todaysList;
+        }        
+        recordsState.init(String.format("%s Best %s Records", prefix, gameModeName), recordList, formatter);
         
+        state = State.RECORDS;
+        continueExitState.setEnterSelected(false);
+        selectionTimer = Menu.SELECTION_FRAMES;
+        InputSource.clear();
+    }
+    
+    private void updateRecords() {
+        recordsState.update();
+        
+        if (continueExitState.isEnterSelected()) {
+            InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            } else {
+                returnToMenu();
+            }
+            return;
+        } 
+        
+        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            } 
+            if (keyStroke.getKeyType() == KeyType.Enter) {
+                continueExitState.setEnterSelected(true);
+                break;
+            }
+        }
+    }
+    
+    private void renderRecords(final TextGraphics g, final TerminalSize size) {
+        recordsRenderer.render(g, size, recordsState, continueExitState);
     }
     
     public static void main(final String... args) throws Exception {
