@@ -8,7 +8,7 @@ public class ContinueExitRenderer {
 
     public void render(final TextGraphics g, final TerminalSize size, final ContinueExitState state, final int y) {
         
-        final int x = (size.getColumns() - (21 + Menu.COLUMN_SPACER)) / 2;
+        final int x = (size.getColumns() - (27 + Menu.COLUMN_SPACER)) / 2;
         
         GraphicsUtil.setColor(g, MenuRenderer.BACKGROUND_COLOR, MenuItemRenderer.BUTTON_COLOR);
         g.setCharacter(x, y, '[');

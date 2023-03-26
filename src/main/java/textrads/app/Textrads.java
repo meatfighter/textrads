@@ -23,9 +23,16 @@ import textrads.ai.Ai;
 import textrads.ai.AiSource;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
+import textrads.attractmode.RecordFormatter;
+import textrads.attractmode.RecordsRenderer;
+import textrads.attractmode.RecordsState;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
+import textrads.db.ExtendedRecord;
 import textrads.db.Preferences;
+import textrads.db.Record;
+import textrads.db.RecordList;
+import textrads.ui.menu.ContinueExitState;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.Menu;
@@ -56,7 +63,9 @@ public class Textrads {
         DIFFICULTY_CONFIG,
         PLAY,
         GIVE_UP,
-        CONTINUE,        
+        CONTINUE,
+        CONGRATS,
+        RECORDS,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -86,6 +95,11 @@ public class Textrads {
     
     private final GameRenderer gameRenderer = new GameRenderer();
     
+    // TODO TESTING
+    private final ContinueExitState continueExitState = new ContinueExitState();
+    private final RecordsState recordsState = new RecordsState();
+    private final RecordsRenderer recordsRenderer = new RecordsRenderer();
+    
     private State state = State.ATTRACT;
     
     private byte gameMode;
@@ -108,6 +122,9 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
+            
+            recordsState.init("All Time Best Marathon Records", database.get(Database.AllTimeKeys.MARATHON, true), 
+                    new RecordFormatter());
 
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -194,61 +211,63 @@ public class Textrads {
     }
     
     private void update() {
-        switch (state) {
-            case ATTRACT:
-                updateAttractMode();
-                break;
-            case MAIN_MENU:
-                updateMainMenu();
-                break;
-            case LEVEL_CONFIG:
-                updateLevelConfig();
-                break;
-            case HEIGHT_CONFIG:
-                updateHeightConfig();
-                break;
-            case DIFFICULTY_CONFIG:
-                updateDifficultyConfig();
-                break;
-            case PLAY:
-                updatePlay();
-                break;
-            case GIVE_UP:
-                updateGiveUp();
-                break;
-            case CONTINUE:
-                updateContinue();
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                updateAttractMode();
+//                break;
+//            case MAIN_MENU:
+//                updateMainMenu();
+//                break;
+//            case LEVEL_CONFIG:
+//                updateLevelConfig();
+//                break;
+//            case HEIGHT_CONFIG:
+//                updateHeightConfig();
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                updateDifficultyConfig();
+//                break;
+//            case PLAY:
+//                updatePlay();
+//                break;
+//            case GIVE_UP:
+//                updateGiveUp();
+//                break;
+//            case CONTINUE:
+//                updateContinue();
+//                break;
+//        }
+        recordsState.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        switch (state) {
-            case ATTRACT:
-                renderAttractMode(g, size);
-                break;
-            case MAIN_MENU:
-                renderMainMenu(g, size);
-                break;
-            case LEVEL_CONFIG:
-                renderLevelConfig(g, size);
-                break;
-            case HEIGHT_CONFIG:
-                renderHeightConfig(g, size);
-                break;
-            case DIFFICULTY_CONFIG:
-                renderDifficultyConfig(g, size);
-                break;
-            case PLAY:
-                renderPlay(g, size);
-                break;
-            case GIVE_UP:
-                renderGiveUp(g, size);
-                break;
-            case CONTINUE:
-                renderContinue(g, size);
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                renderAttractMode(g, size);
+//                break;
+//            case MAIN_MENU:
+//                renderMainMenu(g, size);
+//                break;
+//            case LEVEL_CONFIG:
+//                renderLevelConfig(g, size);
+//                break;
+//            case HEIGHT_CONFIG:
+//                renderHeightConfig(g, size);
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                renderDifficultyConfig(g, size);
+//                break;
+//            case PLAY:
+//                renderPlay(g, size);
+//                break;
+//            case GIVE_UP:
+//                renderGiveUp(g, size);
+//                break;
+//            case CONTINUE:
+//                renderContinue(g, size);
+//                break;
+//        }
+        recordsRenderer.render(g, size, recordsState, continueExitState);
     }
     
     private void updateAttractMode() {
@@ -564,7 +583,9 @@ public class Textrads {
     }
     
     private void handleContinue() {
+        
         final GameState gameState = GameStateSource.getState();
+        
         if (gameMode == GameState.Mode.VS_AI || gameMode == GameState.Mode.VS_HUMAN) {
             final MonoGameState[] states = gameState.getStates();
             wins0 = states[0].getWins();
@@ -577,6 +598,82 @@ public class Textrads {
                 gotoDifficultyConfig();
             }
         }
+        
+        final String allTimesKey;
+        final String todaysKey;
+        switch (gameMode) {
+            case GameState.Mode.MARATHON:
+                allTimesKey = Database.AllTimeKeys.MARATHON;
+                todaysKey = Database.TodaysKeys.MARATHON;
+                break;
+            case GameState.Mode.CONSTANT_LEVEL:
+                allTimesKey = Database.AllTimeKeys.CONSTANT_LEVEL;
+                todaysKey = Database.TodaysKeys.CONSTANT_LEVEL;                
+                break;
+            case GameState.Mode.RISING_GARBAGE:
+                allTimesKey = Database.AllTimeKeys.RISING_GARBAGE;
+                todaysKey = Database.TodaysKeys.RISING_GARBAGE;
+                break;
+            case GameState.Mode.THREE_MINUTES:
+                allTimesKey = Database.AllTimeKeys.THREE_MINUTES;
+                todaysKey = Database.TodaysKeys.THREE_MINUTES;
+                break;
+            case GameState.Mode.INVISIBLE:
+                allTimesKey = Database.AllTimeKeys.INVISIBLE;
+                todaysKey = Database.TodaysKeys.INVISIBLE;
+                break;
+            case GameState.Mode.GARBAGE_HEAP:
+                allTimesKey = Database.AllTimeKeys.GARBAGE_HEAP;
+                todaysKey = Database.TodaysKeys.GARBAGE_HEAP;
+                break;
+            case GameState.Mode.FORTY_LINES:
+                allTimesKey = Database.AllTimeKeys.FORTY_LINES;
+                todaysKey = Database.TodaysKeys.FORTY_LINES;
+                break;
+            case GameState.Mode.VS_AI:
+                allTimesKey = Database.AllTimeKeys.VS_AI;
+                todaysKey = Database.TodaysKeys.VS_AI;
+                break;
+            default:
+                allTimesKey = null;
+                todaysKey = null;
+                break;
+        }
+        
+        final MonoGameState monoGameState = gameState.getStates()[0];
+        final Record record;
+        switch (gameMode) {
+            case GameState.Mode.GARBAGE_HEAP:
+            case GameState.Mode.FORTY_LINES:
+            case GameState.Mode.VS_AI:
+                record = new ExtendedRecord("AAA", challenge, monoGameState.getLevel(), monoGameState.getUpdates(), 
+                        monoGameState.getScore(), System.currentTimeMillis());
+                break;
+            default:
+                record = new Record("AAA", monoGameState.getScore(), monoGameState.getLevel(), 
+                        System.currentTimeMillis());
+                break;
+        }
+        
+        final RecordList<? super Record> allTimesList = database.get(allTimesKey, false);
+        final int allTimesIndex = allTimesList.findIndex(record);
+        
+        final RecordList<? super Record> todaysList = database.get(todaysKey, true);
+        final int todaysIndex = todaysList.findIndex(record);
+     
+        
+    }
+    
+    private void gotoCongrats() {
+        
+    }
+    
+    private void updateCongrats() {
+        
+    }
+    
+    private void renderCongrats(final TextGraphics g, final TerminalSize size) {
+        
     }
     
     public static void main(final String... args) throws Exception {
