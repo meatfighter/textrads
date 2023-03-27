@@ -1,3 +1,43 @@
+Netplay:
+
+---------------------
+
+NetPlay
+
+[S] Play as Server
+[C] Play as Client
+
+---------------------
+
+Server
+
+[R] Run
+[S] Stop
+[C] Configure
+
+---------------------
+
+Client
+
+[R] Run
+[S] Stop
+[C] Configure
+
+---------------------
+
+Waiting for client...
+
+[Esc]
+
+---------------------
+
+
+
+
+
+
+
+
 Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
 
   00000000001111111111
