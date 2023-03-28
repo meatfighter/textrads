@@ -1,40 +1,115 @@
-Netplay:
+Vs. Human
 
----------------------
-
-NetPlay
-
-[S] Play as Server
+[S] Play as Server  
 [C] Play as Client
+
+[Esc] Back  [Ctrl+C] Exit
 
 ---------------------
 
 Server
 
+Host: ...
+Port: ...
+
 [R] Run
-[S] Stop
-[C] Configure
+[H] Set Host
+[P] Set Port
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Server
+
+Host: _
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Server
+
+Port: _
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Server Error
+
+Port already in use.
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Waiting for Client...
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Play again?
+
+[Y] Yes
+[N] No
+
+[Ctrl+C] Exit
+
+---------------------
 
 ---------------------
 
 Client
 
+Host: ...
+Port: ...
+
 [R] Run
-[S] Stop
-[C] Configure
+[H] Set Host
+[P] Set Port
+
+[Esc] Back  [Ctrl+C] Exit
 
 ---------------------
 
-Waiting for client...
+Client
 
-[Esc]
+Host: _
+
+[Esc] Back  [Ctrl+C] Exit
 
 ---------------------
 
+Client
 
+Port: _
 
+[Esc] Back  [Ctrl+C] Exit
 
+---------------------
 
+Client Error
+
+Cannot connect to host.
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Waiting for Server...
+
+[Esc] Back  [Ctrl+C] Exit
+
+---------------------
+
+Play again?
+
+[Y] Yes
+[N] No
+
+[Ctrl+C] Exit
 
 
 
