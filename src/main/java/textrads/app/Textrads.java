@@ -37,6 +37,8 @@ import textrads.db.RecordList;
 import textrads.netplay.NetplayRenderer;
 import textrads.netplay.NetplayState;
 import textrads.netplay.Server;
+import textrads.ui.menu.Chooser;
+import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.ContinueExitState;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
@@ -110,6 +112,10 @@ public class Textrads {
     private final NetplayState netplayState = new NetplayState();
     private final NetplayRenderer netplayRenderer = new NetplayRenderer();
     
+    // TODO TESTING
+    private final Chooser chooser = new Chooser("Select the local address to which the Server will bind:");
+    private final ChooserRenderer chooserRenderer = new ChooserRenderer();
+    
     private State state = State.ATTRACT;
     
     private byte gameMode;
@@ -141,8 +147,30 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
             
-            recordsState.init("All Time Best Marathon Records", database.get(Database.AllTimeKeys.MARATHON, true), 
-                    new RecordFormatter());
+            // TODO TESTING
+            final List<String> items = new ArrayList<>();
+            items.add("Any/all local addresses");
+            items.add("address A");
+            items.add("address B");
+            items.add("address C");
+            items.add("address D");
+            items.add("address E");
+            items.add("address F");
+            items.add("address G");
+            items.add("address H");
+            items.add("address I");
+            items.add("address J");
+            items.add("address K");
+            items.add("address L");
+            items.add("address M");
+            items.add("address N");
+            items.add("address O");
+            items.add("address P");
+            items.add("address Q");
+            items.add("address R");
+            items.add("address S");
+            items.add("address T");            
+            chooser.init(items);
 
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
@@ -229,79 +257,83 @@ public class Textrads {
     }
     
     private void update() {
-        switch (state) {
-            case ATTRACT:
-                updateAttractMode();
-                break;
-            case MAIN_MENU:
-                updateMainMenu();
-                break;
-            case LEVEL_CONFIG:
-                updateLevelConfig();
-                break;
-            case HEIGHT_CONFIG:
-                updateHeightConfig();
-                break;
-            case DIFFICULTY_CONFIG:
-                updateDifficultyConfig();
-                break;
-            case PLAY:
-                updatePlay();
-                break;
-            case GIVE_UP:
-                updateGiveUp();
-                break;
-            case CONTINUE:
-                updateContinue();
-                break;
-            case CONGRATS:
-                updateCongrats();
-                break;
-            case RECORDS:
-                updateRecords();
-                break;
-            case NETPLAY:
-                updateNetplay();
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                updateAttractMode();
+//                break;
+//            case MAIN_MENU:
+//                updateMainMenu();
+//                break;
+//            case LEVEL_CONFIG:
+//                updateLevelConfig();
+//                break;
+//            case HEIGHT_CONFIG:
+//                updateHeightConfig();
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                updateDifficultyConfig();
+//                break;
+//            case PLAY:
+//                updatePlay();
+//                break;
+//            case GIVE_UP:
+//                updateGiveUp();
+//                break;
+//            case CONTINUE:
+//                updateContinue();
+//                break;
+//            case CONGRATS:
+//                updateCongrats();
+//                break;
+//            case RECORDS:
+//                updateRecords();
+//                break;
+//            case NETPLAY:
+//                updateNetplay();
+//                break;
+//        }
+
+        chooser.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-        switch (state) {
-            case ATTRACT:
-                renderAttractMode(g, size);
-                break;
-            case MAIN_MENU:
-                renderMainMenu(g, size);
-                break;
-            case LEVEL_CONFIG:
-                renderLevelConfig(g, size);
-                break;
-            case HEIGHT_CONFIG:
-                renderHeightConfig(g, size);
-                break;
-            case DIFFICULTY_CONFIG:
-                renderDifficultyConfig(g, size);
-                break;
-            case PLAY:
-                renderPlay(g, size);
-                break;
-            case GIVE_UP:
-                renderGiveUp(g, size);
-                break;
-            case CONTINUE:
-                renderContinue(g, size);
-                break;
-            case CONGRATS:
-                renderCongrats(g, size);
-                break;
-            case RECORDS:
-                renderRecords(g, size);
-                break;
-            case NETPLAY:
-                renderNetplay(g, size);
-                break;
-        }
+//        switch (state) {
+//            case ATTRACT:
+//                renderAttractMode(g, size);
+//                break;
+//            case MAIN_MENU:
+//                renderMainMenu(g, size);
+//                break;
+//            case LEVEL_CONFIG:
+//                renderLevelConfig(g, size);
+//                break;
+//            case HEIGHT_CONFIG:
+//                renderHeightConfig(g, size);
+//                break;
+//            case DIFFICULTY_CONFIG:
+//                renderDifficultyConfig(g, size);
+//                break;
+//            case PLAY:
+//                renderPlay(g, size);
+//                break;
+//            case GIVE_UP:
+//                renderGiveUp(g, size);
+//                break;
+//            case CONTINUE:
+//                renderContinue(g, size);
+//                break;
+//            case CONGRATS:
+//                renderCongrats(g, size);
+//                break;
+//            case RECORDS:
+//                renderRecords(g, size);
+//                break;
+//            case NETPLAY:
+//                renderNetplay(g, size);
+//                break;
+//        }
+
+        chooserRenderer.render(g, size, chooser);
     }
     
     private void updateAttractMode() {

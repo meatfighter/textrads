@@ -1,12 +1,22 @@
 package textrads.ui.menu;
 
+import com.googlecode.lanterna.input.KeyStroke;
 import java.util.ArrayList;
 import java.util.List;
+import textrads.input.InputSource;
 
 public class Chooser {
     
     private static final int DEFAULT_DISPLAYED_ITEMS_PER_PAGE = 9;
 
+    private final List<MenuColumn> nextMenuColumns = createNextMenuColumns();
+    private final List<MenuColumn> previousNextMenuColumns = createPreviousNextMenuColumns();
+    private final List<MenuColumn> previousMenuColumns = createPreviousMenuColumns();
+    
+    private final int nextWidth = nextMenuColumns.get(0).getWidth();    
+    private final int previousWidth = previousMenuColumns.get(0).getWidth();
+    private final int previousNextWidth = nextWidth + Menu.COLUMN_SPACER + previousWidth;
+    
     private final List<List<MenuColumn>> pages = new ArrayList<>();
     
     private final String title;
@@ -17,6 +27,14 @@ public class Chooser {
     private int height;
     private int itemsWidth;
     private int itemsHeight;
+    
+    private int pageIndex;
+    
+    private int selectedItemIndex;
+    private boolean escPressed;
+    private boolean nextPressed;
+    private boolean previousPressed;
+    private int selectionTimer;
     
     public Chooser(final String title) {
         this(title, DEFAULT_DISPLAYED_ITEMS_PER_PAGE, true);
@@ -32,14 +50,53 @@ public class Chooser {
         backExitState = new BackExitState(escapeEnabled);
     }
     
+    private List<MenuColumn> createNextMenuColumns() {
+        final List<MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(new MenuItem("Next"));
+        
+        final List<MenuColumn> menuColumns = new ArrayList<>();
+        menuColumns.add(new MenuColumn(menuItems));
+        
+        return menuColumns;
+    }
+    
+    private List<MenuColumn> createPreviousNextMenuColumns() {
+        final List<MenuItem> menuItems0 = new ArrayList<>();
+        menuItems0.add(new MenuItem("Previous"));
+        
+        final List<MenuItem> menuItems1 = new ArrayList<>();
+        menuItems1.add(new MenuItem("Next"));
+        
+        final List<MenuColumn> menuColumns = new ArrayList<>();
+        menuColumns.add(new MenuColumn(menuItems0));
+        menuColumns.add(new MenuColumn(menuItems1));
+        
+        return menuColumns;
+    }
+    
+    private List<MenuColumn> createPreviousMenuColumns() {
+        final List<MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(new MenuItem("Previous"));
+        
+        final List<MenuColumn> menuColumns = new ArrayList<>();
+        menuColumns.add(new MenuColumn(menuItems));
+        
+        return menuColumns;        
+    }
+    
     public void init(final List<String> items) {
+        
+        backExitState.reset();
+        nextMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        previousNextMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        previousMenuColumns.forEach(menuColumn -> menuColumn.reset());
 
         pages.clear();
         itemsWidth = 0;
         itemsHeight = 0;
         List<MenuItem> page = new ArrayList<>();
         for (int i = 0, end = items.size() - 1, index = 1; i <= end; ++i) {            
-            page.add(new MenuItem(items.get(i), Character.forDigit(index++, 10)));
+            page.add(new MenuItem(items.get(i), Character.forDigit(index, 10)));
             if (i == end || index == displayedItemsPerPage) {                
                 final List<MenuColumn> menuColumnList = new ArrayList<>();
                 final MenuColumn menuColumn = new MenuColumn(page);
@@ -51,11 +108,111 @@ public class Chooser {
                     index = 1;
                     page = new ArrayList<>();
                 }
+            } else {
+                ++index;
             }
         }
         
         width = Math.max(itemsWidth, title.length());        
         height = 7 + itemsHeight;
+        
+        pageIndex = 0;
+        selectedItemIndex = -1;
+        escPressed = false;
+        selectionTimer = Menu.SELECTION_FRAMES;
+    }
+    
+    public void update() {
+        if (nextPressed || previousPressed || escPressed || selectedItemIndex >= 0) {
+            InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            } else if (nextPressed) {
+                handleNextPressed();
+            } else if (previousPressed) {
+                handlePreviousPressed();
+            }
+        } else {
+            for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+                final KeyStroke keyStroke = InputSource.poll();
+                if (keyStroke == null) {
+                    break;
+                }
+                handleInput(keyStroke);
+            }
+        }
+    }
+    
+    private void handleNextPressed() {
+        nextPressed = false;
+        selectionTimer = Menu.SELECTION_FRAMES;
+        nextMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        previousNextMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        ++pageIndex;
+    }
+    
+    private void handlePreviousPressed() {
+        previousPressed = false;
+        selectionTimer = Menu.SELECTION_FRAMES;
+        previousNextMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        previousMenuColumns.forEach(menuColumn -> menuColumn.reset());
+        --pageIndex;
+    }
+    
+    private void handleInput(final KeyStroke keyStroke) {
+        switch (keyStroke.getKeyType()) {
+            case Escape:
+                if (backExitState.isEscapeEnabled()) {
+                    escPressed = true;
+                    backExitState.setEscSelected(true);
+                }
+                break;
+            case Character: {
+                final Character character = keyStroke.getCharacter();
+                if (character == null) {
+                    break;
+                }                
+                final char c = Character.toUpperCase(character);
+                
+                switch (c) {
+                    case 'N':
+                        if (pageIndex != pages.size() - 1) {
+                            nextPressed = true;
+                            if (pageIndex == 0) {
+                                nextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                            } else {
+                                previousNextMenuColumns.get(1).getMenuItems().get(0).setSelected(true);
+                            }
+                        }
+                        return;
+                    case 'P':
+                        if (pageIndex != 0) {
+                            previousPressed = true;
+                            if (pageIndex == pages.size() - 1) {
+                                previousMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                            } else {
+                                previousNextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                            }
+                        }
+                        return;
+                }
+                
+                final MenuColumn page = pages.get(pageIndex).get(0);
+                if (page.handleInput(c)) {
+                    selectedItemIndex = displayedItemsPerPage * pageIndex + Character.getNumericValue(c) - 1;
+                }    
+                
+                break;
+            }
+        }
+    }
+
+    public int getSelectedItemIndex() {
+        return (selectionTimer == 0) ? selectedItemIndex : -1;
+    }
+
+    public boolean isEscPressed() {
+        return (selectionTimer == 0) ? escPressed : false;
     }
 
     public int getWidth() {
@@ -72,5 +229,49 @@ public class Chooser {
 
     public int getItemsHeight() {
         return itemsHeight;
+    }
+
+    public List<MenuColumn> getNextMenuColumns() {
+        return nextMenuColumns;
+    }
+
+    public List<MenuColumn> getPreviousNextMenuColumns() {
+        return previousNextMenuColumns;
+    }
+
+    public List<MenuColumn> getPreviousMenuColumns() {
+        return previousMenuColumns;
+    }
+
+    public int getNextWidth() {
+        return nextWidth;
+    }
+
+    public int getPreviousWidth() {
+        return previousWidth;
+    }
+
+    public int getPreviousNextWidth() {
+        return previousNextWidth;
+    }
+
+    public List<List<MenuColumn>> getPages() {
+        return pages;
+    }
+
+    public List<MenuColumn> getPage() {
+        return pages.get(pageIndex);
+    }
+    
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public BackExitState getBackExitState() {
+        return backExitState;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }
