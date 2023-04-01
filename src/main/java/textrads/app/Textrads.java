@@ -34,6 +34,9 @@ import textrads.db.ExtendedRecord;
 import textrads.db.Preferences;
 import textrads.db.Record;
 import textrads.db.RecordList;
+import textrads.netplay.NetplayRenderer;
+import textrads.netplay.NetplayState;
+import textrads.netplay.Server;
 import textrads.ui.menu.ContinueExitState;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
@@ -68,6 +71,7 @@ public class Textrads {
         CONTINUE,
         CONGRATS,
         RECORDS,
+        NETPLAY,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -101,7 +105,10 @@ public class Textrads {
     private final RecordsState recordsState = new RecordsState();
     private final RecordsRenderer recordsRenderer = new RecordsRenderer();
     private final RecordFormatter recordFormatter = new RecordFormatter();
-    private final ExtendedRecordHeightFormatter extendedRecordHeightFormatter = new ExtendedRecordHeightFormatter(); 
+    private final ExtendedRecordHeightFormatter extendedRecordHeightFormatter = new ExtendedRecordHeightFormatter();
+    
+    private final NetplayState netplayState = new NetplayState();
+    private final NetplayRenderer netplayRenderer = new NetplayRenderer();
     
     private State state = State.ATTRACT;
     
@@ -253,6 +260,9 @@ public class Textrads {
             case RECORDS:
                 updateRecords();
                 break;
+            case NETPLAY:
+                updateNetplay();
+                break;
         }
     }
     
@@ -287,7 +297,10 @@ public class Textrads {
                 break;
             case RECORDS:
                 renderRecords(g, size);
-                break;                
+                break;
+            case NETPLAY:
+                renderNetplay(g, size);
+                break;
         }
     }
     
@@ -352,8 +365,8 @@ public class Textrads {
                         gameMode = GameState.Mode.VS_AI;
                         break;
                     case 'H':
-                        gameMode = GameState.Mode.VS_HUMAN;
-                        break;
+                        gotoNetplay();
+                        return;
                 }
                 gotoLevelConfig();
                 break;
@@ -812,7 +825,26 @@ public class Textrads {
         recordsRenderer.render(g, size, recordsState, continueExitState);
     }
     
+    private void gotoNetplay() {
+        state = State.NETPLAY;
+        gameMode = GameState.Mode.VS_HUMAN;
+        netplayState.reset();
+    }
+    
+    private void updateNetplay() {
+        netplayState.update();
+        if (netplayState.isReturnToMainMenu()) {
+            gotoMainMenu();
+        }
+    }
+    
+    private void renderNetplay(final TextGraphics g, final TerminalSize size) {
+        netplayRenderer.render(g, size, netplayState);
+    }
+    
     public static void main(final String... args) throws Exception {
-        new Textrads().launch();
+        //new Textrads().launch();
+        
+        Server.getNetworkInterfaceAddresses().forEach(System.out::println);
     }
 }

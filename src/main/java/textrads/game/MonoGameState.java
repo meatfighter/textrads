@@ -31,7 +31,7 @@ public class MonoGameState implements Serializable {
     
     private static final long MAX_SCORE = 999_999_999L;
     
-    private static final int FRAMES_PER_THREE_MINUTES = /*Textrads.FRAMES_PER_SECOND **/ 60/* * 3*/; // TODO TESTING
+    private static final int FRAMES_PER_THREE_MINUTES = Textrads.FRAMES_PER_SECOND * 60 * 3;
     
     private static final int[] CLEAR_POINTS = { 0, 40, 100, 300, 1200 };
     private static final int[] ATTACK_ROWS = { 0, 0, 1, 2, 4 };
@@ -207,12 +207,11 @@ public class MonoGameState implements Serializable {
         
         switch (gameState.getMode()) {
             case GameState.Mode.GARBAGE_HEAP:
-                //lines = 25;
-                lines = 1; // TODO TESTING
+                lines = 25;
                 createGarbageHeap(garbageHeight);
                 break;
             case GameState.Mode.FORTY_LINES:
-                lines = 1; // TODO TESTING 40;
+                lines = 40;
                 break;
             default:
                 lines = 0;
