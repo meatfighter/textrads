@@ -114,7 +114,7 @@ public class Chooser {
         }
         
         width = Math.max(itemsWidth, title.length());        
-        height = 7 + itemsHeight;
+        height = 7 + 2 * displayedItemsPerPage;
         
         pageIndex = 0;
         selectedItemIndex = -1;
@@ -174,27 +174,29 @@ public class Chooser {
                 }                
                 final char c = Character.toUpperCase(character);
                 
-                switch (c) {
-                    case 'N':
-                        if (pageIndex != pages.size() - 1) {
-                            nextPressed = true;
-                            if (pageIndex == 0) {
-                                nextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
-                            } else {
-                                previousNextMenuColumns.get(1).getMenuItems().get(0).setSelected(true);
+                if (pages.size() > 1) {
+                    switch (c) {
+                        case 'N':
+                            if (pageIndex != pages.size() - 1) {
+                                nextPressed = true;
+                                if (pageIndex == 0) {
+                                    nextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                                } else {
+                                    previousNextMenuColumns.get(1).getMenuItems().get(0).setSelected(true);
+                                }
                             }
-                        }
-                        return;
-                    case 'P':
-                        if (pageIndex != 0) {
-                            previousPressed = true;
-                            if (pageIndex == pages.size() - 1) {
-                                previousMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
-                            } else {
-                                previousNextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                            return;
+                        case 'P':
+                            if (pageIndex != 0) {
+                                previousPressed = true;
+                                if (pageIndex == pages.size() - 1) {
+                                    previousMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                                } else {
+                                    previousNextMenuColumns.get(0).getMenuItems().get(0).setSelected(true);
+                                }
                             }
-                        }
-                        return;
+                            return;
+                    }
                 }
                 
                 final MenuColumn page = pages.get(pageIndex).get(0);

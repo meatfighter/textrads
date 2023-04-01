@@ -3,6 +3,7 @@ package textrads.ui.menu;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import java.util.List;
 import textrads.ui.common.Colors;
 import textrads.util.GraphicsUtil;
 
@@ -27,18 +28,21 @@ public class ChooserRenderer {
         menuColumnsRenderer.render(g, size, chooser.getPage(), (size.getColumns() - chooser.getItemsWidth()) / 2, 
                 oy + 2);
         
-        final int pageIndex = chooser.getPageIndex();
-        if (pageIndex == 0) {
-            menuColumnsRenderer.render(g, size, chooser.getNextMenuColumns(), 
-                    (size.getColumns() - chooser.getNextWidth()) / 2, oy + chooser.getItemsHeight() + 4);
-        } else if (pageIndex == chooser.getPages().size() - 1) {
-            menuColumnsRenderer.render(g, size, chooser.getPreviousMenuColumns(), 
-                    (size.getColumns() - chooser.getPreviousWidth()) / 2, oy + chooser.getItemsHeight() + 4);
-        } else {
-            menuColumnsRenderer.render(g, size, chooser.getPreviousNextMenuColumns(), 
-                    (size.getColumns() - chooser.getPreviousNextWidth()) / 2, oy + chooser.getItemsHeight() + 4);
+        final List<List<MenuColumn>> pages = chooser.getPages();
+        if (pages.size() > 1) {
+            final int pageIndex = chooser.getPageIndex();
+            if (pageIndex == 0) {
+                menuColumnsRenderer.render(g, size, chooser.getNextMenuColumns(), 
+                        (size.getColumns() - chooser.getNextWidth()) / 2, oy + chooser.getHeight() - 4);
+            } else if (pageIndex == pages.size() - 1) {
+                menuColumnsRenderer.render(g, size, chooser.getPreviousMenuColumns(), 
+                        (size.getColumns() - chooser.getPreviousWidth()) / 2, oy + chooser.getHeight() - 4);
+            } else {
+                menuColumnsRenderer.render(g, size, chooser.getPreviousNextMenuColumns(), 
+                        (size.getColumns() - chooser.getPreviousNextWidth()) / 2, oy + chooser.getHeight() - 4);
+            }
         }
         
-        backExitRenderer.render(g, size, chooser.getBackExitState(), oy + chooser.getItemsHeight() + 6);
+        backExitRenderer.render(g, size, chooser.getBackExitState(), oy + chooser.getHeight() - 2);
     }
 }

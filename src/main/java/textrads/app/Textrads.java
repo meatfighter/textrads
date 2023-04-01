@@ -15,7 +15,13 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
+import static java.lang.System.out;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -133,6 +139,16 @@ public class Textrads {
     private int allTimesIndex;
     private int todaysIndex;
     private AbstractRecordFormatter formatter;
+    
+    static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
+        out.printf("Display name: %s\n", netint.getDisplayName());
+        out.printf("Name: %s\n", netint.getName());
+        Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+        for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+            out.printf("InetAddress: %s\n", inetAddress);
+        }
+        out.printf("\n");
+     }
         
     public void launch() throws Exception {
         
@@ -148,28 +164,14 @@ public class Textrads {
             attractModeState.reset();
             
             // TODO TESTING
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+        for (NetworkInterface netint : Collections.list(nets))
+            displayInterfaceInformation(netint);
+            
+            
             final List<String> items = new ArrayList<>();
             items.add("Any/all local addresses");
-            items.add("address A");
-            items.add("address B");
-            items.add("address C");
-            items.add("address D");
-            items.add("address E");
-            items.add("address F");
-            items.add("address G");
-            items.add("address H");
-            items.add("address I");
-            items.add("address J");
-            items.add("address K");
-            items.add("address L");
-            items.add("address M");
-            items.add("address N");
-            items.add("address O");
-            items.add("address P");
-            items.add("address Q");
-            items.add("address R");
-            items.add("address S");
-            items.add("address T");            
+            Server.getNetworkInterfaceAddresses().forEach(address -> items.add(address.toString()));
             chooser.init(items);
 
             final TextGraphics g = screen.newTextGraphics();
