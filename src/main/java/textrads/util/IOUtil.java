@@ -29,16 +29,28 @@ public final class IOUtil {
         private final String name;
         private final int sortPriority;
         
-        public NetworkInterfaceAddress(final InetAddress address, final String name) {
-            this.address = address;
+        public NetworkInterfaceAddress(final String name) {
+            this(name, null);
+        }
+        
+        public NetworkInterfaceAddress(final String name, final InetAddress address) {
             this.name = name;
+            this.address = address;
+            sortPriority = 0;
+        }
+        
+        public NetworkInterfaceAddress(final NetworkInterface networkInterface, final InetAddress address) {
+            this.address = address;
+            this.name = String.format("%s: %s", networkInterface.getDisplayName(), address);
             
-            final String n = name.toLowerCase();
-            sortPriority = (n.contains("local") ? 0 : 0x10)
-                    | (n.contains("loop") ? 0 : 0x08)
-                    | (n.contains("ethernet") ? 0 : 0x04)
-                    | (n.contains("wireless") ? 0 : 0x02)          
-                    | (n.contains("wi") && n.contains("fi") ? 0 : 0x01);
+            final String n = networkInterface.getName().toLowerCase();
+            final String d = networkInterface.getDisplayName().toLowerCase();            
+            sortPriority = (n.startsWith("l") || d.contains("loop") || d.contains("local") ? 0 : 32)
+                    | (n.startsWith("e") || d.contains("ethernet") ? 0 : 16)
+                    | (n.startsWith("w") || d.contains("wireless") ? 0 : 8)
+                    | (n.startsWith("p") || d.contains("point") ? 0 : 4)
+                    | (n.startsWith("v") || d.contains("virtual") ? 0 : 2)
+                    | (n.startsWith("t") || d.contains("tunnel") ? 0 : 1);
         }
 
         @Override
@@ -88,12 +100,11 @@ public final class IOUtil {
         }
         Collections.list(NetworkInterface.getNetworkInterfaces()).forEach(networkInterface -> {
             Collections.list(networkInterface.getInetAddresses()).forEach(address -> {
-                NETWORK_INTERFACE_ADDRESSES.add(new NetworkInterfaceAddress(address, 
-                        String.format("%s: %s", networkInterface.getDisplayName(), address)));
+                NETWORK_INTERFACE_ADDRESSES.add(new NetworkInterfaceAddress(networkInterface, address));
             });
         });
         Collections.sort(NETWORK_INTERFACE_ADDRESSES);
-        NETWORK_INTERFACE_ADDRESSES.add(0, new NetworkInterfaceAddress(null, "Any/all local addresses"));
+        NETWORK_INTERFACE_ADDRESSES.add(0, new NetworkInterfaceAddress("Any/all local addresses"));
     }
     
     public static List<NetworkInterfaceAddress> getNetworkInterfaceAddresses() {

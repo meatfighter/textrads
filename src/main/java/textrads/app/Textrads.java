@@ -121,7 +121,7 @@ public class Textrads {
     
     // TODO TESTING
     private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
-            = new Chooser<>("Select the local address to which the Server will bind:");
+            = new Chooser<>("Bind where?");
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
     
     private State state = State.ATTRACT;
@@ -142,16 +142,6 @@ public class Textrads {
     private int todaysIndex;
     private AbstractRecordFormatter formatter;
     
-    static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
-        out.printf("Display name: %s\n", netint.getDisplayName());
-        out.printf("Name: %s\n", netint.getName());
-        Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-        for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-            out.printf("InetAddress: %s\n", inetAddress);
-        }
-        out.printf("\n");
-     }
-        
     public void launch() throws Exception {
         
         IOUtil.init();
