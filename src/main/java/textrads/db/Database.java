@@ -64,6 +64,7 @@ public class Database {
         load(AllTimeKeys.CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER);
         load(AllTimeKeys.RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER);
         load(AllTimeKeys.THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER);
+        load(AllTimeKeys.NO_ROTATION, RecordList.RECORD_LIST_SUPPLIER);
         load(AllTimeKeys.INVISIBLE, RecordList.RECORD_LIST_SUPPLIER);
         
         load(AllTimeKeys.GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER);
@@ -74,6 +75,7 @@ public class Database {
         load(TodaysKeys.CONSTANT_LEVEL, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TodaysKeys.RISING_GARBAGE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TodaysKeys.THREE_MINUTES, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
+        load(TodaysKeys.NO_ROTATION, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         load(TodaysKeys.INVISIBLE, RecordList.RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);
         
         load(TodaysKeys.GARBAGE_HEAP, RecordList.EXTENDED_RECORD_LIST_SUPPLIER, RecordList.TODAYS_INITIALIZATION_TASK);

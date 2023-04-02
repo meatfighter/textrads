@@ -1,17 +1,15 @@
-Server/Client
-
-Host: ...
-
-Port: ...
-
-[P] Play     |
-             | Error: Failed to ... / Waiting for Server/Client...
-             | 
-[H] Set host |
-             |
-[P] Set Port |
-
-[Esc] Back  [Ctrl+C] Exit
+ 0 Server/Client
+ 1
+ 2 Host: ...
+ 3 Port: ...
+ 4                              |
+ 5 [S] Start                    |
+ 6                              |  
+ 7 [H] Set host   [P] Set Port  |  Error: Failed to ... / Waiting for Server/Client...
+ 8                              |
+ 9                              |
+10                              |
+11 [Esc] Back  [Ctrl+C] Exit
 
 --------------------------
 
@@ -131,6 +129,10 @@ Play again?
 [N] No
 
 [Ctrl+C] Exit
+
+
+TODO:
+No rotation and invisible initial scores need to be lowered.
 
 
 

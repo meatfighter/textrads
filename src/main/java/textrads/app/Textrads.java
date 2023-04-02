@@ -647,44 +647,41 @@ public class Textrads {
             }
         }
         
+        gameModeName = GameState.Mode.toString(gameMode);
         switch (gameMode) {
             case GameState.Mode.MARATHON:
-                gameModeName = "Marathon";
                 allTimesKey = Database.AllTimeKeys.MARATHON;
                 todaysKey = Database.TodaysKeys.MARATHON;                
                 break;
             case GameState.Mode.CONSTANT_LEVEL:
-                gameModeName = "Constant Level";
                 allTimesKey = Database.AllTimeKeys.CONSTANT_LEVEL;
                 todaysKey = Database.TodaysKeys.CONSTANT_LEVEL;                
                 break;
+            case GameState.Mode.GARBAGE_HEAP:
+                allTimesKey = Database.AllTimeKeys.GARBAGE_HEAP;
+                todaysKey = Database.TodaysKeys.GARBAGE_HEAP;
+                break;                
             case GameState.Mode.RISING_GARBAGE:
-                gameModeName = "Rising Garbage";
                 allTimesKey = Database.AllTimeKeys.RISING_GARBAGE;
                 todaysKey = Database.TodaysKeys.RISING_GARBAGE;
                 break;
             case GameState.Mode.THREE_MINUTES:
-                gameModeName = "Three Minutes";
                 allTimesKey = Database.AllTimeKeys.THREE_MINUTES;
                 todaysKey = Database.TodaysKeys.THREE_MINUTES;
                 break;
+            case GameState.Mode.FORTY_LINES:
+                allTimesKey = Database.AllTimeKeys.FORTY_LINES;
+                todaysKey = Database.TodaysKeys.FORTY_LINES;
+                break;                
+            case GameState.Mode.NO_ROTATION:
+                allTimesKey = Database.AllTimeKeys.NO_ROTATION;
+                todaysKey = Database.TodaysKeys.NO_ROTATION;
+                break;                
             case GameState.Mode.INVISIBLE:
-                gameModeName = "Invisible";
                 allTimesKey = Database.AllTimeKeys.INVISIBLE;
                 todaysKey = Database.TodaysKeys.INVISIBLE;
                 break;
-            case GameState.Mode.GARBAGE_HEAP:
-                gameModeName = "Garbage Heap";
-                allTimesKey = Database.AllTimeKeys.GARBAGE_HEAP;
-                todaysKey = Database.TodaysKeys.GARBAGE_HEAP;
-                break;
-            case GameState.Mode.FORTY_LINES:
-                gameModeName = "Forty Lines";
-                allTimesKey = Database.AllTimeKeys.FORTY_LINES;
-                todaysKey = Database.TodaysKeys.FORTY_LINES;
-                break;
             case GameState.Mode.VS_AI:
-                gameModeName = "Vs. AI";
                 allTimesKey = Database.AllTimeKeys.VS_AI;
                 todaysKey = Database.TodaysKeys.VS_AI;
                 break;
@@ -862,6 +859,9 @@ public class Textrads {
     
     private void updateKeymapping() {
         keyMapModeState.update();
+        if (keyMapModeState.isEscPressed()) {
+            gotoMainMenu();
+        }
     }
     
     private void renderKeymapping(final TextGraphics g, final TerminalSize size) {

@@ -19,7 +19,7 @@ public class NetplayState {
     private final Menu playAsMenu = createPlayAsMenu();
     
     private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
-            = new Chooser<>("From where should the server accept connections?");
+            = new Chooser<>("From where should the Server accept connections?");
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
 
     // TODO:

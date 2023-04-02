@@ -123,6 +123,8 @@ public class Chooser<T> {
         selectedItem = null;
         escPressed = false;
         selectionTimer = Menu.SELECTION_FRAMES;
+        
+        InputSource.clear();
     }
     
     public void update() {
