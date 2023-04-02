@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import textrads.input.InputSource;
 
-public class Chooser {
+public class Chooser<T> {
     
     private static final int DEFAULT_DISPLAYED_ITEMS_PER_PAGE = 9;
 
@@ -22,6 +22,8 @@ public class Chooser {
     private final String title;
     private final int displayedItemsPerPage;
     private final BackExitState backExitState;
+
+    private List<T> items;
     
     private int width;
     private int height;
@@ -30,7 +32,7 @@ public class Chooser {
     
     private int pageIndex;
     
-    private int selectedItemIndex;
+    private T selectedItem;
     private boolean escPressed;
     private boolean nextPressed;
     private boolean previousPressed;
@@ -84,7 +86,7 @@ public class Chooser {
         return menuColumns;        
     }
     
-    public void init(final List<String> items) {
+    public void init(final List<T> items) {
         
         backExitState.reset();
         nextMenuColumns.forEach(menuColumn -> menuColumn.reset());
@@ -96,7 +98,7 @@ public class Chooser {
         itemsHeight = 0;
         List<MenuItem> page = new ArrayList<>();
         for (int i = 0, end = items.size() - 1, index = 1; i <= end; ++i) {            
-            page.add(new MenuItem(items.get(i), Character.forDigit(index, 10)));
+            page.add(new MenuItem(items.get(i).toString(), Character.forDigit(index, 10)));
             if (i == end || index == displayedItemsPerPage) {                
                 final List<MenuColumn> menuColumnList = new ArrayList<>();
                 final MenuColumn menuColumn = new MenuColumn(page);
@@ -116,14 +118,15 @@ public class Chooser {
         width = Math.max(itemsWidth, title.length());        
         height = 7 + 2 * displayedItemsPerPage;
         
+        this.items = items;
         pageIndex = 0;
-        selectedItemIndex = -1;
+        selectedItem = null;
         escPressed = false;
         selectionTimer = Menu.SELECTION_FRAMES;
     }
     
     public void update() {
-        if (nextPressed || previousPressed || escPressed || selectedItemIndex >= 0) {
+        if (nextPressed || previousPressed || escPressed || selectedItem != null) {
             InputSource.clear();
             if (selectionTimer > 0) {
                 --selectionTimer;
@@ -201,7 +204,7 @@ public class Chooser {
                 
                 final MenuColumn page = pages.get(pageIndex).get(0);
                 if (page.handleInput(c)) {
-                    selectedItemIndex = displayedItemsPerPage * pageIndex + Character.getNumericValue(c) - 1;
+                    selectedItem = items.get(displayedItemsPerPage * pageIndex + Character.getNumericValue(c) - 1);
                 }    
                 
                 break;
@@ -209,8 +212,8 @@ public class Chooser {
         }
     }
 
-    public int getSelectedItemIndex() {
-        return (selectionTimer == 0) ? selectedItemIndex : -1;
+    public T getSelectedItemIndex() {
+        return (selectionTimer == 0) ? selectedItem : null;
     }
 
     public boolean isEscPressed() {

@@ -56,6 +56,7 @@ import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.QuestionRenderer;
 import textrads.ui.question.TextField;
+import textrads.util.IOUtil;
 import textrads.util.TerminalUtil;
 
 public class Textrads {
@@ -119,7 +120,8 @@ public class Textrads {
     private final NetplayRenderer netplayRenderer = new NetplayRenderer();
     
     // TODO TESTING
-    private final Chooser chooser = new Chooser("Select the local address to which the Server will bind:");
+    private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
+            = new Chooser<>("Select the local address to which the Server will bind:");
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
     
     private State state = State.ATTRACT;
@@ -152,6 +154,7 @@ public class Textrads {
         
     public void launch() throws Exception {
         
+        IOUtil.init();
         InputEventSource.setKeyMap(database.get(Database.OtherKeys.KEY_MAP));
 
         try (final Terminal terminal = TerminalUtil.createTerminal();
@@ -164,15 +167,7 @@ public class Textrads {
             attractModeState.reset();
             
             // TODO TESTING
-            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-        for (NetworkInterface netint : Collections.list(nets))
-            displayInterfaceInformation(netint);
-            
-            
-            final List<String> items = new ArrayList<>();
-            items.add("Any/all local addresses");
-            Server.getNetworkInterfaceAddresses().forEach(address -> items.add(address.toString()));
-            chooser.init(items);
+            chooser.init(IOUtil.getNetworkInterfaceAddresses()); // TODO REMOVE
 
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
