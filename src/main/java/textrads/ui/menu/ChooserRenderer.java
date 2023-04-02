@@ -25,8 +25,8 @@ public class ChooserRenderer {
         GraphicsUtil.setColor(g, BACKGROUND_COLOR, TITLE_COLOR);
         GraphicsUtil.centerString(g, size, oy, chooser.getTitle());
 
-        menuColumnsRenderer.render(g, size, chooser.getPage(), (size.getColumns() - chooser.getItemsWidth()) / 2, 
-                oy + 2);
+        menuColumnsRenderer.render(g, size, chooser.getPage(), 
+                Math.max(0, (size.getColumns() - chooser.getItemsWidth()) / 2), oy + 2);
         
         final List<List<MenuColumn>> pages = chooser.getPages();
         if (pages.size() > 1) {

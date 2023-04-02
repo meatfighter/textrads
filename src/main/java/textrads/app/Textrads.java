@@ -15,13 +15,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import static java.lang.System.out;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -40,11 +34,10 @@ import textrads.db.ExtendedRecord;
 import textrads.db.Preferences;
 import textrads.db.Record;
 import textrads.db.RecordList;
+import textrads.keymap.KeyMapModeRenderer;
+import textrads.keymap.KeyMapModeState;
 import textrads.netplay.NetplayRenderer;
 import textrads.netplay.NetplayState;
-import textrads.netplay.Server;
-import textrads.ui.menu.Chooser;
-import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.ContinueExitState;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
@@ -81,6 +74,7 @@ public class Textrads {
         CONGRATS,
         RECORDS,
         NETPLAY,
+        KEYMAPPING,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -119,10 +113,8 @@ public class Textrads {
     private final NetplayState netplayState = new NetplayState();
     private final NetplayRenderer netplayRenderer = new NetplayRenderer();
     
-    // TODO TESTING
-    private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
-            = new Chooser<>("Bind where?");
-    private final ChooserRenderer chooserRenderer = new ChooserRenderer();
+    private final KeyMapModeState keyMapModeState = new KeyMapModeState();
+    private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
     
     private State state = State.ATTRACT;
     
@@ -156,9 +148,6 @@ public class Textrads {
             InputSource.setScreen(screen);
             attractModeState.reset();
             
-            // TODO TESTING
-            chooser.init(IOUtil.getNetworkInterfaceAddresses()); // TODO REMOVE
-
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
             
@@ -244,83 +233,85 @@ public class Textrads {
     }
     
     private void update() {
-//        switch (state) {
-//            case ATTRACT:
-//                updateAttractMode();
-//                break;
-//            case MAIN_MENU:
-//                updateMainMenu();
-//                break;
-//            case LEVEL_CONFIG:
-//                updateLevelConfig();
-//                break;
-//            case HEIGHT_CONFIG:
-//                updateHeightConfig();
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                updateDifficultyConfig();
-//                break;
-//            case PLAY:
-//                updatePlay();
-//                break;
-//            case GIVE_UP:
-//                updateGiveUp();
-//                break;
-//            case CONTINUE:
-//                updateContinue();
-//                break;
-//            case CONGRATS:
-//                updateCongrats();
-//                break;
-//            case RECORDS:
-//                updateRecords();
-//                break;
-//            case NETPLAY:
-//                updateNetplay();
-//                break;
-//        }
-
-        chooser.update();
+        switch (state) {
+            case ATTRACT:
+                updateAttractMode();
+                break;
+            case MAIN_MENU:
+                updateMainMenu();
+                break;
+            case LEVEL_CONFIG:
+                updateLevelConfig();
+                break;
+            case HEIGHT_CONFIG:
+                updateHeightConfig();
+                break;
+            case DIFFICULTY_CONFIG:
+                updateDifficultyConfig();
+                break;
+            case PLAY:
+                updatePlay();
+                break;
+            case GIVE_UP:
+                updateGiveUp();
+                break;
+            case CONTINUE:
+                updateContinue();
+                break;
+            case CONGRATS:
+                updateCongrats();
+                break;
+            case RECORDS:
+                updateRecords();
+                break;
+            case NETPLAY:
+                updateNetplay();
+                break;
+            case KEYMAPPING:
+                updateKeymapping();
+                break;
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        switch (state) {
-//            case ATTRACT:
-//                renderAttractMode(g, size);
-//                break;
-//            case MAIN_MENU:
-//                renderMainMenu(g, size);
-//                break;
-//            case LEVEL_CONFIG:
-//                renderLevelConfig(g, size);
-//                break;
-//            case HEIGHT_CONFIG:
-//                renderHeightConfig(g, size);
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                renderDifficultyConfig(g, size);
-//                break;
-//            case PLAY:
-//                renderPlay(g, size);
-//                break;
-//            case GIVE_UP:
-//                renderGiveUp(g, size);
-//                break;
-//            case CONTINUE:
-//                renderContinue(g, size);
-//                break;
-//            case CONGRATS:
-//                renderCongrats(g, size);
-//                break;
-//            case RECORDS:
-//                renderRecords(g, size);
-//                break;
-//            case NETPLAY:
-//                renderNetplay(g, size);
-//                break;
-//        }
-
-        chooserRenderer.render(g, size, chooser);
+        switch (state) {
+            case ATTRACT:
+                renderAttractMode(g, size);
+                break;
+            case MAIN_MENU:
+                renderMainMenu(g, size);
+                break;
+            case LEVEL_CONFIG:
+                renderLevelConfig(g, size);
+                break;
+            case HEIGHT_CONFIG:
+                renderHeightConfig(g, size);
+                break;
+            case DIFFICULTY_CONFIG:
+                renderDifficultyConfig(g, size);
+                break;
+            case PLAY:
+                renderPlay(g, size);
+                break;
+            case GIVE_UP:
+                renderGiveUp(g, size);
+                break;
+            case CONTINUE:
+                renderContinue(g, size);
+                break;
+            case CONGRATS:
+                renderCongrats(g, size);
+                break;
+            case RECORDS:
+                renderRecords(g, size);
+                break;
+            case NETPLAY:
+                renderNetplay(g, size);
+                break;
+            case KEYMAPPING:
+                renderKeymapping(g, size);
+                break;
+        }
     }
     
     private void updateAttractMode() {
@@ -385,6 +376,9 @@ public class Textrads {
                         break;
                     case 'H':
                         gotoNetplay();
+                        return;
+                    case 'K':
+                        gotoKeymapping();
                         return;
                 }
                 gotoLevelConfig();
@@ -859,6 +853,19 @@ public class Textrads {
     
     private void renderNetplay(final TextGraphics g, final TerminalSize size) {
         netplayRenderer.render(g, size, netplayState);
+    }
+    
+    private void gotoKeymapping() {
+        state = State.KEYMAPPING;
+        keyMapModeState.reset();
+    }
+    
+    private void updateKeymapping() {
+        keyMapModeState.update();
+    }
+    
+    private void renderKeymapping(final TextGraphics g, final TerminalSize size) {
+        keyMapModeRenderer.render(g, size, keyMapModeState);
     }
     
     public static void main(final String... args) throws Exception {

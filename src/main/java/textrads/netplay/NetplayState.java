@@ -3,9 +3,12 @@ package textrads.netplay;
 import com.googlecode.lanterna.input.KeyStroke;
 import java.util.ArrayList;
 import java.util.List;
+import textrads.ui.menu.Chooser;
+import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
+import textrads.util.IOUtil;
 
 public class NetplayState {
     
@@ -14,6 +17,13 @@ public class NetplayState {
     }
     
     private final Menu playAsMenu = createPlayAsMenu();
+    
+    private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
+            = new Chooser<>("From where should the server accept connections?");
+    private final ChooserRenderer chooserRenderer = new ChooserRenderer();
+
+    // TODO:
+    //        chooser.init(IOUtil.getNetworkInterfaceAddresses());
     
     private State state;
     private boolean returnToMainMenu;
