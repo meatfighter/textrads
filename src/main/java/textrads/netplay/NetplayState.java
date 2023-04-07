@@ -19,7 +19,7 @@ public class NetplayState {
     private final Menu playAsMenu = createPlayAsMenu();
     
     private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
-            = new Chooser<>("From which host will the server accept connections?");
+            = new Chooser<>("Which host will the server accept connections from?");
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
 
     // TODO:
@@ -31,7 +31,10 @@ public class NetplayState {
             // TODO TESTING
 //            connectMenuState.init("Server", "localhost", "8080", 
 //                    "ERROR: Failed to start server.", 
-//                    ConnectScreenState.MessageType.ERROR);    
+//                    ConnectScreenState.MessageType.ERROR); 
+    
+    // private final Question question = new Question(new TextField(null, new MaxLengthValidator(256), true));
+    // question.init("Which host will the client connect to?", "127.0.0.1");
     
     private State state;
     private boolean returnToMainMenu;

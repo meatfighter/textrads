@@ -1,10 +1,10 @@
 package textrads.netplay;
 
+import textrads.ui.message.MessageState;
 import com.googlecode.lanterna.input.KeyStroke;
 import static com.googlecode.lanterna.input.KeyType.Escape;
 import java.util.ArrayList;
 import java.util.List;
-import textrads.app.Textrads;
 import textrads.input.InputSource;
 import textrads.ui.menu.BackExitState;
 import static textrads.ui.menu.Menu.SELECTION_FRAMES;
@@ -13,33 +13,17 @@ import textrads.ui.menu.MenuItem;
 
 public class ConnectScreenState {
     
-    public static final int MAX_DOTS = 3;
-    
-    private static final double DOTS_PER_SECOND = 2.0;
-    
-    private static final float DOTS_PER_FRAME = (float) (DOTS_PER_SECOND / (double) Textrads.FRAMES_PER_SECOND);
-    
-    public static enum MessageType {        
-        INFORM,
-        WAITING,
-        ERROR,
-    }
-
     private final List<MenuColumn> startMenu = createStartMenu();
     private final List<MenuColumn> setMenu = createSetMenu();
-    private final BackExitState backExitState = new BackExitState();    
+    private final MessageState messageState = new MessageState();
+    private final BackExitState backExitState = new BackExitState();
     
     private String title;
     private String host;
     private String port;
-    private String message;
-    private MessageType messageType;
         
     private KeyStroke selection;
     private int selectionTimer;
-    
-    private float dotsFraction;
-    private int dots;
     
     private List<MenuColumn> createStartMenu() {
         final List<MenuItem> menuItems = new ArrayList<>();
@@ -71,13 +55,11 @@ public class ConnectScreenState {
     }
     
     public void init(final String title, final String host, final String port, 
-            final String message, final MessageType messageType) {
+            final String message, final MessageState.MessageType messageType) {
         
         this.title = title;
         this.host = host;
         this.port = port;
-        this.message = message;
-        this.messageType = messageType;
         
         startMenu.forEach(menuColumn -> menuColumn.reset());
         setMenu.forEach(menuColumn -> menuColumn.reset());        
@@ -86,8 +68,7 @@ public class ConnectScreenState {
         selection = null;
         selectionTimer = SELECTION_FRAMES;
         
-        dotsFraction = 1f;
-        dots = 0;
+        messageState.init(message, messageType);
         
         InputSource.clear();
     }
@@ -108,13 +89,7 @@ public class ConnectScreenState {
             }
         }
         
-        if (messageType == MessageType.WAITING) {
-            dotsFraction -= DOTS_PER_FRAME;
-            if (dotsFraction <= 0f) {
-                dotsFraction += 1f;
-                dots = (dots == MAX_DOTS) ? 0 : 1 + dots;
-            }
-        }
+        messageState.update();
     }
     
     private void handleInput(final KeyStroke keyStroke) {
@@ -126,7 +101,7 @@ public class ConnectScreenState {
                 }
                 break;
             case Character: {
-                if (message != null) {
+                if (messageState.getMessage() != null) {
                     break;
                 }
                 final Character character = keyStroke.getCharacter();
@@ -180,15 +155,7 @@ public class ConnectScreenState {
         return (selectionTimer == 0) ? selection : null;
     }    
 
-    public String getMessage() {
-        return message;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-    public int getDots() {
-        return dots;
+    public MessageState getMessageState() {
+        return messageState;
     }
 }

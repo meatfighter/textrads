@@ -12,6 +12,7 @@ public class TextField {
     private static final float FRAMES_PER_BLINK = (float) (Textrads.FRAMES_PER_SECOND * CURSOR_BLINK_MILLIS / 1000.0);
 
     private final String message;
+    private final boolean centered;
     private final TextFieldValidator validator;
     private final TextFieldTransformer transformer;
     private final int width;
@@ -23,14 +24,29 @@ public class TextField {
     private int cursorPosition;
     
     public TextField(final String message, final TextFieldValidator validator) {
-        this(message, validator, null);
+        this(message, validator, false, null);
+    }
+    
+    public TextField(final String message, final TextFieldValidator validator, final boolean centered) {
+        this(message, validator, centered, null);
     }
     
     public TextField(final String message, final TextFieldValidator validator, final TextFieldTransformer transformer) {
-        this.message = message;
+        this(message, validator, false, transformer);
+    }
+    
+    public TextField(final String message, final TextFieldValidator validator, final boolean centered, 
+            final TextFieldTransformer transformer) {
+        this.message = message;        
         this.validator = validator;
+        this.centered = centered;
         this.transformer = transformer;
-        width = message.length() + 1 + validator.getMaxLength();
+        
+        if (message == null) {
+            width = validator.getMaxLength();
+        } else {
+            width = validator.getMaxLength() + message.length() + 1;
+        }        
     }
     
     public void init(final String initialValue) {
@@ -152,5 +168,9 @@ public class TextField {
     
     public String getValue() {
         return value.toString();
+    }
+
+    public boolean isCentered() {
+        return centered;
     }
 }

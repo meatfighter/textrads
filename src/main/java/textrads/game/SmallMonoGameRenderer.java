@@ -12,7 +12,6 @@ import textrads.app.Tetromino;
 import static textrads.game.MonoGameRenderer.BACKGROUND_COLOR;
 import static textrads.game.MonoGameRenderer.END_TITLE_COLOR;
 import static textrads.game.MonoGameRenderer.LINE_COLOR;
-import textrads.ui.common.Colors;
 import textrads.ui.menu.MenuItemRenderer;
 import textrads.util.GraphicsUtil;
 
@@ -221,9 +220,9 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                     g.putString(x + 8, y + 13, "Ctrl+C");
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, (gameState.getSelection() == 0)
                             ? MenuItemRenderer.SELECTED_COLOR : MenuItemRenderer.DESCRIPTION_COLOR);
-                    g.putString(x + 16, y + 11, "\u2500>");
+                    g.putString(x + 16, y + 11, "\u2500\u2500>");
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, MenuItemRenderer.DESCRIPTION_COLOR);
-                    g.setCharacter(x + 17, y + 13, 'X');
+                    g.putString(x + 16, y + 13, "End");
                 }                
                 break;
             }            

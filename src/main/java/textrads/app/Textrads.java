@@ -117,10 +117,6 @@ public class Textrads {
     private final KeyMapModeState keyMapModeState = new KeyMapModeState();
     private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
     
-    // TODO TESTING
-    private final Question question = new Question(new TextField(null, new MaxLengthValidator(160)));
-    
-    
     private State state = State.ATTRACT;
     
     private byte gameMode;
@@ -277,7 +273,7 @@ public class Textrads {
 //                break;
 //        }
 
-        connectMenuState.update();
+        question.update();
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
@@ -320,7 +316,7 @@ public class Textrads {
 //                break;
 //        }
 
-        connectMenuRenderer.render(g, size, connectMenuState);
+        questionRenderer.render(g, size, question);
     }
     
     private void updateAttractMode() {

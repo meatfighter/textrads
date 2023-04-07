@@ -18,6 +18,8 @@
 
 
 
+Need to pick starting level for Vs. Human
+
 
 
 Vs. Human
@@ -286,9 +288,9 @@ XX|              |XX
 XX|  Round Lost  |XX
 XX|              |XX
 XX|              |XX
-XX|  [Enter] ->  |XX
+XX|  [Enter] --> |XX
 XX|              |XX
-XX| [Ctrl+C]  X  |XX  
+XX| [Ctrl+C] End |XX  
 XX|              |XX
 XX+--------------+XX
 01234567890123456789
@@ -306,6 +308,51 @@ XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX
 XXXXXXXX|                      |XXXXXXXX
 XXXXXXXX+----------------------+XXXXXXXX
 0123456789012345678901234567890123456789
+
+
+
+
+
+Vs. Human:
+
+   00000000001111111111
+   01234567890123456789
+ 0 XX+--------------+XX
+ 1 XX|              |XX
+ 2 XX|   Game Over  |XX
+ 3 XX|              |XX
+ 4 XX|  Play Again? |XX
+ 5 XX|              |XX
+ 6 XX|    [Y] Yes   |XX
+ 7 XX|              |XX
+ 8 XX|    [N] No    |XX
+ 9 XX|              |XX
+10 XX| [Ctrl+C] End |XX  
+11 XX|              |XX
+12 XX+--------------+XX
+   01234567890123456789
+   00000000001111111111
+
+
+   0000000000111111111122222222223333333333
+   0123456789012345678901234567890123456789
+ 0 XXXXXXXX+----------------------+XXXXXXXX
+ 1 XXXXXXXX|                      |XXXXXXXX
+ 2 XXXXXXXX|      Game Over       |XXXXXXXX
+ 3 XXXXXXXX|                      |XXXXXXXX
+ 4 XXXXXXXX|     Play Again?      |XXXXXXXX
+ 5 XXXXXXXX|                      |XXXXXXXX
+ 6 XXXXXXXX|       [Y] Yes        |XXXXXXXX
+ 7 XXXXXXXX|                      |XXXXXXXX
+ 8 XXXXXXXX|       [N] No         |XXXXXXXX
+ 9 XXXXXXXX|                      |XXXXXXXX
+10 XXXXXXXX|  [Ctrl+C] Exit       |XXXXXXXX  
+11 XXXXXXXX|                      |XXXXXXXX
+12 XXXXXXXX+----------------------+XXXXXXXX
+   0123456789012345678901234567890123456789
+   0000000000111111111122222222223333333333
+
+
 
 
 80x24
