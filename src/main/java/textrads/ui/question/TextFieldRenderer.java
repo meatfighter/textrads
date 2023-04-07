@@ -12,24 +12,46 @@ public class TextFieldRenderer {
     
     private final TextColor messageColor;
     private final TextColor valueColor;
+    private final boolean centered;
     
     public TextFieldRenderer() {
-        this(DEFAULT_MESSAGE_COLOR, DEFAULT_VALUE_COLOR);
+        this(false, DEFAULT_MESSAGE_COLOR, DEFAULT_VALUE_COLOR);
     }
     
-    public TextFieldRenderer(final TextColor messageColor, final TextColor valueColor) {
+    public TextFieldRenderer(final boolean centered) {
+        this(centered, DEFAULT_MESSAGE_COLOR, DEFAULT_VALUE_COLOR);
+    }
+    
+    public TextFieldRenderer(final boolean centered, final TextColor messageColor, final TextColor valueColor) {
+        this.centered = centered;
         this.messageColor = messageColor;
         this.valueColor = valueColor;
     }
     
     public void render(final TextGraphics g, final TerminalSize size, final TextField textField, final int y) {
         
-        final int x = (size.getColumns() - textField.getWidth()) / 2;
+        final String message = textField.getMessage();
         
-        GraphicsUtil.setColor(g, QuestionRenderer.BACKGROUND_COLOR, messageColor);
-        g.putString(x, y, textField.getMessage());
+        final int x;
+        if (centered) {
+            if (message != null) {
+                x = (size.getColumns() - (message.length() + 1 + textField.getValue().length())) / 2;
+            } else {
+                x = (size.getColumns() - textField.getValue().length()) / 2;
+            }
+        } else {
+            x = (size.getColumns() - textField.getWidth()) / 2;
+        }
+                
+        final int valueX;
+        if (message != null) {        
+            GraphicsUtil.setColor(g, QuestionRenderer.BACKGROUND_COLOR, messageColor);
+            g.putString(x, y, message);
+            valueX = x + message.length() + 1;
+        } else {
+            valueX = x;
+        }
         
-        final int valueX = x + textField.getMessage().length() + 1;
         final String value = textField.getValue();
         GraphicsUtil.setColor(g, QuestionRenderer.BACKGROUND_COLOR, valueColor);
         g.putString(valueX, y, value);

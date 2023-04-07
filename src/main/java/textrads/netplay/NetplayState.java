@@ -19,11 +19,19 @@ public class NetplayState {
     private final Menu playAsMenu = createPlayAsMenu();
     
     private final Chooser<IOUtil.NetworkInterfaceAddress> chooser 
-            = new Chooser<>("From where should the Server accept connections?");
+            = new Chooser<>("From which host will the server accept connections?");
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
 
     // TODO:
     //        chooser.init(IOUtil.getNetworkInterfaceAddresses());
+    
+    private final ConnectScreenState connectMenuState = new ConnectScreenState();
+    private final ConnectScreenRenderer connectMenuRenderer = new ConnectScreenRenderer();
+
+            // TODO TESTING
+//            connectMenuState.init("Server", "localhost", "8080", 
+//                    "ERROR: Failed to start server.", 
+//                    ConnectScreenState.MessageType.ERROR);    
     
     private State state;
     private boolean returnToMainMenu;

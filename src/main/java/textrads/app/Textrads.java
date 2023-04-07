@@ -36,8 +36,6 @@ import textrads.db.Record;
 import textrads.db.RecordList;
 import textrads.keymap.KeyMapModeRenderer;
 import textrads.keymap.KeyMapModeState;
-import textrads.netplay.ConnectScreenRenderer;
-import textrads.netplay.ConnectScreenState;
 import textrads.netplay.NetplayRenderer;
 import textrads.netplay.NetplayState;
 import textrads.ui.menu.ContinueExitState;
@@ -47,6 +45,7 @@ import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuRenderer;
 import textrads.ui.question.CongratsScreenRenderer;
 import textrads.ui.question.CongratsScreenState;
+import textrads.ui.question.MaxLengthValidator;
 import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.QuestionRenderer;
@@ -119,8 +118,8 @@ public class Textrads {
     private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
     
     // TODO TESTING
-    private final ConnectScreenState connectMenuState = new ConnectScreenState();
-    private final ConnectScreenRenderer connectMenuRenderer = new ConnectScreenRenderer();
+    private final Question question = new Question(new TextField(null, new MaxLengthValidator(160)));
+    
     
     private State state = State.ATTRACT;
     
@@ -153,11 +152,6 @@ public class Textrads {
             
             InputSource.setScreen(screen);
             attractModeState.reset();
-            
-            // TODO TESTING
-            connectMenuState.init("Server", "localhost", "8080", 
-                    "ERROR: Failed to start server.", 
-                    ConnectScreenState.MessageType.ERROR);
             
             final TextGraphics g = screen.newTextGraphics();
             TerminalSize size = screen.getTerminalSize();
