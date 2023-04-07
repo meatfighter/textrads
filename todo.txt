@@ -3,13 +3,16 @@
  2 Host: ...
  3 Port: ...
  4                              |
- 5 [S] Start                    |
- 6                              |  
- 7 [H] Set host   [P] Set Port  |  Error: Failed to ... / Waiting for Server/Client...
- 8                              |
- 9                              |
+ 5                              |
+ 6 [S] Start                    |
+ 7                              |  Error: Failed to ... / Waiting for Server/Client...
+ 8                              |  
+ 9 [H] Set host   [P] Set Port  |  
 10                              |
-11 [Esc] Back  [Ctrl+C] Exit
+11                              |
+12                              |
+13                              |
+14 [Esc] Back  [Ctrl+C] Exit
 
 --------------------------
 

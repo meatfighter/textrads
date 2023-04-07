@@ -17,15 +17,15 @@ public class HostPortRenderer {
         
         final int ox = Math.max(0, (size.getColumns() - (6 + Math.max(host.length(), port.length()))) / 2);
         
-        GraphicsUtil.setColor(g, ConnectMenuRenderer.BACKGROUND_COLOR, LABEL_COLOR);
+        GraphicsUtil.setColor(g, ConnectScreenRenderer.BACKGROUND_COLOR, LABEL_COLOR);
         g.putString(ox, oy, "host");
         g.putString(ox, oy + 1, "port");
         
-        GraphicsUtil.setColor(g, ConnectMenuRenderer.BACKGROUND_COLOR, SEPARATOR_COLOR);
+        GraphicsUtil.setColor(g, ConnectScreenRenderer.BACKGROUND_COLOR, SEPARATOR_COLOR);
         g.setCharacter(ox + 4, oy, ':');
         g.setCharacter(ox + 4, oy + 1, ':');
         
-        GraphicsUtil.setColor(g, ConnectMenuRenderer.BACKGROUND_COLOR, VALUE_COLOR);
+        GraphicsUtil.setColor(g, ConnectScreenRenderer.BACKGROUND_COLOR, VALUE_COLOR);
         g.putString(ox + 6, oy, host);
         g.putString(ox + 6, oy + 1, port);        
     }

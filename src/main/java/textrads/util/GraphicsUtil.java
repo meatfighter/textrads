@@ -127,10 +127,15 @@ public final class GraphicsUtil {
     }
     
     public static int centerString(final TextGraphics g, final TerminalSize size, final int y, final String str) {
-        final int x = (size.getColumns() - str.length()) / 2;
+        return centerString(g, size, y, str, 0);
+    }
+    
+    public static int centerString(final TextGraphics g, final TerminalSize size, final int y, final String str, 
+            final int padding) {
+        final int x = (size.getColumns() - (str.length() + padding)) / 2;
         g.putString(x, y, str);
         return x;
-    }
+    }    
     
     // Always set background and foreground color at the same time, particularly when printing spaces. Spaces do not
     // have a visible foreground color. However, the Screen buffer maintains the foreground color of all characters,
