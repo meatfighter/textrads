@@ -100,9 +100,9 @@ public class Menu {
     private void handleInput(final KeyStroke keyStroke) {
         switch (keyStroke.getKeyType()) {
             case Escape:
-                if (backExitState.isEscapeEnabled()) {
+                if (backExitState.isBackEnabled()) {
                     selection = keyStroke;
-                    backExitState.setEscSelected(true);
+                    backExitState.setSelected(true);
                 }
                 break;
             case Character: {

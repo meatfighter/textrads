@@ -167,9 +167,9 @@ public class Chooser<T> {
     private void handleInput(final KeyStroke keyStroke) {
         switch (keyStroke.getKeyType()) {
             case Escape:
-                if (backExitState.isEscapeEnabled()) {
+                if (backExitState.isBackEnabled()) {
                     escPressed = true;
-                    backExitState.setEscSelected(true);
+                    backExitState.setSelected(true);
                 }
                 break;
             case Character: {

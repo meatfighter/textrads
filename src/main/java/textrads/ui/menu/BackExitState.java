@@ -1,32 +1,55 @@
 package textrads.ui.menu;
 
 public class BackExitState {
-
-    private final boolean escapeEnabled;
     
-    private boolean escSelected;
+    private static final String DEFAULT_BACK_KEY_NAME = "Esc";
+    private static final String DEFAULT_BACK_LABEL = "Back";
+
+    private final String backKeyName;
+    private final String backLabel;
+    private final boolean backEnabled;
+    
+    private boolean selected;
     
     public BackExitState() {
-        this(true);
+        this(DEFAULT_BACK_KEY_NAME, DEFAULT_BACK_LABEL, true);
     }
     
-    public BackExitState(final boolean escapeEnabled) {
-        this.escapeEnabled = escapeEnabled;
+    public BackExitState(final boolean backEnabled) {
+        this(DEFAULT_BACK_KEY_NAME, DEFAULT_BACK_LABEL, backEnabled);
+    }
+    
+    public BackExitState(final String backKeyName, final String backLabel) {
+        this(backKeyName, backLabel, true);
+    }
+    
+    public BackExitState(final String backKeyName, final String backLabel, final boolean backEnabled) {
+        this.backKeyName = backKeyName;
+        this.backLabel = backLabel;
+        this.backEnabled = backEnabled;
     }
 
     public void reset() {
-        escSelected = false;
+        selected = false;
     }
     
-    public boolean isEscSelected() {
-        return escSelected;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setEscSelected(final boolean escSelected) {
-        this.escSelected = escSelected;
+    public void setSelected(final boolean selected) {
+        this.selected = selected;
     }
 
-    public boolean isEscapeEnabled() {
-        return escapeEnabled;
+    public boolean isBackEnabled() {
+        return backEnabled;
+    }
+
+    public String getBackKeyName() {
+        return backKeyName;
+    }
+
+    public String getBackLabel() {
+        return backLabel;
     }
 }

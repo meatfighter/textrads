@@ -54,7 +54,7 @@ public class Question {
         switch (keyStroke.getKeyType()) {
             case Escape:
                 escPressed = true;
-                backExitState.setEscSelected(true);
+                backExitState.setSelected(true);
                 textField.setCursorVisible(false);
                 break;
             default:

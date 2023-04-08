@@ -43,6 +43,10 @@ import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
 import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuRenderer;
+import textrads.ui.message.MessageRenderer;
+import textrads.ui.message.MessageScreen;
+import textrads.ui.message.MessageScreenRenderer;
+import textrads.ui.message.MessageState;
 import textrads.ui.question.CongratsScreenRenderer;
 import textrads.ui.question.CongratsScreenState;
 import textrads.ui.question.MaxLengthValidator;
@@ -234,89 +238,85 @@ public class Textrads {
     }
     
     private void update() {
-//        switch (state) {
-//            case ATTRACT:
-//                updateAttractMode();
-//                break;
-//            case MAIN_MENU:
-//                updateMainMenu();
-//                break;
-//            case LEVEL_CONFIG:
-//                updateLevelConfig();
-//                break;
-//            case HEIGHT_CONFIG:
-//                updateHeightConfig();
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                updateDifficultyConfig();
-//                break;
-//            case PLAY:
-//                updatePlay();
-//                break;
-//            case GIVE_UP:
-//                updateGiveUp();
-//                break;
-//            case CONTINUE:
-//                updateContinue();
-//                break;
-//            case CONGRATS:
-//                updateCongrats();
-//                break;
-//            case RECORDS:
-//                updateRecords();
-//                break;
-//            case NETPLAY:
-//                updateNetplay();
-//                break;
-//            case KEYMAPPING:
-//                updateKeymapping();
-//                break;
-//        }
-
-        question.update();
+        switch (state) {
+            case ATTRACT:
+                updateAttractMode();
+                break;
+            case MAIN_MENU:
+                updateMainMenu();
+                break;
+            case LEVEL_CONFIG:
+                updateLevelConfig();
+                break;
+            case HEIGHT_CONFIG:
+                updateHeightConfig();
+                break;
+            case DIFFICULTY_CONFIG:
+                updateDifficultyConfig();
+                break;
+            case PLAY:
+                updatePlay();
+                break;
+            case GIVE_UP:
+                updateGiveUp();
+                break;
+            case CONTINUE:
+                updateContinue();
+                break;
+            case CONGRATS:
+                updateCongrats();
+                break;
+            case RECORDS:
+                updateRecords();
+                break;
+            case NETPLAY:
+                updateNetplay();
+                break;
+            case KEYMAPPING:
+                updateKeymapping();
+                break;
+        }
     }
     
     private void render(final TextGraphics g, final TerminalSize size) {
-//        switch (state) {
-//            case ATTRACT:
-//                renderAttractMode(g, size);
-//                break;
-//            case MAIN_MENU:
-//                renderMainMenu(g, size);
-//                break;
-//            case LEVEL_CONFIG:
-//                renderLevelConfig(g, size);
-//                break;
-//            case HEIGHT_CONFIG:
-//                renderHeightConfig(g, size);
-//                break;
-//            case DIFFICULTY_CONFIG:
-//                renderDifficultyConfig(g, size);
-//                break;
-//            case PLAY:
-//                renderPlay(g, size);
-//                break;
-//            case GIVE_UP:
-//                renderGiveUp(g, size);
-//                break;
-//            case CONTINUE:
-//                renderContinue(g, size);
-//                break;
-//            case CONGRATS:
-//                renderCongrats(g, size);
-//                break;
-//            case RECORDS:
-//                renderRecords(g, size);
-//                break;
-//            case NETPLAY:
-//                renderNetplay(g, size);
-//                break;
-//            case KEYMAPPING:
-//                renderKeymapping(g, size);
-//                break;
-//        }
-
-        questionRenderer.render(g, size, question);
+        switch (state) {
+            case ATTRACT:
+                renderAttractMode(g, size);
+                break;
+            case MAIN_MENU:
+                renderMainMenu(g, size);
+                break;
+            case LEVEL_CONFIG:
+                renderLevelConfig(g, size);
+                break;
+            case HEIGHT_CONFIG:
+                renderHeightConfig(g, size);
+                break;
+            case DIFFICULTY_CONFIG:
+                renderDifficultyConfig(g, size);
+                break;
+            case PLAY:
+                renderPlay(g, size);
+                break;
+            case GIVE_UP:
+                renderGiveUp(g, size);
+                break;
+            case CONTINUE:
+                renderContinue(g, size);
+                break;
+            case CONGRATS:
+                renderCongrats(g, size);
+                break;
+            case RECORDS:
+                renderRecords(g, size);
+                break;
+            case NETPLAY:
+                renderNetplay(g, size);
+                break;
+            case KEYMAPPING:
+                renderKeymapping(g, size);
+                break;
+        }
     }
     
     private void updateAttractMode() {
