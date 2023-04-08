@@ -214,7 +214,7 @@ public class Chooser<T> {
         }
     }
 
-    public T getSelectedItemIndex() {
+    public T getSelectedItem() {
         return (selectionTimer == 0) ? selectedItem : null;
     }
 

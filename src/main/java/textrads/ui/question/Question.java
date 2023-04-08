@@ -26,6 +26,7 @@ public class Question {
         this.title = title;
         width = Math.max(title.length(), textField.getWidth());
         textField.init(initialValue);
+        backExitState.reset();
         escPressed = false;
         escTimer = ESC_FRAMES;
         InputSource.clear();

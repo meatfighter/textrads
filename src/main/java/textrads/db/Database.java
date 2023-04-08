@@ -46,6 +46,8 @@ public class Database {
     public static interface OtherKeys {
         String PREFERENCES = "preferences";
         String KEY_MAP = "key-map";
+        String SERVER = "server";
+        String CLIENT = "client";
     }
     
     private static final String DIR = "data";
@@ -84,6 +86,8 @@ public class Database {
         
         load(OtherKeys.PREFERENCES, () -> new Preferences());
         load(OtherKeys.KEY_MAP, () -> new KeyMap());
+        load(OtherKeys.SERVER, () -> new NetplayConfig());
+        load(OtherKeys.CLIENT, () -> new NetplayConfig());
     }
     
     public RecordList<? super Record> get(final String key, final boolean todaysBest) {
