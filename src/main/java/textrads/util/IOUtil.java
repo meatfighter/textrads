@@ -41,7 +41,7 @@ public final class IOUtil {
         
         public NetworkInterfaceAddress(final NetworkInterface networkInterface, final InetAddress address) {
             this.address = address;
-            this.name = String.format("%s: %s", networkInterface.getDisplayName(), address);
+            this.name = String.format("%s (%s)", networkInterface.getDisplayName(), address.getHostAddress());
             
             final String n = networkInterface.getName().toLowerCase();
             final String d = networkInterface.getDisplayName().toLowerCase();            

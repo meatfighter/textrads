@@ -149,7 +149,7 @@ public class NetplayState {
                 if (host == null) {
                     return nia;
                 }
-            } else if (address.toString().equals(host)) {
+            } else if (address.getHostAddress().equals(host)) {
                 return nia;
             }
         }
@@ -257,10 +257,14 @@ public class NetplayState {
         state = State.CLIENT_CONFIG;
         
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
-        if (isBlank(config.getHost())) {
-            final NetworkInterfaceAddress nia = IOUtil.getNetworkInterfaceAddresses().get(1);
-            host = nia.getAddress();
-            hostname = host.toString();
+        if (isBlank(config.getHost())) {                        
+            hostname = "localhost";
+            try {
+                host = InetAddress.getByName(hostname);
+            } catch (final UnknownHostException ignored) {
+                host = IOUtil.getNetworkInterfaceAddresses().get(1).getAddress();
+                hostname = host.getHostAddress();
+            }
         }
         port = config.getPort();
         
@@ -269,6 +273,8 @@ public class NetplayState {
     
     private void updateClientConfig() {
         connectMenuState.update();
+        
+        // TODO CONFIG
     }
     
     private void gotoClientConfigHost() {
