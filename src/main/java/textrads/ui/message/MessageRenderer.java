@@ -11,7 +11,7 @@ public class MessageRenderer {
     public static final TextColor BACKGROUND_COLOR = Colors.BLACK;
     public static final TextColor INFORM_COLOR = new TextColor.Indexed(223);    
     public static final TextColor WAITING_COLOR = new TextColor.Indexed(158);
-    public static final TextColor ERROR_COLOR = new TextColor.Indexed(197);
+    public static final TextColor ERROR_COLOR = Colors.RED;
     
     private static final String[] DOTS_STRINGS = new String[MessageState.MAX_DOTS + 1];
     static {

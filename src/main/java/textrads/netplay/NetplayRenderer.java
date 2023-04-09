@@ -4,7 +4,9 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.MenuRenderer;
+import textrads.ui.message.MessageScreenRenderer;
 import textrads.ui.question.QuestionRenderer;
+import static textrads.netplay.NetplayState.State.CLIENT_CONFIG_HOST_ERROR;
 
 public class NetplayRenderer {
     
@@ -12,6 +14,7 @@ public class NetplayRenderer {
     private final ConnectScreenRenderer connectMenuRenderer = new ConnectScreenRenderer();
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
+    private final MessageScreenRenderer messageScreenRenderer = new MessageScreenRenderer();
     
     public void render(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         switch (state.getState()) {
@@ -35,6 +38,9 @@ public class NetplayRenderer {
                 break;
             case CLIENT_CONFIG_PORT:
                 renderClientConfigPort(g, size, state);
+                break;
+            case CLIENT_CONFIG_HOST_ERROR:
+                renderClientConfigHostError(g, size, state);
                 break;
         }
     }
@@ -60,10 +66,14 @@ public class NetplayRenderer {
     }
     
     private void renderClientConfigHost(final TextGraphics g, final TerminalSize size, final NetplayState state) {
-        
+        questionRenderer.render(g, size, state.getClientHostQuestion());
     }
     
     private void renderClientConfigPort(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         questionRenderer.render(g, size, state.getPortQuestion());
+    }
+    
+    private void renderClientConfigHostError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
     }
 }

@@ -15,7 +15,10 @@ public class HostPortRenderer {
     public void render(final TextGraphics g, final TerminalSize size, final String host, final String port, 
             final int oy) {
         
-        final int ox = Math.max(0, (size.getColumns() - (6 + Math.max(host.length(), port.length()))) / 2);
+        final String h = (host == null) ? "" : host;
+        final String p = (port == null) ? "" : port;
+        
+        final int ox = Math.max(0, (size.getColumns() - (6 + Math.max(h.length(), p.length()))) / 2);
         
         GraphicsUtil.setColor(g, ConnectScreenRenderer.BACKGROUND_COLOR, LABEL_COLOR);
         g.putString(ox, oy, "host");
@@ -26,7 +29,7 @@ public class HostPortRenderer {
         g.setCharacter(ox + 4, oy + 1, ':');
         
         GraphicsUtil.setColor(g, ConnectScreenRenderer.BACKGROUND_COLOR, VALUE_COLOR);
-        g.putString(ox + 6, oy, host);
-        g.putString(ox + 6, oy + 1, port);        
+        g.putString(ox + 6, oy, h);
+        g.putString(ox + 6, oy + 1, p);        
     }
 }

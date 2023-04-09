@@ -46,4 +46,9 @@ public class NetplayConfig implements Serializable {
     public byte getLevel() {
         return level;
     }
+
+    @Override
+    public String toString() {
+        return String.format("host = %s, port = %s, level = %s", host, port, level);
+    }
 }

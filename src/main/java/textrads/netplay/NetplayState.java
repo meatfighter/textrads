@@ -13,6 +13,9 @@ import textrads.ui.menu.Chooser;
 import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuColumn;
 import textrads.ui.menu.MenuItem;
+import textrads.ui.message.MessageScreen;
+import textrads.ui.message.MessageState;
+import textrads.ui.question.LengthValidator;
 import textrads.ui.question.NumberValidator;
 import textrads.ui.question.Question;
 import textrads.ui.question.TextField;
@@ -29,6 +32,7 @@ public class NetplayState {
         CLIENT_CONFIG,
         CLIENT_CONFIG_HOST,
         CLIENT_CONFIG_PORT,
+        CLIENT_CONFIG_HOST_ERROR,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -41,9 +45,9 @@ public class NetplayState {
     private final ConnectScreenState connectMenuState = new ConnectScreenState();    
 
     private final Question portQuestion = new Question(new TextField(null, new NumberValidator(1, 65535)));
-    //private final Question question = new Question(new TextField(null, new MaxLengthValidator(256), true));
+    private final Question clientHostQuestion = new Question(new TextField(null, new LengthValidator(1, 256), true));
     
-    //question.init("Which host will the client connect to?", "127.0.0.1");
+    private final MessageScreen messageScreen = new MessageScreen();
     
     private State state;
     private boolean returnToMainMenu;
@@ -91,6 +95,9 @@ public class NetplayState {
                 break;
             case CLIENT_CONFIG_PORT:
                 updateClientConfigPort();
+                break;
+            case CLIENT_CONFIG_HOST_ERROR:
+                updateClientConfigHostError();
                 break;
         }
     }
@@ -257,32 +264,111 @@ public class NetplayState {
         state = State.CLIENT_CONFIG;
         
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
-        if (isBlank(config.getHost())) {                        
+        
+        hostname = config.getHost();
+        port = config.getPort();
+        
+        if (isBlank(hostname)) {
+            hostname = "localhost";
+        }
+        
+        host = null;
+        try {
+            host = InetAddress.getByName(hostname);
+        } catch (final UnknownHostException e0) {
             hostname = "localhost";
             try {
                 host = InetAddress.getByName(hostname);
-            } catch (final UnknownHostException ignored) {
-                host = IOUtil.getNetworkInterfaceAddresses().get(1).getAddress();
-                hostname = host.getHostAddress();
+            } catch (final UnknownHostException e1) {            
+                final List<NetworkInterfaceAddress> nias = IOUtil.getNetworkInterfaceAddresses();
+                if (nias.size() >= 2) {
+                    final NetworkInterfaceAddress nia = nias.get(1);
+                    hostname = nia.getName();
+                    host = nia.getAddress();                
+                } else {
+                    try {
+                        host = InetAddress.getLocalHost();
+                        hostname = host.getHostAddress();
+                    } catch (final UnknownHostException e2) {
+                    }
+                }
             }
         }
-        port = config.getPort();
         
         connectMenuState.init("Client", hostname, Integer.toString(config.getPort()));
     }
     
     private void updateClientConfig() {
         connectMenuState.update();
-        
-        // TODO CONFIG
+        final KeyStroke keyStroke = connectMenuState.getSelection();
+        if (keyStroke == null) {
+            return;
+        }
+        switch (keyStroke.getKeyType()) {
+            case Escape:
+                gotoPlayAs();
+                break;
+            case Character: {
+                final Character c = keyStroke.getCharacter();
+                if (c == null) {
+                    break;
+                }
+                switch (Character.toUpperCase(c)) {
+                    case 'S':
+                        gotoStartClient();
+                        break;
+                    case 'H':
+                        gotoClientConfigHost();
+                        break;
+                    case 'P':
+                        gotoClientConfigPort();
+                        break;
+                }
+                break;
+            }
+        }
     }
+    
+    private void gotoStartClient() {
+        
+    }
+
+    private void updateClientStart() {
+        
+    }    
     
     private void gotoClientConfigHost() {
         state = State.CLIENT_CONFIG_HOST;
+        clientHostQuestion.init("Which host will the client connect to?", hostname);
     }
     
     private void updateClientConfigHost() {
+        clientHostQuestion.update();
         
+        if (clientHostQuestion.isEscPressed()) {            
+            connectMenuState.init("Client", hostname, Integer.toString(port));
+            state = State.CLIENT_CONFIG;
+            return;
+        }
+        
+        if (!clientHostQuestion.isEnterPressed()) {
+            return;
+        }
+        
+        final String hn = clientHostQuestion.getValue().trim();
+        try {
+            host = InetAddress.getByName(hn);
+        } catch (final UnknownHostException e) {
+            gotoClientConfigHostError();
+            return;
+        }
+        
+        hostname = hn;
+        connectMenuState.init("Client", hostname, Integer.toString(port));
+        state = State.CLIENT_CONFIG;
+        
+        final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
+        database.saveAsync(Database.OtherKeys.CLIENT, config.setHost(hostname)); 
     }
     
     private void gotoClientConfigPort() {
@@ -292,7 +378,20 @@ public class NetplayState {
 
     private void updateClientConfigPort() {
         updateConfigPort("Client", State.CLIENT_CONFIG, Database.OtherKeys.CLIENT);
-    }    
+    }
+
+    private void gotoClientConfigHostError() {
+        state = State.CLIENT_CONFIG_HOST_ERROR;
+        messageScreen.init("Invalid Host", "Host IP address not found.", MessageState.MessageType.ERROR);
+    }
+    
+    private void updateClientConfigHostError() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {
+            state = State.CLIENT_CONFIG_HOST;
+            clientHostQuestion.init("Which host will the client connect to?", clientHostQuestion.getValue());
+        }        
+    }
 
     public State getState() {
         return state;
@@ -316,5 +415,13 @@ public class NetplayState {
 
     public Question getPortQuestion() {
         return portQuestion;
+    }
+
+    public Question getClientHostQuestion() {
+        return clientHostQuestion;
+    }
+
+    public MessageScreen getMessageScreen() {
+        return messageScreen;
     }
 }
