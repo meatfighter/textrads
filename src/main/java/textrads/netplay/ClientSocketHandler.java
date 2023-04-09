@@ -18,7 +18,7 @@ public class ClientSocketHandler {
     private static final long MAX_IN_QUEUE_WAIT_MILLIS = Math.round(1000.0 / Textrads.FRAMES_PER_SECOND);
     
     private static enum State {
-        STOPPED,
+        NEW,
         RUNNING,
         CANCELLED,
         TERMINATED,
@@ -36,7 +36,7 @@ public class ClientSocketHandler {
     private final Thread inQueueThread;
     
     private final Object stateMonitor = new Object();
-    private State state = State.STOPPED;
+    private State state = State.NEW;
     
     public ClientSocketHandler(final Client client, final Socket socket) throws IOException {
         this.client = client;
@@ -51,7 +51,7 @@ public class ClientSocketHandler {
     public void start() {
         
         synchronized (stateMonitor) {
-            if (state != State.STOPPED) {
+            if (state != State.NEW) {
                 return;
             }
             outQueueThread.start();
@@ -160,7 +160,7 @@ public class ClientSocketHandler {
                         outQueue.waitForData(Server.HEARTBEAT_PERIOD);
                     }
                     if (outQueue.isEmpty()) {
-                        out.write(Command.HEARTBEAT);
+                        out.write(Element.ElementTypes.HEARTBEAT);
                     } else {
                         outQueue.getReadElement().write(out);        
                         outQueue.incrementReadIndex();
@@ -177,39 +177,28 @@ public class ClientSocketHandler {
             synchronized (stateMonitor) {
                 state = State.TERMINATED;
             }
-            client.handleTerminatedConnection();
+            client.handleTerminatedConnection(this);
         }                
     }
     
     private void runInQueue() {        
         try {
-            outer: while (true) {                
+            while (true) {                
                 synchronized (stateMonitor) {
                     if (state != State.RUNNING) {
                         return;
                     }
                 }                      
                 try {
-                    switch ((byte) in.read()) {
-                        case Command.HEARTBEAT:
-                            break;
-                        case Command.GAME_STATE:
-                            if (inQueue.isFull()) {
-                                break outer;
-                            }
-                            inQueue.getWriteElement().readGameState(in);
-                            inQueue.incrementWriteIndex();
-                            break;
-                        case Command.INPUT_EVENTS:
-                            if (inQueue.isFull()) {
-                                break outer;
-                            }
-                            inQueue.getWriteElement().readInputEvents(in);
-                            inQueue.incrementWriteIndex();
-                            break;
-                        default:
-                            break outer;
-                    }   
+                    final byte type = in.readByte();
+                    if (type == Element.ElementTypes.HEARTBEAT) {
+                        continue;
+                    }
+                    if (inQueue.isFull()) {
+                        break;
+                    }
+                    inQueue.getWriteElement().read(in, type);
+                    inQueue.incrementWriteIndex();   
                 } catch (final IOException ignored) {
                     break;
                 }                                

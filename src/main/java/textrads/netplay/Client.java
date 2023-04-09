@@ -73,7 +73,7 @@ public class Client {
         }
     }
     
-    public void handleTerminatedConnection() {
+    public void handleTerminatedConnection(final ClientSocketHandler clientSocketHandler) {
         synchronized (stateMonitor) {
             stateMonitor.notifyAll();
         }
