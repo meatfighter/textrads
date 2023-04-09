@@ -1,12 +1,12 @@
 package textrads.db;
 
 import java.io.Serializable;
+import textrads.netplay.Server;
 
 public class NetplayConfig implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    public static final int DEFAULT_PORT = 8080;
     public static final byte DEFAULT_LEVEL = -1;
     
     private final String host;
@@ -14,7 +14,7 @@ public class NetplayConfig implements Serializable {
     private final byte level;
     
     public NetplayConfig() {
-        this(null, DEFAULT_PORT, DEFAULT_LEVEL);
+        this(null, Server.DEFAULT_PORT, DEFAULT_LEVEL);
     }
 
     public NetplayConfig(final String host, final int port, final byte level) {

@@ -18,7 +18,7 @@ public class ClientSocketHandler {
     private static final long MAX_IN_QUEUE_WAIT_MILLIS = Math.round(1000.0 / Textrads.FRAMES_PER_SECOND);
     
     private static enum State {
-        NOT_STARTED,
+        STOPPED,
         RUNNING,
         CANCELLED,
         TERMINATED,
@@ -35,15 +35,12 @@ public class ClientSocketHandler {
     private final Queue inQueue = new Queue();
     private final Thread inQueueThread;
     
-    private final boolean player; // false = observer
-    
     private final Object stateMonitor = new Object();
-    private State state = State.NOT_STARTED;
+    private State state = State.STOPPED;
     
-    public ClientSocketHandler(final Client client, final Socket socket, final boolean player) throws IOException {
+    public ClientSocketHandler(final Client client, final Socket socket) throws IOException {
         this.client = client;
         this.socket = socket;
-        this.player = player;
         
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -54,7 +51,7 @@ public class ClientSocketHandler {
     public void start() {
         
         synchronized (stateMonitor) {
-            if (state != State.NOT_STARTED) {
+            if (state != State.STOPPED) {
                 return;
             }
             outQueueThread.start();
@@ -98,13 +95,10 @@ public class ClientSocketHandler {
         if (outQueue.isFull()) {
             stop();
             return;
-        }        
-        if (player) {
-            InputEventSource.poll(outQueue.getWriteElement().getInputEvents(0));
-            outQueue.incrementWriteIndex();
-        } else {
-            InputEventSource.clear();
         }
+
+        InputEventSource.poll(outQueue.getWriteElement().getInputEvents(0));
+        outQueue.incrementWriteIndex();
         
         while (inQueue.isEmpty()) {
             synchronized (stateMonitor) {

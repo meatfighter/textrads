@@ -8,23 +8,11 @@ import textrads.util.IOUtil;
 
 public class Element {
     
-    private static final int DEFAULT_PLAYERS = 2;
-
-    private final InputEventList[] inputEvents;
+    private final InputEventList serverInputEventList = new InputEventList();
+    private final InputEventList clientInputEventList = new InputEventList();
     
     private byte[] data;
     
-    public Element() {
-        this(DEFAULT_PLAYERS);
-    }
-    
-    public Element(final int players) {
-        inputEvents = new InputEventList[players];
-        for (int i = players - 1; i >= 0; --i) {
-            inputEvents[i] = new InputEventList();
-        }
-    }
-
     public byte[] getData() {
         return data;
     }

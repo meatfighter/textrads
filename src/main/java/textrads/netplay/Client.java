@@ -7,23 +7,22 @@ import textrads.util.ThreadUtil;
 public class Client {
     
     private static enum State {
-        NOT_STARTED,
+        STOPPED,
         RUNNING,
         CANCELLED,
     }
     
     private volatile String host;
     private volatile int port = Server.DEFAULT_PORT;
-    private volatile boolean player;
     
     private final Object stateMonitor = new Object();
-    private State state = State.NOT_STARTED;    
+    private State state = State.STOPPED;    
     private Thread listenerThread;    
     private ClientSocketHandler handler;
     
     public void start() {        
         synchronized (stateMonitor) {
-            if (state != State.NOT_STARTED) {
+            if (state != State.STOPPED) {
                 return;
             }
             state = State.RUNNING;
@@ -53,7 +52,7 @@ public class Client {
                 
                 if (h == null || h.isTerminated()) {
                     try {
-                        h = new ClientSocketHandler(this, new Socket(host, port), player);
+                        h = new ClientSocketHandler(this, new Socket(host, port));
                         h.start();
                     } catch (final IOException ignored) {
                         ThreadUtil.sleepOneSecond();
@@ -85,11 +84,11 @@ public class Client {
         synchronized (stateMonitor) { 
             h = handler;
             switch (state) {
-                case NOT_STARTED:
+                case STOPPED:
                     return;
                 case CANCELLED: 
                     if ((listenerThread == null || !listenerThread.isAlive()) && (h == null || h.isTerminated())) {
-                        state = State.NOT_STARTED;
+                        state = State.STOPPED;
                     }
                     return;
                 default:
@@ -129,13 +128,5 @@ public class Client {
 
     public void setPort(final int port) {
         this.port = port;
-    }
-
-    public boolean isPlayer() {
-        return player;
-    }
-
-    public void setPlayer(final boolean player) {
-        this.player = player;
     }
 }
