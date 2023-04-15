@@ -9,9 +9,11 @@ import java.net.Socket;
 import textrads.app.Textrads;
 import textrads.util.ThreadUtil;
 
-public class SocketHandler {
+public class MessageChannel {
     
     private static final long MAX_WAIT_NANOS = Math.round(1.0E9 / Textrads.FRAMES_PER_SECOND);
+    
+    private static final int DEFAULT_OUT_QUEUE_PLAYERS = 2;
     
     private static enum State {
         NEW,
@@ -25,21 +27,35 @@ public class SocketHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
 
-    private final Queue outQueue = new Queue(1);
+    private final MessageQueue outQueue;
     private final Thread outQueueThread;
     
-    private final Queue inQueue = new Queue();
+    private final MessageQueue inQueue;
     private final Thread inQueueThread;
     
     private final Object stateMonitor = new Object();
     private State state = State.NEW;
     
-    public SocketHandler(final Socket socket, final TerminatedListener terminatedListener) throws IOException {        
+    public MessageChannel(final Socket socket) throws IOException {
+        this(socket, null, DEFAULT_OUT_QUEUE_PLAYERS);
+    }
+    
+    public MessageChannel(final Socket socket, final TerminatedListener terminatedListener) throws IOException {
+        this(socket, terminatedListener, DEFAULT_OUT_QUEUE_PLAYERS);
+    }
+    
+    public MessageChannel(final Socket socket, final TerminatedListener terminatedListener, final int outPlayers) 
+            throws IOException {        
+        
         this.socket = socket;
         this.terminatedListener = terminatedListener;
         
+        inQueue = new MessageQueue();
+        outQueue = new MessageQueue(outPlayers);
+        
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        
         outQueueThread = new Thread(this::runOutQueue);
         inQueueThread = new Thread(this::runInQueue);
     }
@@ -76,15 +92,14 @@ public class SocketHandler {
     
     private void closeSocket() {
         try {   
-            final Socket s = socket;
-            if (s != null) {
-                s.close();
+            if (socket != null) {
+                socket.close();
             }
         } catch (final IOException ignored) {            
         }
     } 
 
-    public QueueElement getWriteElement() {
+    public Message getWriteMessage() {
         
         synchronized (stateMonitor) {
             if (state != State.RUNNING) {
@@ -97,7 +112,7 @@ public class SocketHandler {
             return null;
         }      
         
-        return outQueue.getWriteElement();
+        return outQueue.getWriteMessage();
     }
     
     public void incrementWriteIndex() {
@@ -116,7 +131,7 @@ public class SocketHandler {
         outQueue.incrementWriteIndex();
     }
     
-    public int waitForData() {
+    public int waitForMessage() {
         
         final long startTime = System.nanoTime();
         while (true) {
@@ -137,13 +152,13 @@ public class SocketHandler {
             }
             
             try {            
-                inQueue.waitForData(remainingNanos / 1_000_000L);
+                inQueue.waitForMessage(remainingNanos / 1_000_000L);
             } catch (final InterruptedException ignored) {
             }
         }
     }
 
-    public QueueElement getReadElement() {
+    public Message getReadMessage() {
         
         synchronized (stateMonitor) {
             if (state != State.RUNNING) {
@@ -151,7 +166,7 @@ public class SocketHandler {
             }
         }
         
-        return inQueue.getReadElement();
+        return inQueue.getReadMessage();
     }
         
     public void incrementReadIndex() {
@@ -187,12 +202,12 @@ public class SocketHandler {
                 } 
                 try {
                     if (outQueue.isEmpty()) {
-                        outQueue.waitForData(Server.HEARTBEAT_PERIOD);
+                        outQueue.waitForMessage(Server.HEARTBEAT_PERIOD);
                     }
                     if (outQueue.isEmpty()) {
-                        out.write(QueueElement.Type.HEARTBEAT);
+                        out.write(Message.Type.HEARTBEAT);
                     } else {
-                        outQueue.getReadElement().write(out);        
+                        outQueue.getReadMessage().write(out);        
                         outQueue.incrementReadIndex();
                     }
                     out.flush();
@@ -207,7 +222,9 @@ public class SocketHandler {
             synchronized (stateMonitor) {
                 state = State.TERMINATED;
             }
-            terminatedListener.handleTerminated(this);
+            if (terminatedListener != null) {
+                terminatedListener.handleTerminated(this);
+            }
         }                
     }
     
@@ -221,13 +238,13 @@ public class SocketHandler {
                 }                      
                 try {
                     final byte type = in.readByte();
-                    if (type == QueueElement.Type.HEARTBEAT) {
+                    if (type == Message.Type.HEARTBEAT) {
                         continue;
                     }
                     if (inQueue.isFull()) {
                         break;
                     }
-                    inQueue.getWriteElement().read(in, type);
+                    inQueue.getWriteMessage().read(in, type);
                     inQueue.incrementWriteIndex();   
                 } catch (final IOException ignored) {
                     break;

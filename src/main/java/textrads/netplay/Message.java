@@ -6,7 +6,7 @@ import java.io.IOException;
 import textrads.input.InputEventList;
 import textrads.util.IOUtil;
 
-public class QueueElement {
+public class Message {
     
     private static final int DEFAULT_PLAYERS = 2;
     
@@ -21,11 +21,11 @@ public class QueueElement {
     private byte type;
     private byte[] data;
 
-    public QueueElement() {
+    public Message() {
         this(DEFAULT_PLAYERS);
     }
 
-    public QueueElement(final int players) {
+    public Message(final int players) {
         inputEvents = new InputEventList[players];
         for (int i = players - 1; i >= 0; --i) {
             inputEvents[i] = new InputEventList();

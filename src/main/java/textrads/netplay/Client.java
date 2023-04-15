@@ -18,7 +18,7 @@ public class Client {
     private final Object stateMonitor = new Object();
     private State state = State.STOPPED;    
     private Thread listenerThread;    
-    private SocketHandler handler;
+    private MessageChannel handler;
     
     public void start() {        
         synchronized (stateMonitor) {
@@ -27,7 +27,7 @@ public class Client {
             }
             state = State.RUNNING;
             listenerThread = new Thread(this::listen);
-            listenerThread.start();            
+            listenerThread.start();
         }
     }
     
@@ -35,7 +35,7 @@ public class Client {
         try {
             outer: while (true) {
                 
-                SocketHandler h;
+                MessageChannel h;
                 synchronized (stateMonitor) {
                     if (state != State.RUNNING) {
                         break;
@@ -52,7 +52,7 @@ public class Client {
                 
                 if (h == null || h.isTerminated()) {
                     try {
-                        h = new SocketHandler(this, new Socket(host, port));
+                        h = new MessageChannel(this, new Socket(host, port));
                         h.start();
                     } catch (final IOException ignored) {
                         ThreadUtil.sleepOneSecond();
@@ -73,14 +73,14 @@ public class Client {
         }
     }
     
-    public void handleTerminatedConnection(final SocketHandler clientSocketHandler) {
+    private void handleTerminatedConnection(final MessageChannel clientSocketHandler) {
         synchronized (stateMonitor) {
             stateMonitor.notifyAll();
         }
     }
        
     public void update() {   
-        final SocketHandler h;
+        final MessageChannel h;
         synchronized (stateMonitor) { 
             h = handler;
             switch (state) {

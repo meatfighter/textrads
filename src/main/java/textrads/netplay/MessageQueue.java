@@ -2,30 +2,30 @@ package textrads.netplay;
 
 import textrads.app.Textrads;
 
-public class Queue {
+public class MessageQueue {
     
     private static final int DEFAULT_PLAYERS = 2;
     private static final int DEFAULT_CAPACITY = 60 * Textrads.FRAMES_PER_SECOND;
 
-    private final QueueElement[] elements;
+    private final Message[] messages;
     
     private int readIndex;
     private int writeIndex;
     private int size;
     private boolean running;
     
-    public Queue() {
+    public MessageQueue() {
         this(DEFAULT_PLAYERS, DEFAULT_CAPACITY);
     }
     
-    public Queue(final int players) {
+    public MessageQueue(final int players) {
         this(players, DEFAULT_CAPACITY);
     }
     
-    public Queue(final int players, final int capacity) {
-        elements = new QueueElement[capacity];
+    public MessageQueue(final int players, final int capacity) {
+        messages = new Message[capacity];
         for (int i = capacity - 1; i >= 0; --i) {
-            elements[i] = new QueueElement(players);
+            messages[i] = new Message(players);
         }
     }
     
@@ -39,48 +39,48 @@ public class Queue {
         notifyAll();
     }    
     
-    public synchronized QueueElement getWriteElement() {
-        return elements[writeIndex];
+    public synchronized Message getWriteMessage() {
+        return messages[writeIndex];
     }
     
     public synchronized void incrementWriteIndex() {
-        if (size < elements.length) {
+        if (size < messages.length) {
             if (size == 0) {
                 notifyAll();
             }
             ++size;
-            if (++writeIndex == elements.length) {
+            if (++writeIndex == messages.length) {
                 writeIndex = 0;
             }            
         }
     }
     
-    public synchronized void waitForData() throws InterruptedException {
-        waitForData(0);
+    public synchronized void waitForMessage() throws InterruptedException {
+        waitForMessage(0);
     }
     
-    public synchronized void waitForData(final long timeout) throws InterruptedException {
+    public synchronized void waitForMessage(final long timeout) throws InterruptedException {
         while (running && size == 0) {
             wait(timeout);
         }
     }
     
-    public synchronized QueueElement getReadElement() {
-        return elements[readIndex];
+    public synchronized Message getReadMessage() {
+        return messages[readIndex];
     }
     
     public synchronized void incrementReadIndex() {
         if (size > 0) {
             --size;
-            elements[readIndex].clear();
-            if (++readIndex == elements.length) {
+            messages[readIndex].clear();
+            if (++readIndex == messages.length) {
                 readIndex = 0;
             }
         }
     }    
     
     public synchronized boolean isFull() {
-        return size >= elements.length;
+        return size >= messages.length;
     }
     
     public synchronized boolean isEmpty() {
@@ -92,6 +92,6 @@ public class Queue {
     }
     
     public synchronized int getCapacity() {
-        return elements.length;
+        return messages.length;
     }
 }
