@@ -1,6 +1,55 @@
- 
+    public void write(final Serializable obj) {
+        
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
+                return;
+            }
+        }
+        
+        if (outQueue.isFull()) {
+            stop();
+            return;
+        }
+        
+        final byte[] byteArray;
+        try {
+            byteArray = IOUtil.toByteArray(obj);
+        } catch (final IOException ignored) {
+            stop();
+            return;
+        }
+        
+        final QueueElement element = outQueue.getWriteElement();
+        element.setType(QueueElement.Type.DATA);
+        element.setData(byteArray);
+        outQueue.incrementWriteIndex();
+    } 
 
+        InputEventSource.poll(outQueue.getWriteElement().getInputEvents(0));
+        outQueue.incrementWriteIndex();
 
+        for (int i = inQueue.size() - 1; i >= 0; --i) {
+            final QueueElement element = inQueue.getReadElement();
+            final byte[] data = element.getData();
+            if (data != null) {
+                try {
+                    GameStateSource.setState(data);
+                } catch (final IOException | ClassNotFoundException ignored) {
+                    stop();
+                    return;
+                }
+            } else {
+                final GameState gameState = GameStateSource.getState();
+                final InputEventList[] events = element.getInputEvents();
+                for (int p = 0; p < events.length; ++p) {
+                    final InputEventList es = events[p];
+                    for (int j = 0; j < es.size(); ++j) {
+                        gameState.handleInputEvent(es.get(j), p);
+                    }
+                }
+            }
+            inQueue.incrementReadIndex();
+        }
 
 
 0 Server/Client

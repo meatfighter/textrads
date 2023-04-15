@@ -6,11 +6,11 @@ import java.io.IOException;
 import textrads.input.InputEventList;
 import textrads.util.IOUtil;
 
-public class Element {
+public class QueueElement {
     
     private static final int DEFAULT_PLAYERS = 2;
     
-    public static interface ElementTypes {
+    public static interface Type {
         byte HEARTBEAT = 0;
         byte INPUT_EVENTS = 1;
         byte DATA = 2;
@@ -21,15 +21,23 @@ public class Element {
     private byte type;
     private byte[] data;
 
-    public Element() {
+    public QueueElement() {
         this(DEFAULT_PLAYERS);
     }
 
-    public Element(final int players) {
+    public QueueElement(final int players) {
         inputEvents = new InputEventList[players];
         for (int i = players - 1; i >= 0; --i) {
             inputEvents[i] = new InputEventList();
         }
+    }
+
+    public byte getType() {
+        return type;
+    }
+
+    public void setType(final byte type) {
+        this.type = type;
     }
     
     public byte[] getData() {
@@ -59,12 +67,12 @@ public class Element {
     public void write(final DataOutputStream out) throws IOException {
         out.write(type);
         switch (type) {
-            case ElementTypes.INPUT_EVENTS:
+            case Type.INPUT_EVENTS:
                 for (int i = 0; i < inputEvents.length; ++i) {
                     inputEvents[i].write(out);
                 }
                 break;
-            case ElementTypes.DATA:
+            case Type.DATA:
                 IOUtil.writeByteArray(out, data);
                 break;
         }
@@ -76,16 +84,16 @@ public class Element {
     
     public void read(final DataInputStream in, final byte type) throws IOException {
         switch (type) {
-            case ElementTypes.INPUT_EVENTS:
+            case Type.INPUT_EVENTS:
                 for (int i = 0; i < inputEvents.length; ++i) {
                     inputEvents[i].read(in);
                 }
                 break;
-            case ElementTypes.DATA:
+            case Type.DATA:
                 data = IOUtil.readByteArray(in);
                 break;
             default:
-                throw new IOException("Unknown element type.");
+                throw new IOException("Unknown type.");
         }
     }   
 }

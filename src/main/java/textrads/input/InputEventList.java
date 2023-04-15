@@ -31,6 +31,11 @@ public class InputEventList {
         size = Math.min(size, index + 1);
     }
     
+    public void set(final InputEventList inputEventList) {
+        this.size = inputEventList.size;
+        System.arraycopy(inputEventList.data, 0, data, 0, inputEventList.size);
+    }
+    
     public void clear() {
         size = 0;
     }
@@ -50,7 +55,7 @@ public class InputEventList {
     public void read(final DataInputStream in) throws IOException {
         final int length = in.read();
         if (length < 0 || length > InputEventSource.MAX_POLLS) {
-            throw new IOException("invalid events length");
+            throw new IOException("Invalid events length.");
         }                
         in.readFully(data, 0, length);
         size = length;

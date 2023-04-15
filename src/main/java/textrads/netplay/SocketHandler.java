@@ -6,16 +6,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import textrads.game.GameState;
-import textrads.game.GameStateSource;
-import textrads.input.InputEventList;
-import textrads.input.InputEventSource;
 import textrads.app.Textrads;
 import textrads.util.ThreadUtil;
 
-public class ClientSocketHandler {
+public class SocketHandler {
     
-    private static final long MAX_IN_QUEUE_WAIT_MILLIS = Math.round(1000.0 / Textrads.FRAMES_PER_SECOND);
+    private static final long MAX_WAIT_NANOS = Math.round(1.0E9 / Textrads.FRAMES_PER_SECOND);
     
     private static enum State {
         NEW,
@@ -24,8 +20,8 @@ public class ClientSocketHandler {
         TERMINATED,
     }
     
-    private final Client client;
     private final Socket socket;
+    private final TerminatedListener terminatedListener;
     private final DataInputStream in;
     private final DataOutputStream out;
 
@@ -38,9 +34,9 @@ public class ClientSocketHandler {
     private final Object stateMonitor = new Object();
     private State state = State.NEW;
     
-    public ClientSocketHandler(final Client client, final Socket socket) throws IOException {
-        this.client = client;
+    public SocketHandler(final Socket socket, final TerminatedListener terminatedListener) throws IOException {        
         this.socket = socket;
+        this.terminatedListener = terminatedListener;
         
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -54,6 +50,8 @@ public class ClientSocketHandler {
             if (state != State.NEW) {
                 return;
             }
+            outQueue.start();        
+            inQueue.start();
             outQueueThread.start();
             inQueueThread.start();
             state = State.RUNNING;
@@ -70,6 +68,8 @@ public class ClientSocketHandler {
         }
         
         closeSocket();
+        outQueue.stop();
+        inQueue.stop();
         ThreadUtil.interrupt(outQueueThread);
         ThreadUtil.interrupt(inQueueThread);
     }
@@ -82,10 +82,26 @@ public class ClientSocketHandler {
             }
         } catch (final IOException ignored) {            
         }
-    }     
-    
-    public void update() {
+    } 
 
+    public QueueElement getWriteElement() {
+        
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
+                return null;
+            }
+        }
+        
+        if (outQueue.isFull()) {
+            stop();
+            return null;
+        }      
+        
+        return outQueue.getWriteElement();
+    }
+    
+    public void incrementWriteIndex() {
+        
         synchronized (stateMonitor) {
             if (state != State.RUNNING) {
                 return;
@@ -96,43 +112,57 @@ public class ClientSocketHandler {
             stop();
             return;
         }
-
-        InputEventSource.poll(outQueue.getWriteElement().getInputEvents(0));
-        outQueue.incrementWriteIndex();
         
-        while (inQueue.isEmpty()) {
+        outQueue.incrementWriteIndex();
+    }
+    
+    public int waitForData() {
+        
+        final long startTime = System.nanoTime();
+        while (true) {
+            
             synchronized (stateMonitor) {
                 if (state != State.RUNNING) {
-                    return;
+                    return 0;
                 }
+            }
+            
+            if (!inQueue.isEmpty()) {
+                return inQueue.size();
             }            
+            
+            final long remainingNanos = MAX_WAIT_NANOS - (System.nanoTime() - startTime);
+            if (remainingNanos <= 0L) {
+                return 0;
+            }
+            
             try {            
-                inQueue.waitForData(MAX_IN_QUEUE_WAIT_MILLIS);
-            } catch (final InterruptedException ignored) {                
+                inQueue.waitForData(remainingNanos / 1_000_000L);
+            } catch (final InterruptedException ignored) {
             }
         }
-        for (int i = inQueue.size() - 1; i >= 0; --i) {
-            final Element element = inQueue.getReadElement();
-            final byte[] data = element.getData();
-            if (data != null) {
-                try {
-                    GameStateSource.setState(data);
-                } catch (final IOException | ClassNotFoundException ignored) {
-                    stop();
-                    return;
-                }
-            } else {
-                final GameState gameState = GameStateSource.getState();
-                final InputEventList[] events = element.getInputEvents();
-                for (int p = 0; p < events.length; ++p) {
-                    final InputEventList es = events[p];
-                    for (int j = 0; j < es.size(); ++j) {
-                        gameState.handleInputEvent(es.get(j), p);
-                    }
-                }
+    }
+
+    public QueueElement getReadElement() {
+        
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
+                return null;
             }
-            inQueue.incrementReadIndex();
         }
+        
+        return inQueue.getReadElement();
+    }
+        
+    public void incrementReadIndex() {
+        
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
+                return;
+            }
+        }        
+        
+        inQueue.incrementReadIndex();
     }
     
     public boolean isRunning() {
@@ -160,7 +190,7 @@ public class ClientSocketHandler {
                         outQueue.waitForData(Server.HEARTBEAT_PERIOD);
                     }
                     if (outQueue.isEmpty()) {
-                        out.write(Element.ElementTypes.HEARTBEAT);
+                        out.write(QueueElement.Type.HEARTBEAT);
                     } else {
                         outQueue.getReadElement().write(out);        
                         outQueue.incrementReadIndex();
@@ -177,7 +207,7 @@ public class ClientSocketHandler {
             synchronized (stateMonitor) {
                 state = State.TERMINATED;
             }
-            client.handleTerminatedConnection(this);
+            terminatedListener.handleTerminated(this);
         }                
     }
     
@@ -191,7 +221,7 @@ public class ClientSocketHandler {
                 }                      
                 try {
                     final byte type = in.readByte();
-                    if (type == Element.ElementTypes.HEARTBEAT) {
+                    if (type == QueueElement.Type.HEARTBEAT) {
                         continue;
                     }
                     if (inQueue.isFull()) {

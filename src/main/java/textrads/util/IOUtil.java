@@ -1,8 +1,13 @@
 package textrads.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -13,6 +18,8 @@ import java.util.List;
 public final class IOUtil {
     
     private static final int MAX_BYTE_ARRAY_LENGTH = 1024 * 1024;
+    
+    private static final int BAOS_INITIAL_SIZE = 64 * 1024;
     
     private static final List<NetworkInterfaceAddress> NETWORK_INTERFACE_ADDRESSES = new ArrayList<>();
     
@@ -119,12 +126,28 @@ public final class IOUtil {
     public static byte[] readByteArray(final DataInputStream in) throws IOException {
         final int length = in.readInt();
         if (length < 0 || length > MAX_BYTE_ARRAY_LENGTH) {
-            throw new IOException("invalid byte array length");
+            throw new IOException("Invalid byte array length.");
         }
         final byte[] data = new byte[in.readInt()];
         in.readFully(data);
         return data;
     }
+    
+    public static byte[] toByteArray(final Serializable obj) throws IOException {
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(BAOS_INITIAL_SIZE)) {
+            try (final ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(obj);
+            }
+            return baos.toByteArray();
+        }
+    }
+    
+    public static <T> T fromByteArray(final byte[] data) throws IOException, ClassNotFoundException {
+        try (final ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                final ObjectInputStream ois = new ObjectInputStream(bais)) {
+            return (T) ois.readObject();
+        }
+    }    
     
     private IOUtil() {        
     }

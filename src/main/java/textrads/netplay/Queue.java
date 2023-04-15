@@ -7,11 +7,12 @@ public class Queue {
     private static final int DEFAULT_PLAYERS = 2;
     private static final int DEFAULT_CAPACITY = 60 * Textrads.FRAMES_PER_SECOND;
 
-    private final Element[] elements;
+    private final QueueElement[] elements;
     
     private int readIndex;
     private int writeIndex;
     private int size;
+    private boolean running;
     
     public Queue() {
         this(DEFAULT_PLAYERS, DEFAULT_CAPACITY);
@@ -22,13 +23,23 @@ public class Queue {
     }
     
     public Queue(final int players, final int capacity) {
-        elements = new Element[capacity];
+        elements = new QueueElement[capacity];
         for (int i = capacity - 1; i >= 0; --i) {
-            elements[i] = new Element(players);
+            elements[i] = new QueueElement(players);
         }
     }
     
-    public synchronized Element getWriteElement() {
+    public synchronized void start() {
+        running = true;
+        notifyAll();
+    }
+    
+    public synchronized void stop() {
+        running = false;
+        notifyAll();
+    }    
+    
+    public synchronized QueueElement getWriteElement() {
         return elements[writeIndex];
     }
     
@@ -49,12 +60,12 @@ public class Queue {
     }
     
     public synchronized void waitForData(final long timeout) throws InterruptedException {
-        while (size == 0) {
+        while (running && size == 0) {
             wait(timeout);
         }
     }
     
-    public synchronized Element getReadElement() {
+    public synchronized QueueElement getReadElement() {
         return elements[readIndex];
     }
     
