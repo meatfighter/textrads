@@ -37,7 +37,16 @@ public class NetplayRenderer {
                 break;
             case SERVER_START_ERROR:
                 renderServerStartError(g, size, state);
-                break;                
+                break;
+            case SERVER_CHANNEL:
+                renderServerChannel(g, size, state);
+                break;
+            case SERVER_WAITING:
+                renderServerWaiting(g, size, state);
+                break;
+            case SERVER_ERROR:
+                renderServerError(g, size, state);
+                break;
                 
             case CLIENT_CONFIG:
                 renderClientConfig(g, size, state);
@@ -56,6 +65,15 @@ public class NetplayRenderer {
                 break;
             case CLIENT_START_ERROR:
                 renderClientStartError(g, size, state);
+                break;
+            case CLIENT_CHANNEL:
+                renderClientChannel(g, size, state);
+                break;
+            case CLIENT_WAITING:
+                renderClientWaiting(g, size, state);
+                break;
+            case CLIENT_ERROR:
+                renderClientError(g, size, state);
                 break;                
         }
     }
@@ -84,6 +102,27 @@ public class NetplayRenderer {
         connectMenuRenderer.render(g, size, state.getConnectMenuState());
     }    
     
+    private void renderServerChannel(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        switch (state.getChannelState()) {
+            case PROMPTING_LEVEL:
+                questionRenderer.render(g, size, state.getLevelQuestion());
+                break;
+            case WAITING_TO_PLAY:
+                messageScreenRenderer.render(g, size, state.getMessageScreen());
+                break;
+            case PLAYING:
+                break;
+        }
+    }
+    
+    private void renderServerWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
+    }
+    
+    private void renderServerError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
+    }
+    
     private void renderClientConfig(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         connectMenuRenderer.render(g, size, state.getConnectMenuState());
     }
@@ -106,5 +145,26 @@ public class NetplayRenderer {
     
     private void renderClientStartError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         connectMenuRenderer.render(g, size, state.getConnectMenuState());
+    }
+
+    private void renderClientChannel(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        switch (state.getChannelState()) {
+            case PROMPTING_LEVEL:
+                questionRenderer.render(g, size, state.getLevelQuestion());
+                break;
+            case WAITING_TO_PLAY:
+                messageScreenRenderer.render(g, size, state.getMessageScreen());
+                break;
+            case PLAYING:
+                break;
+        }
+    }
+
+    private void renderClientWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
+    }
+    
+    private void renderClientError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
     }    
 }

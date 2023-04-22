@@ -119,6 +119,10 @@ public final class IOUtil {
     }    
     
     public static void writeByteArray(final DataOutputStream out, final byte[] data) throws IOException {
+        if (data == null) {
+            out.writeInt(0);
+            return;
+        }
         out.writeInt(data.length);
         out.write(data);
     }
@@ -128,7 +132,10 @@ public final class IOUtil {
         if (length < 0 || length > MAX_BYTE_ARRAY_LENGTH) {
             throw new IOException("Invalid byte array length.");
         }
-        final byte[] data = new byte[in.readInt()];
+        if (length == 0) {
+            return null;
+        }
+        final byte[] data = new byte[length];
         in.readFully(data);
         return data;
     }

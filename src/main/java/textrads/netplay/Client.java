@@ -48,12 +48,14 @@ public class Client {
     }    
     
     private void connect() {
+        System.out.println("-- connect");
         try {
             while (true) {
                 
                 synchronized (monitor) {
                     while (running && channel != null && !channel.isTerminated()) {
                         try {
+                            System.out.println("Waiting for disconnection...");
                             monitor.wait();
                         } catch (final InterruptedException ignored) {
                         }
@@ -62,6 +64,7 @@ public class Client {
                         break;
                     }
                     if (channel != null && channel.isHandshakeError()) {
+                        System.out.println("Bad handshake :(");
                         error = "Bad handshake.";
                         return;
                     }
@@ -70,6 +73,7 @@ public class Client {
 
                 final MessageChannel c;
                 try {
+                    System.out.println("Connecting...");
                     c = new MessageChannel(new Socket(host, port), chan -> {
                         synchronized (monitor) {
                             monitor.notifyAll();
@@ -77,8 +81,9 @@ public class Client {
                     });
                     c.start();
                 } catch (final IOException e) {
+                    System.out.println("Connection error: " + e.getMessage());
                     synchronized (monitor) {
-                        if (firstConnectionAttempt) {
+                        if (firstConnectionAttempt) {                            
                             error = e.getMessage();
                             return;
                         }

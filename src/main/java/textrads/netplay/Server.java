@@ -54,7 +54,7 @@ public class Server {
     }
        
     private void listen() {
-        System.out.println("--1");
+        System.out.println("-- 1isten");
         
         try {
             synchronized (monitor) {
@@ -82,6 +82,7 @@ public class Server {
                         break;
                     }
                     if (channel != null && channel.isHandshakeError()) {
+                        System.out.println("Bad handshake :(");
                         error = "Bad handshake.";
                         return;
                     }
@@ -103,6 +104,7 @@ public class Server {
                     });
                     c.start();
                 } catch (final IOException e) {
+                    System.out.println("Connection error: " + e.getMessage());
                     ThreadUtil.sleepOneSecond();
                     continue;
                 }                

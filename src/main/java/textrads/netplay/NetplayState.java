@@ -25,6 +25,9 @@ import textrads.util.IOUtil;
 import textrads.util.IOUtil.NetworkInterfaceAddress;
 
 public class NetplayState {
+
+    private static String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
+    private static String CONNECTING_TO_SERVER_STR = "Connecting to server";
     
     static enum State {
         PLAY_AS,
@@ -34,13 +37,25 @@ public class NetplayState {
         SERVER_CONFIG_PORT,
         SERVER_START_WAITING,
         SERVER_START_ERROR,
+        SERVER_CHANNEL,
+        SERVER_WAITING,
+        SERVER_ERROR,
         
         CLIENT_CONFIG,
         CLIENT_CONFIG_HOST,
         CLIENT_CONFIG_PORT,
         CLIENT_CONFIG_HOST_ERROR,
         CLIENT_START_WAITING,
-        CLIENT_START_ERROR,        
+        CLIENT_START_ERROR,
+        CLIENT_CHANNEL,
+        CLIENT_WAITING,
+        CLIENT_ERROR,
+    }
+    
+    static enum ChannelState {
+        PROMPTING_LEVEL,
+        WAITING_TO_PLAY,
+        PLAYING,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -60,13 +75,22 @@ public class NetplayState {
     
     private final MessageScreen messageScreen = new MessageScreen();
     
+    private final Question levelQuestion = new Question(new TextField("Level (0\u2500\u250029)?", 
+            new NumberValidator(0, 29)));    
+    
     private State state;
+    private ChannelState channelState;
     private boolean returnToMainMenu;
     
     private String hostname;
     private InetAddress host;
     private int port;
     private byte level;
+    
+    private MessageChannel channel;
+    private boolean channelJustEstablished;
+    private boolean serverSubmittedLevel;
+    private boolean clientSubmittedLevel;
     
     private Menu createPlayAsMenu() {
         final List<MenuItem> menuItems = new ArrayList<>();
@@ -104,6 +128,9 @@ public class NetplayState {
                 break;
             case SERVER_START_ERROR:
                 updateServerStartError();
+                break;
+            case SERVER_CHANNEL:
+                updateServerChannel();
                 break;                
                 
             case CLIENT_CONFIG:
@@ -123,7 +150,10 @@ public class NetplayState {
                 break;
             case CLIENT_START_ERROR:
                 updateClientStartError();
-                break;                
+                break;
+            case CLIENT_CHANNEL:
+                updateClientChannel();
+                break;
         }
     }
     
@@ -162,6 +192,8 @@ public class NetplayState {
     
     private void gotoServerConfig() {
         state = State.SERVER_CONFIG;
+        
+        server.stop();
         
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         final NetworkInterfaceAddress nia = toNetworkInterfaceAddress(config.getHost());
@@ -221,7 +253,7 @@ public class NetplayState {
     
     private void gotoServerStartWaiting() {
         state = State.SERVER_START_WAITING;
-        connectMenuState.init("Server", hostname, Integer.toString(port), "Waiting for client to connect", 
+        connectMenuState.init("Server", hostname, Integer.toString(port), WAITING_FOR_CLIENT_STR, 
                 MessageState.MessageType.WAITING);
         server.setBindAddress(host);
         server.setPort(port);
@@ -244,6 +276,12 @@ public class NetplayState {
             } else {
                 gotoServerConfig();
             }
+            return;
+        }
+        
+        channel = server.getMessageChannel();
+        if (channel != null) {
+            gotoServerChannel();
         }
     }
     
@@ -256,6 +294,106 @@ public class NetplayState {
         connectMenuState.update();
         final KeyStroke keyStroke = connectMenuState.getSelection();
         if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            gotoServerConfig();
+        }
+    }
+    
+    private void gotoServerChannel() {
+        state = State.SERVER_CHANNEL;
+        
+        channelState = ChannelState.PROMPTING_LEVEL;
+        final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
+        level = config.getLevel();
+        levelQuestion.init("Server", (level >= 0) ? Integer.toString(level) : "");
+        
+        channelJustEstablished = true;
+        serverSubmittedLevel = false;
+        clientSubmittedLevel = false;        
+    }
+    
+    private void updateServerChannel() {
+        
+        if (channel.isTerminated()) {
+            channel = null;
+            gotoServerWaiting();
+            return;
+        }
+        
+        if (channelJustEstablished) {
+            channelJustEstablished = false;
+            if (!clientSubmittedLevel) {
+                final Message message = channel.getWriteMessage();
+                if (message == null) {
+                    return;
+                }
+                message.setType(Message.Type.PROMPT_LEVEL);
+                channel.incrementWriteIndex();
+            } else {
+                // TODO GAME
+            }
+        }
+        
+        switch (channelState) {
+            case PROMPTING_LEVEL:
+                updateServerPromptLevel();
+                break;
+            case WAITING_TO_PLAY:
+                break;
+            case PLAYING:
+                break;
+        }
+    }
+    
+    private void updateServerPromptLevel() {
+        levelQuestion.update();
+        
+        if (levelQuestion.isEscPressed()) {
+            gotoServerConfig();
+            return;
+        }
+        
+        if (!levelQuestion.isEnterPressed()) {
+            return;
+        }
+    }
+    
+    private void gotoServerWaiting() {
+        state = State.SERVER_WAITING;
+        messageScreen.init("Server", WAITING_FOR_CLIENT_STR, MessageState.MessageType.WAITING);
+    }
+    
+    private void updateServerWaiting() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
+            gotoServerConfig();
+            return;
+        }
+        
+        if (!server.isRunning()) {
+            final String error = server.getError();
+            if (isNotBlank(error)) {
+                gotoServerError(error);
+            } else {
+                gotoServerConfig();
+            }
+            return;
+        }
+
+        channel = server.getMessageChannel();
+        if (channel != null) {
+            state = State.SERVER_CHANNEL;
+            channelJustEstablished = true;
+        }        
+    }
+    
+    private void gotoServerError(final String error) {
+        state = State.SERVER_ERROR;
+        messageScreen.init("Server", error, MessageState.MessageType.ERROR);
+    }
+    
+    private void updateServerError() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
             gotoServerConfig();
         }
     }
@@ -320,6 +458,8 @@ public class NetplayState {
     
     private void gotoClientConfig() {
         state = State.CLIENT_CONFIG;
+        
+        client.stop();
         
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
         
@@ -389,7 +529,7 @@ public class NetplayState {
     
     private void gotoClientStartWaiting() {
         state = State.CLIENT_START_WAITING;
-        connectMenuState.init("Client", hostname, Integer.toString(port), "Connecting to server", 
+        connectMenuState.init("Client", hostname, Integer.toString(port), CONNECTING_TO_SERVER_STR, 
                 MessageState.MessageType.WAITING);
         client.setHost(hostname);
         client.setPort(port);
@@ -424,6 +564,66 @@ public class NetplayState {
         connectMenuState.update();
         final KeyStroke keyStroke = connectMenuState.getSelection();
         if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            gotoClientConfig();
+        }
+    }
+
+    private void gotoClientChannel() {
+        state = State.CLIENT_CHANNEL;
+        channelJustEstablished = true;
+        
+    }
+    
+    private void updateClientChannel() {
+        
+        if (channel.isTerminated()) {
+            channel = null;
+            gotoClientWaiting();
+            return;
+        }
+        
+        if (channelJustEstablished) {
+            channelJustEstablished = false;
+        }
+    }
+
+    private void gotoClientWaiting() {
+        state = State.CLIENT_WAITING;
+        messageScreen.init("Client", CONNECTING_TO_SERVER_STR, MessageState.MessageType.WAITING);
+    }
+    
+    private void updateClientWaiting() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
+            gotoClientConfig();
+            return;
+        }
+        
+        if (!client.isRunning()) {
+            final String error = client.getError();
+            if (isNotBlank(error)) {
+                gotoClientError(error);
+            } else {
+                gotoClientConfig();
+            }
+            return;
+        }
+
+        channel = server.getMessageChannel();
+        if (channel != null) {
+            state = State.SERVER_CHANNEL;
+            channelJustEstablished = true;
+        }        
+    }
+    
+    private void gotoClientError(final String error) {
+        state = State.CLIENT_ERROR;
+        messageScreen.init("Client", error, MessageState.MessageType.ERROR);
+    }
+    
+    private void updateClientError() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
             gotoClientConfig();
         }
     }    
@@ -514,5 +714,13 @@ public class NetplayState {
 
     public MessageScreen getMessageScreen() {
         return messageScreen;
+    }
+
+    public ChannelState getChannelState() {
+        return channelState;
+    }
+
+    public Question getLevelQuestion() {
+        return levelQuestion;
     }
 }

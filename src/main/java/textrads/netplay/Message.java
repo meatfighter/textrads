@@ -14,6 +14,7 @@ public class Message {
         byte HEARTBEAT = 0;
         byte INPUT_EVENTS = 1;
         byte HANDSHAKE = 2;
+        byte PROMPT_LEVEL = 3;
     }    
     
     private final InputEventList[] inputEvents;
