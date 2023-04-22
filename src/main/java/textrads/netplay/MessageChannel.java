@@ -6,12 +6,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 import textrads.app.Textrads;
 import textrads.util.ThreadUtil;
 
 public class MessageChannel {
     
-    private static final long MAX_WAIT_NANOS = Math.round(1.0E9 / Textrads.FRAMES_PER_SECOND);
+    private static final long WAIT_MILLIS = Math.round(1000.0 / Textrads.FRAMES_PER_SECOND);
+    
+    public static final long HEARTBEAT_MILLIS = TimeUnit.SECONDS.toMillis(10);
     
     private static final int DEFAULT_OUT_QUEUE_PLAYERS = 2;
     
@@ -133,29 +136,17 @@ public class MessageChannel {
     
     public int waitForMessage() {
         
-        final long startTime = System.nanoTime();
-        while (true) {
-            
-            synchronized (stateMonitor) {
-                if (state != State.RUNNING) {
-                    return 0;
-                }
-            }
-            
-            if (!inQueue.isEmpty()) {
-                return inQueue.size();
-            }            
-            
-            final long remainingNanos = MAX_WAIT_NANOS - (System.nanoTime() - startTime);
-            if (remainingNanos <= 0L) {
+        synchronized (stateMonitor) {
+            if (state != State.RUNNING) {
                 return 0;
             }
-            
-            try {            
-                inQueue.waitForMessage(remainingNanos / 1_000_000L);
-            } catch (final InterruptedException ignored) {
-            }
-        }
+        }        
+                    
+        if (inQueue.isEmpty()) {
+            inQueue.waitForMessage(WAIT_MILLIS);            
+        }            
+
+        return inQueue.size();
     }
 
     public Message getReadMessage() {
@@ -200,10 +191,8 @@ public class MessageChannel {
                         return;
                     }
                 } 
+                outQueue.waitForMessage(HEARTBEAT_MILLIS);
                 try {
-                    if (outQueue.isEmpty()) {
-                        outQueue.waitForMessage(Server.HEARTBEAT_PERIOD);
-                    }
                     if (outQueue.isEmpty()) {
                         out.write(Message.Type.HEARTBEAT);
                     } else {
@@ -211,7 +200,6 @@ public class MessageChannel {
                         outQueue.incrementReadIndex();
                     }
                     out.flush();
-                } catch (final InterruptedException ignored) {
                 } catch (final IOException ignored) {
                     break;
                 }

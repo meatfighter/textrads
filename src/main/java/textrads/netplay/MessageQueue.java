@@ -55,13 +55,16 @@ public class MessageQueue {
         }
     }
     
-    public synchronized void waitForMessage() throws InterruptedException {
+    public synchronized void waitForMessage() {
         waitForMessage(0);
     }
     
-    public synchronized void waitForMessage(final long timeout) throws InterruptedException {
+    public synchronized void waitForMessage(final long timeout) {
         while (running && size == 0) {
-            wait(timeout);
+            try {
+                wait(timeout);
+            } catch (final InterruptedException ignored) {                
+            }
         }
     }
     

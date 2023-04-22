@@ -83,6 +83,7 @@ public class Message {
     }
     
     public void read(final DataInputStream in, final byte type) throws IOException {
+        this.type = type;
         switch (type) {
             case Type.INPUT_EVENTS:
                 for (int i = 0; i < inputEvents.length; ++i) {
