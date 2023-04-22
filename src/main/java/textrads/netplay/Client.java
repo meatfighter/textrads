@@ -10,28 +10,35 @@ public class Client {
     private volatile int port = Server.DEFAULT_PORT;
     
     private boolean running;
-    private final Object stateMonitor = new Object();   
+    private final Object monitor = new Object();   
     private Thread connectThread;    
     private MessageChannel channel;
+    private boolean firstConnectionAttempt;
+    private String fatalError;
     
     public void start() {        
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (running) {
                 return;
             }
             running = true;
+            firstConnectionAttempt = true;
+            fatalError = null;
             connectThread = new Thread(this::connect);
             connectThread.start();
         }
     }
     
     public void stop() {        
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (!running) {
                 return;
             }
             running = false;
-            ThreadUtil.interrupt(connectThread);
+            if (connectThread != null) {                
+                ThreadUtil.interrupt(connectThread);
+                connectThread = null;
+            }
             if (channel != null) {
                 channel.stop();
                 channel = null;
@@ -43,15 +50,19 @@ public class Client {
         try {
             while (true) {
                 
-                synchronized (stateMonitor) {
+                synchronized (monitor) {
                     while (running && channel != null && !channel.isTerminated()) {
                         try {
-                            stateMonitor.wait();
+                            monitor.wait();
                         } catch (final InterruptedException ignored) {
                         }
                     }                    
                     if (!running) {
                         break;
+                    }
+                    if (channel != null && channel.isHandshakeError()) {
+                        fatalError = "Bad handshake.";
+                        return;
                     }
                     channel = null;
                 }
@@ -59,35 +70,47 @@ public class Client {
                 final MessageChannel c;
                 try {
                     c = new MessageChannel(new Socket(host, port), chan -> {
-                        synchronized (stateMonitor) {
-                            stateMonitor.notifyAll();
+                        synchronized (monitor) {
+                            monitor.notifyAll();
                         }
                     });
                     c.start();
                 } catch (final IOException e) {
-                    
-                    // TODO FIRST TIME FAILURE
-                    
+                    synchronized (monitor) {
+                        if (firstConnectionAttempt) {
+                            fatalError = e.getMessage();
+                            return;
+                        }
+                    }
                     ThreadUtil.sleepOneSecond();
                     continue;
                 }
                 
-                synchronized (stateMonitor) {                    
+                synchronized (monitor) {
+                    firstConnectionAttempt = false;                    
                     channel = c;                    
                 }
             }
         } finally {
-            synchronized (stateMonitor) {
-                if (channel != null) {
-                    channel.stop();
-                }
-            }
+            stop();
         }
     }
     
     public MessageChannel getMessageChannel() {
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             return channel;
+        }
+    }
+    
+    public boolean isRunning() {
+        synchronized (monitor) {
+            return running;
+        }
+    }
+
+    public String getFatalError() {
+        synchronized (monitor) {
+            return fatalError;
         }
     }
        

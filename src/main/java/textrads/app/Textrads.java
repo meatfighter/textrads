@@ -54,8 +54,6 @@ import textrads.util.TerminalUtil;
 
 public class Textrads {
     
-    public static String VERSION = "1.0.0";
-    
     public static final int FRAMES_PER_SECOND = 60;
     
     private static final int MAX_FRAME_SKIPS = 3;

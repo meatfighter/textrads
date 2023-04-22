@@ -13,7 +13,7 @@ public class Message {
     public static interface Type {
         byte HEARTBEAT = 0;
         byte INPUT_EVENTS = 1;
-        byte DATA = 2;
+        byte HANDSHAKE = 2;
     }    
     
     private final InputEventList[] inputEvents;
@@ -67,12 +67,14 @@ public class Message {
     public void write(final DataOutputStream out) throws IOException {
         out.write(type);
         switch (type) {
+            case Type.HEARTBEAT:
+                break;
             case Type.INPUT_EVENTS:
                 for (int i = 0; i < inputEvents.length; ++i) {
                     inputEvents[i].write(out);
                 }
                 break;
-            case Type.DATA:
+            default:
                 IOUtil.writeByteArray(out, data);
                 break;
         }
@@ -85,16 +87,16 @@ public class Message {
     public void read(final DataInputStream in, final byte type) throws IOException {
         this.type = type;
         switch (type) {
+            case Type.HEARTBEAT:
+                break;
             case Type.INPUT_EVENTS:
                 for (int i = 0; i < inputEvents.length; ++i) {
                     inputEvents[i].read(in);
                 }
                 break;
-            case Type.DATA:
+            default:
                 data = IOUtil.readByteArray(in);
                 break;
-            default:
-                throw new IOException("Unknown type.");
         }
     }   
 }

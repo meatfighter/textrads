@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import textrads.app.Textrads;
+import textrads.util.IOUtil;
 import textrads.util.ThreadUtil;
 
 public class MessageChannel {
@@ -17,6 +18,8 @@ public class MessageChannel {
     public static final long HEARTBEAT_MILLIS = TimeUnit.SECONDS.toMillis(10);
     
     private static final int DEFAULT_OUT_QUEUE_PLAYERS = 2;
+    
+    private static final String HANDSHAKE_STR = "TEXTRADS 1.0.0";
     
     private static enum State {
         NEW,
@@ -36,8 +39,10 @@ public class MessageChannel {
     private final MessageQueue inQueue;
     private final Thread inQueueThread;
     
-    private final Object stateMonitor = new Object();
+    private final Object monitor = new Object();
     private State state = State.NEW;
+    
+    private volatile boolean handshakeError;
     
     public MessageChannel(final Socket socket) throws IOException {
         this(socket, null, DEFAULT_OUT_QUEUE_PLAYERS);
@@ -65,21 +70,23 @@ public class MessageChannel {
     
     public void start() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.NEW) {
                 return;
             }
-            outQueue.start();        
+            state = State.RUNNING;            
+            outQueue.start();
             inQueue.start();
             outQueueThread.start();
             inQueueThread.start();
-            state = State.RUNNING;
+
+            sendHandshake();
         }
     }
     
     public void stop() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return;
             }
@@ -93,6 +100,17 @@ public class MessageChannel {
         ThreadUtil.interrupt(inQueueThread);
     }
     
+    private void sendHandshake() {
+        try {
+            final Message message = outQueue.getWriteMessage();
+            message.setType(Message.Type.HANDSHAKE);
+            message.setData(IOUtil.toByteArray(HANDSHAKE_STR));
+            outQueue.incrementWriteIndex();
+        } catch (final IOException ignored) {
+            stop();
+        }
+    }
+    
     private void closeSocket() {
         try {   
             if (socket != null) {
@@ -104,7 +122,7 @@ public class MessageChannel {
 
     public Message getWriteMessage() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return null;
             }
@@ -120,7 +138,7 @@ public class MessageChannel {
     
     public void incrementWriteIndex() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return;
             }
@@ -136,7 +154,7 @@ public class MessageChannel {
     
     public int waitForMessage() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return 0;
             }
@@ -151,7 +169,7 @@ public class MessageChannel {
 
     public Message getReadMessage() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return null;
             }
@@ -162,7 +180,7 @@ public class MessageChannel {
         
     public void incrementReadIndex() {
         
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             if (state != State.RUNNING) {
                 return;
             }
@@ -172,13 +190,13 @@ public class MessageChannel {
     }
     
     public boolean isRunning() {
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             return state == State.RUNNING;
         }
     }
     
     public boolean isTerminated() {
-        synchronized (stateMonitor) {
+        synchronized (monitor) {
             return state == State.TERMINATED;
         }
     }
@@ -186,7 +204,7 @@ public class MessageChannel {
     private void runOutQueue() {
         try {
             while (true) {
-                synchronized (stateMonitor) {
+                synchronized (monitor) {
                     if (state != State.RUNNING) {
                         return;
                     }
@@ -207,7 +225,7 @@ public class MessageChannel {
         } finally {
             stop();            
             ThreadUtil.join(inQueueThread);
-            synchronized (stateMonitor) {
+            synchronized (monitor) {
                 state = State.TERMINATED;
             }
             if (terminatedListener != null) {
@@ -219,27 +237,39 @@ public class MessageChannel {
     private void runInQueue() {        
         try {
             while (true) {                
-                synchronized (stateMonitor) {
+                synchronized (monitor) {
                     if (state != State.RUNNING) {
                         return;
                     }
                 }                      
                 try {
                     final byte type = in.readByte();
-                    if (type == Message.Type.HEARTBEAT) {
-                        continue;
+                    switch (type) {
+                        case Message.Type.HEARTBEAT:
+                            continue;
+                        case Message.Type.HANDSHAKE: {
+                            if (!HANDSHAKE_STR.equals(IOUtil.fromByteArray(IOUtil.readByteArray(in)))) {
+                                handshakeError = true;
+                                return;
+                            }
+                            break;
+                        }
                     }
                     if (inQueue.isFull()) {
                         break;
                     }
                     inQueue.getWriteMessage().read(in, type);
                     inQueue.incrementWriteIndex();   
-                } catch (final IOException ignored) {
+                } catch (final IOException | ClassNotFoundException ignored) {
                     break;
                 }                                
             }
         } finally {
             stop();
         }
+    }
+
+    public boolean isHandshakeError() {
+        return handshakeError;
     }
 }
