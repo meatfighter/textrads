@@ -15,7 +15,7 @@ public class Client {
     private Thread connectThread;    
     private MessageChannel channel;
     private boolean firstConnectionAttempt;
-    private String fatalError;
+    private String error;
     
     public void start() {        
         synchronized (monitor) {
@@ -24,7 +24,7 @@ public class Client {
             }
             running = true;
             firstConnectionAttempt = true;
-            fatalError = null;
+            error = null;
             connectThread = new Thread(this::connect);
             connectThread.start();
         }
@@ -62,7 +62,7 @@ public class Client {
                         break;
                     }
                     if (channel != null && channel.isHandshakeError()) {
-                        fatalError = "Bad handshake.";
+                        error = "Bad handshake.";
                         return;
                     }
                     channel = null;
@@ -79,7 +79,7 @@ public class Client {
                 } catch (final IOException e) {
                     synchronized (monitor) {
                         if (firstConnectionAttempt) {
-                            fatalError = e.getMessage();
+                            error = e.getMessage();
                             return;
                         }
                     }
@@ -109,9 +109,9 @@ public class Client {
         }
     }
 
-    public String getFatalError() {
+    public String getError() {
         synchronized (monitor) {
-            return fatalError;
+            return error;
         }
     }
        

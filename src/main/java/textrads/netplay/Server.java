@@ -20,7 +20,7 @@ public class Server {
     private Thread listenerThread;
     private MessageChannel channel;
     private ServerSocket serverSocket;
-    private String fatalError;
+    private String error;
     
     public void start() {        
         synchronized (monitor) {
@@ -28,7 +28,7 @@ public class Server {
                 return;
             }
             running = true;
-            fatalError = null;
+            error = null;
             listenerThread = new Thread(this::listen);
             listenerThread.start();
         }
@@ -54,12 +54,15 @@ public class Server {
     }
        
     private void listen() {
+        System.out.println("--1");
+        
         try {
             synchronized (monitor) {
                 serverSocket = new ServerSocket(port, BACKLOG, bindAddress);
+                System.out.println("listening on: " + port + " " + bindAddress);
             }
         } catch (final IOException e) {
-            fatalError = e.getMessage();
+            error = e.getMessage();
             stop();
             return;
         }
@@ -70,6 +73,7 @@ public class Server {
                 synchronized (monitor) {
                     while (running && channel != null && !channel.isTerminated()) {
                         try {
+                            System.out.println("Waiting for disconnection...");
                             monitor.wait();
                         } catch (final InterruptedException ignored) {
                         }
@@ -78,7 +82,7 @@ public class Server {
                         break;
                     }
                     if (channel != null && channel.isHandshakeError()) {
-                        fatalError = "Bad handshake.";
+                        error = "Bad handshake.";
                         return;
                     }
                     channel = null;
@@ -91,6 +95,7 @@ public class Server {
                 
                 final MessageChannel c;
                 try {
+                    System.out.println("Waiting for connection...");
                     c = new MessageChannel(ss.accept(), chan -> {
                         synchronized (monitor) {
                             monitor.notifyAll();
@@ -103,6 +108,7 @@ public class Server {
                 }                
 
                 synchronized (monitor) {
+                    System.out.println("Connected.");
                     channel = c;
                 }
             }
@@ -135,9 +141,9 @@ public class Server {
         }
     }
 
-    public String getFatalError() {
+    public String getError() {
         synchronized (monitor) {
-            return fatalError;
+            return error;
         }
     }    
 

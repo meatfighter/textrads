@@ -1,11 +1,13 @@
 package textrads.netplay;
 
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.NetplayConfig;
@@ -26,16 +28,25 @@ public class NetplayState {
     
     static enum State {
         PLAY_AS,
+        
         SERVER_CONFIG,
         SERVER_CONFIG_HOST,
         SERVER_CONFIG_PORT,
+        SERVER_START_WAITING,
+        SERVER_START_ERROR,
+        
         CLIENT_CONFIG,
         CLIENT_CONFIG_HOST,
         CLIENT_CONFIG_PORT,
         CLIENT_CONFIG_HOST_ERROR,
+        CLIENT_START_WAITING,
+        CLIENT_START_ERROR,        
     }
     
     private final Database database = DatabaseSource.getDatabase();
+    
+    private final Server server = new Server();
+    private final Client client = new Client();
     
     private final Menu playAsMenu = createPlayAsMenu();
     
@@ -78,6 +89,7 @@ public class NetplayState {
             case PLAY_AS:
                 updatePlayAs();
                 break;
+                
             case SERVER_CONFIG:
                 updateServerConfig();
                 break;
@@ -87,6 +99,13 @@ public class NetplayState {
             case SERVER_CONFIG_PORT:
                 updateServerConfigPort();
                 break;
+            case SERVER_START_WAITING:
+                updateServerStartWaiting();
+                break;
+            case SERVER_START_ERROR:
+                updateServerStartError();
+                break;                
+                
             case CLIENT_CONFIG:
                 updateClientConfig();
                 break;
@@ -99,6 +118,12 @@ public class NetplayState {
             case CLIENT_CONFIG_HOST_ERROR:
                 updateClientConfigHostError();
                 break;
+            case CLIENT_START_WAITING:
+                updateClientStartWaiting();
+                break;
+            case CLIENT_START_ERROR:
+                updateClientStartError();
+                break;                
         }
     }
     
@@ -180,7 +205,7 @@ public class NetplayState {
                 }
                 switch (Character.toUpperCase(c)) {
                     case 'S':
-                        gotoStartServer();
+                        gotoServerStartWaiting();
                         break;
                     case 'H':
                         gotoServerConfigHost();
@@ -194,13 +219,46 @@ public class NetplayState {
         }
     }
     
-    private void gotoStartServer() {
-        
+    private void gotoServerStartWaiting() {
+        state = State.SERVER_START_WAITING;
+        connectMenuState.init("Server", hostname, Integer.toString(port), "Waiting for client to connect", 
+                MessageState.MessageType.WAITING);
+        server.setBindAddress(host);
+        server.setPort(port);
+        server.start();
     }
     
-    private void updateStartServer() {
-        
-    }    
+    private void updateServerStartWaiting() {
+        connectMenuState.update();
+        final KeyStroke keyStroke = connectMenuState.getSelection();
+        if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            server.stop();
+            gotoServerConfig();
+            return;
+        }
+
+        if (!server.isRunning()) {
+            final String error = server.getError();
+            if (isNotBlank(error)) {
+                gotoServerStartError(error);
+            } else {
+                gotoServerConfig();
+            }
+        }
+    }
+    
+    private void gotoServerStartError(final String error) {
+        state = State.SERVER_START_ERROR;
+        connectMenuState.init("Server", hostname, Integer.toString(port), error, MessageState.MessageType.ERROR);
+    }
+    
+    private void updateServerStartError() {
+        connectMenuState.update();
+        final KeyStroke keyStroke = connectMenuState.getSelection();
+        if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            gotoServerConfig();
+        }
+    }
     
     private void gotoServerConfigHost() {
         state = State.SERVER_CONFIG_HOST;
@@ -315,7 +373,7 @@ public class NetplayState {
                 }
                 switch (Character.toUpperCase(c)) {
                     case 'S':
-                        gotoStartClient();
+                        gotoClientStartWaiting();
                         break;
                     case 'H':
                         gotoClientConfigHost();
@@ -329,12 +387,45 @@ public class NetplayState {
         }
     }
     
-    private void gotoStartClient() {
-        
+    private void gotoClientStartWaiting() {
+        state = State.CLIENT_START_WAITING;
+        connectMenuState.init("Client", hostname, Integer.toString(port), "Connecting to server", 
+                MessageState.MessageType.WAITING);
+        client.setHost(hostname);
+        client.setPort(port);
+        client.start();
     }
+    
+    private void updateClientStartWaiting() {
+        connectMenuState.update();
+        final KeyStroke keyStroke = connectMenuState.getSelection();
+        if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            client.stop();
+            gotoClientConfig();
+            return;
+        }
 
-    private void updateClientStart() {
-        
+        if (!client.isRunning()) {
+            final String error = client.getError();
+            if (isNotBlank(error)) {
+                gotoClientStartError(error);
+            } else {
+                gotoClientConfig();
+            }
+        }
+    }
+    
+    private void gotoClientStartError(final String error) {
+        state = State.CLIENT_START_ERROR;
+        connectMenuState.init("Client", hostname, Integer.toString(port), error, MessageState.MessageType.ERROR);
+    }
+    
+    private void updateClientStartError() {
+        connectMenuState.update();
+        final KeyStroke keyStroke = connectMenuState.getSelection();
+        if (keyStroke != null && keyStroke.getKeyType() == KeyType.Escape) {
+            gotoClientConfig();
+        }
     }    
     
     private void gotoClientConfigHost() {

@@ -7,6 +7,7 @@ import textrads.ui.menu.MenuRenderer;
 import textrads.ui.message.MessageScreenRenderer;
 import textrads.ui.question.QuestionRenderer;
 import static textrads.netplay.NetplayState.State.CLIENT_CONFIG_HOST_ERROR;
+import static textrads.netplay.NetplayState.State.SERVER_START_WAITING;
 
 public class NetplayRenderer {
     
@@ -21,6 +22,7 @@ public class NetplayRenderer {
             case PLAY_AS:
                 renderPlayAs(g, size, state);
                 break;
+                
             case SERVER_CONFIG:
                 renderServerConfig(g, size, state);
                 break;
@@ -30,6 +32,13 @@ public class NetplayRenderer {
             case SERVER_CONFIG_PORT:
                 renderServerConfigPort(g, size, state);
                 break;
+            case SERVER_START_WAITING:
+                renderServerStartWaiting(g, size, state);
+                break;
+            case SERVER_START_ERROR:
+                renderServerStartError(g, size, state);
+                break;                
+                
             case CLIENT_CONFIG:
                 renderClientConfig(g, size, state);
                 break;
@@ -42,6 +51,12 @@ public class NetplayRenderer {
             case CLIENT_CONFIG_HOST_ERROR:
                 renderClientConfigHostError(g, size, state);
                 break;
+            case CLIENT_START_WAITING:
+                renderClientStartWaiting(g, size, state);
+                break;
+            case CLIENT_START_ERROR:
+                renderClientStartError(g, size, state);
+                break;                
         }
     }
     
@@ -61,6 +76,14 @@ public class NetplayRenderer {
         questionRenderer.render(g, size, state.getPortQuestion());
     }
     
+    private void renderServerStartWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        connectMenuRenderer.render(g, size, state.getConnectMenuState());
+    }
+    
+    private void renderServerStartError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        connectMenuRenderer.render(g, size, state.getConnectMenuState());
+    }    
+    
     private void renderClientConfig(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         connectMenuRenderer.render(g, size, state.getConnectMenuState());
     }
@@ -76,4 +99,12 @@ public class NetplayRenderer {
     private void renderClientConfigHostError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         messageScreenRenderer.render(g, size, state.getMessageScreen());
     }
+    
+    private void renderClientStartWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        connectMenuRenderer.render(g, size, state.getConnectMenuState());
+    }
+    
+    private void renderClientStartError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        connectMenuRenderer.render(g, size, state.getConnectMenuState());
+    }    
 }
