@@ -9,8 +9,9 @@ public class Client {
     private volatile String host;
     private volatile int port = Server.DEFAULT_PORT;
     
-    private boolean running;
-    private final Object monitor = new Object();   
+    private final Object monitor = new Object();
+    
+    private boolean running;    
     private Thread connectThread;    
     private MessageChannel channel;
     private boolean firstConnectionAttempt;

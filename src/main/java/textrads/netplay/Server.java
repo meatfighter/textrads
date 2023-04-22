@@ -3,8 +3,6 @@ package textrads.netplay;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import textrads.util.ThreadUtil;
 
 public class Server {
@@ -13,128 +11,135 @@ public class Server {
 
     private static final int BACKLOG = 50;  
     
-    public static enum Error {
-        NETWORK_INTERFACE_ADDRESSES,
-        SERVER_SOCKET,
-    }
-    
     private volatile InetAddress bindAddress;
     private volatile int port = DEFAULT_PORT;
     
-    private final List<ServerSocketHandler> handlers = new CopyOnWriteArrayList<>();
-    
     private final Object monitor = new Object();
-    private boolean running;
-    private boolean cancelled;
     
-    private volatile Thread listenerThread;
-    private volatile Thread heartbeatThread;
-    private volatile ServerSocket serverSocket;
+    private boolean running;    
+    private Thread listenerThread;
+    private MessageChannel channel;
+    private ServerSocket serverSocket;
+    private String fatalError;
     
-    private volatile Error error;
-    private volatile boolean playerConnected;
-    
-    public void start() {
-        
+    public void start() {        
         synchronized (monitor) {
             if (running) {
                 return;
             }
             running = true;
+            fatalError = null;
+            listenerThread = new Thread(this::listen);
+            listenerThread.start();
         }
-        
-        final Thread listThread = new Thread(this::listen);
-        listenerThread = listThread;
-        listThread.start();
-        
-        final Thread heartThread = new Thread(this::sendHeartbeats);
-        heartbeatThread = heartThread;
-        heartThread.start();
-    }
-    
-    public void update() {
-        // TODO
     }
     
     public void stop() {
         
         synchronized (monitor) {
-            if (!running || cancelled) {
+            if (!running) {
                 return;
             }
-            cancelled = true;
-        }
-               
-        closeServerSocket();
-        ThreadUtil.interrupt(listenerThread);
-        ThreadUtil.interrupt(heartbeatThread);
+            running = false;
+            closeServerSocket();
+            if (listenerThread != null) {
+                ThreadUtil.interrupt(listenerThread);
+                listenerThread = null;
+            }
+            if (channel != null) {
+                channel.stop();
+                channel = null;
+            }                        
+        }                       
     }
-    
-    private void sendHeartbeats() {
-//        while (true) {
-//            handlers.forEach(handler -> {
-//                handler.sendHeartbeat();
-//            });
-//        }
-    }
-    
+       
     private void listen() {
         try {
-            outer: while (true) {                
+            synchronized (monitor) {
+                serverSocket = new ServerSocket(port, BACKLOG, bindAddress);
+            }
+        } catch (final IOException e) {
+            fatalError = e.getMessage();
+            stop();
+            return;
+        }
+                
+        try {
+            while (true) {
+                final ServerSocket ss;
                 synchronized (monitor) {
-                    if (cancelled) {
-                        break;
-                    }
-                }
-                closeServerSocket();
-                               
-                InetAddress address = bindAddress;               
-                
-                try {
-                    serverSocket = new ServerSocket(port, BACKLOG, address);
-                } catch (final IOException ignored) {
-                    setError(Error.SERVER_SOCKET);
-                    break;
-                }
-                
-                while (true) {
-                    synchronized (monitor) {
-                        if (cancelled) {
-                            break outer;
+                    while (running && channel != null && !channel.isTerminated()) {
+                        try {
+                            monitor.wait();
+                        } catch (final InterruptedException ignored) {
                         }
                     }
-                    
-                    try {
-                        handlers.add(new ServerSocketHandler(this, serverSocket.accept()));
-                    } catch (final IOException ignored) {
+                    if (!running) {
+                        break;
                     }
+                    if (channel != null && channel.isHandshakeError()) {
+                        fatalError = "Bad handshake.";
+                        return;
+                    }
+                    channel = null;
+                    ss = serverSocket;
+                }
+                
+                if (ss == null) {
+                    return;
+                }
+                
+                final MessageChannel c;
+                try {
+                    c = new MessageChannel(ss.accept(), chan -> {
+                        synchronized (monitor) {
+                            monitor.notifyAll();
+                        }
+                    });
+                    c.start();
+                } catch (final IOException e) {
+                    ThreadUtil.sleepOneSecond();
+                    continue;
+                }                
+
+                synchronized (monitor) {
+                    channel = c;
                 }
             }
         } finally {
-            closeServerSocket();
-            ThreadUtil.join(heartbeatThread);
-            serverSocket = null;
-            listenerThread = null;
-            heartbeatThread = null;
-            synchronized (monitor) {
-                running = cancelled = false;
-            }
+            stop();
         }
-    }
-    
-    void removeHandler(final ServerSocketHandler handler) {
-        handlers.remove(handler);
     }
     
     private void closeServerSocket() {
-        try {   
-            final ServerSocket ss = serverSocket;
-            if (ss != null) {
-                ss.close();
+        synchronized (monitor) {
+            try {   
+                if (serverSocket != null) {
+                    serverSocket.close();
+                    serverSocket = null;
+                }                
+            } catch (final IOException ignored) {            
             }
-        } catch (final IOException ignored) {            
         }
     }
+    
+    public MessageChannel getMessageChannel() {
+        synchronized (monitor) {
+            return channel;
+        }
+    }
+    
+    public boolean isRunning() {
+        synchronized (monitor) {
+            return running;
+        }
+    }
+
+    public String getFatalError() {
+        synchronized (monitor) {
+            return fatalError;
+        }
+    }    
 
     public InetAddress getBindAddress() {
         return bindAddress;
@@ -144,23 +149,11 @@ public class Server {
         this.bindAddress = bindAddress;
     }
 
-    public Integer getPort() {
+    public int getPort() {
         return port;
     }
 
-    public void setPort(final Integer port) {
+    public void setPort(final int port) {
         this.port = port;
-    }
-
-    public Error getError() {
-        return error;
-    }
-
-    public void setError(final Error error) {
-        this.error = error;
-    }
-
-    public boolean isPlayerConnected() {
-        return playerConnected;
     }
 }
