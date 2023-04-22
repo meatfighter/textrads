@@ -5,115 +5,92 @@ import java.net.Socket;
 import textrads.util.ThreadUtil;
 
 public class Client {
-    
-    private static enum State {
-        STOPPED,
-        RUNNING,
-        CANCELLED,
-    }
-    
+        
     private volatile String host;
     private volatile int port = Server.DEFAULT_PORT;
     
-    private final Object stateMonitor = new Object();
-    private State state = State.STOPPED;    
-    private Thread listenerThread;    
-    private MessageChannel handler;
+    private boolean running;
+    private final Object stateMonitor = new Object();   
+    private Thread connectThread;    
+    private MessageChannel channel;
     
     public void start() {        
         synchronized (stateMonitor) {
-            if (state != State.STOPPED) {
+            if (running) {
                 return;
             }
-            state = State.RUNNING;
-            listenerThread = new Thread(this::listen);
-            listenerThread.start();
+            running = true;
+            connectThread = new Thread(this::connect);
+            connectThread.start();
         }
     }
     
-    private void listen() {
+    public void stop() {        
+        synchronized (stateMonitor) {
+            if (!running) {
+                return;
+            }
+            running = false;
+            ThreadUtil.interrupt(connectThread);
+            if (channel != null) {
+                channel.stop();
+                channel = null;
+            }
+        }        
+    }    
+    
+    private void connect() {
         try {
-            outer: while (true) {
+            while (true) {
                 
-                MessageChannel h;
                 synchronized (stateMonitor) {
-                    if (state != State.RUNNING) {
-                        break;
-                    }
-                    h = handler;
-                    while (h != null && h.isRunning()) {
+                    while (running && channel != null && !channel.isTerminated()) {
                         try {
                             stateMonitor.wait();
                         } catch (final InterruptedException ignored) {
-                            continue outer;
                         }
+                    }                    
+                    if (!running) {
+                        break;
                     }
+                    channel = null;
                 }
-                
-                if (h == null || h.isTerminated()) {
-                    try {
-                        h = new MessageChannel(this, new Socket(host, port));
-                        h.start();
-                    } catch (final IOException ignored) {
-                        ThreadUtil.sleepOneSecond();
-                        continue;
-                    }
+
+                final MessageChannel c;
+                try {
+                    c = new MessageChannel(new Socket(host, port), chan -> {
+                        synchronized (stateMonitor) {
+                            stateMonitor.notifyAll();
+                        }
+                    });
+                    c.start();
+                } catch (final IOException e) {
+                    
+                    // TODO FIRST TIME FAILURE
+                    
+                    ThreadUtil.sleepOneSecond();
+                    continue;
                 }
                 
                 synchronized (stateMonitor) {                    
-                    handler = h;                    
+                    channel = c;                    
                 }
             }
         } finally {
             synchronized (stateMonitor) {
-                if (handler != null) {
-                    handler.stop();
+                if (channel != null) {
+                    channel.stop();
                 }
             }
         }
     }
     
-    private void handleTerminatedConnection(final MessageChannel clientSocketHandler) {
+    public MessageChannel getMessageChannel() {
         synchronized (stateMonitor) {
-            stateMonitor.notifyAll();
+            return channel;
         }
     }
        
-    public void update() {   
-        final MessageChannel h;
-        synchronized (stateMonitor) { 
-            h = handler;
-            switch (state) {
-                case STOPPED:
-                    return;
-                case CANCELLED: 
-                    if ((listenerThread == null || !listenerThread.isAlive()) && (h == null || h.isTerminated())) {
-                        state = State.STOPPED;
-                    }
-                    return;
-                default:
-                    if (h == null) {
-                        return;
-                    }
-                    break;
-            }
-        }
-        h.update();
-    }    
-    
-    public void stop() {        
-        synchronized (stateMonitor) {
-            if (state != State.RUNNING) {
-                return;
-            }
-            state = State.CANCELLED;
-            ThreadUtil.interrupt(listenerThread);
-            if (handler != null) {
-                handler.stop();
-            }
-        }        
-    }
-
     public String getHost() {
         return host;
     }

@@ -15,7 +15,6 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -54,6 +53,8 @@ import textrads.util.IOUtil;
 import textrads.util.TerminalUtil;
 
 public class Textrads {
+    
+    public static String VERSION = "1.0.0";
     
     public static final int FRAMES_PER_SECOND = 60;
     
