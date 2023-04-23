@@ -1,12 +1,13 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import textrads.util.ThreadUtil;
 
 public class Client {
         
-    private volatile String host;
+    private volatile InetAddress host;
     private volatile int port = Server.DEFAULT_PORT;
     
     private final Object monitor = new Object();
@@ -126,11 +127,11 @@ public class Client {
         }
     }
        
-    public String getHost() {
+    public InetAddress getHost() {
         return host;
     }
 
-    public void setHost(final String host) {
+    public void setHost(final InetAddress host) {
         this.host = host;
     }
 

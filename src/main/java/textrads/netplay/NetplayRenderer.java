@@ -104,10 +104,10 @@ public class NetplayRenderer {
     
     private void renderServerChannel(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         switch (state.getChannelState()) {
-            case PROMPTING_LEVEL:
+            case ASKING_FOR_LEVEL:
                 questionRenderer.render(g, size, state.getLevelQuestion());
                 break;
-            case WAITING_TO_PLAY:
+            case WAITING_FOR_LEVEL:
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
@@ -149,10 +149,10 @@ public class NetplayRenderer {
 
     private void renderClientChannel(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         switch (state.getChannelState()) {
-            case PROMPTING_LEVEL:
+            case ASKING_FOR_LEVEL:
                 questionRenderer.render(g, size, state.getLevelQuestion());
                 break;
-            case WAITING_TO_PLAY:
+            case WAITING_FOR_LEVEL:
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:

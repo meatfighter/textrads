@@ -2,6 +2,8 @@ package textrads.netplay;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -54,9 +56,11 @@ public class NetplayState {
     }
     
     static enum ChannelState {
-        PROMPTING_LEVEL,
-        WAITING_TO_PLAY,
+        ASKING_FOR_LEVEL,
+        WAITING_FOR_LEVEL,
         PLAYING,
+        CONTINUE,
+        GIVE_UP,
     }
     
     private final Database database = DatabaseSource.getDatabase();
@@ -87,12 +91,11 @@ public class NetplayState {
     private String hostname;
     private InetAddress host;
     private int port;
-    private byte level;
+    private byte serverLevel;
+    private byte clientLevel;
     
     private MessageChannel channel;
     private boolean channelJustEstablished;
-    private boolean serverSubmittedLevel;
-    private boolean clientSubmittedLevel;
     
     private Menu createPlayAsMenu() {
         final List<MenuItem> menuItems = new ArrayList<>();
@@ -202,7 +205,6 @@ public class NetplayState {
         host = nia.getAddress();
         hostname = nia.getName();
         port = config.getPort();
-        level = config.getLevel();
         
         connectMenuState.init("Server", hostname, Integer.toString(config.getPort()));
     }
@@ -302,15 +304,32 @@ public class NetplayState {
     
     private void gotoServerChannel() {
         state = State.SERVER_CHANNEL;
-        
-        channelState = ChannelState.PROMPTING_LEVEL;
-        final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
-        level = config.getLevel();
-        levelQuestion.init("Server", (level >= 0) ? Integer.toString(level) : "");
-        
         channelJustEstablished = true;
-        serverSubmittedLevel = false;
-        clientSubmittedLevel = false;        
+        serverLevel = -1;
+        clientLevel = -1;        
+        gotoServerAskingForLevel();
+    }
+    
+    private void sendMessage(final byte type) {
+        sendMessage(type, null);
+    }
+    
+    private void sendMessage(final byte type, final Serializable obj) {
+        final Message message = channel.getWriteMessage();
+        if (message == null) {
+            channel.stop();
+            return;
+        }
+        message.setType(type);
+        if (obj != null) {
+            try {
+                message.setData(IOUtil.toByteArray(obj));
+            } catch (final IOException ignored) {
+                channel.stop();
+                return;
+            }
+        }
+        channel.incrementWriteIndex();
     }
     
     private void updateServerChannel() {
@@ -323,30 +342,48 @@ public class NetplayState {
         
         if (channelJustEstablished) {
             channelJustEstablished = false;
-            if (!clientSubmittedLevel) {
-                final Message message = channel.getWriteMessage();
-                if (message == null) {
-                    return;
+            
+            if (clientLevel < 0) {
+                sendMessage(Message.Type.ASK_FOR_LEVEL);
+            } else if (serverLevel < 0) {
+                sendMessage(Message.Type.WAIT_FOR_LEVEL);
+            } else {            
+                switch (channelState) {
+                    case PLAYING:
+
+                        break;
                 }
-                message.setType(Message.Type.PROMPT_LEVEL);
-                channel.incrementWriteIndex();
-            } else {
-                // TODO GAME
             }
         }
         
         switch (channelState) {
-            case PROMPTING_LEVEL:
-                updateServerPromptLevel();
+            case ASKING_FOR_LEVEL:
+                updateServerAskingForLevel();
                 break;
-            case WAITING_TO_PLAY:
+            case WAITING_FOR_LEVEL:
+                updateServerWaitingForLevel();
                 break;
             case PLAYING:
+                updateServerPlaying();
+                break;
+            case CONTINUE:
+                updateServerContinue();
+                break;
+            case GIVE_UP:
+                updateServerGiveUp();
                 break;
         }
     }
     
-    private void updateServerPromptLevel() {
+    private void gotoServerAskingForLevel() {
+        channelState = ChannelState.ASKING_FOR_LEVEL;
+        
+        final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
+        final byte level = config.getLevel();
+        levelQuestion.init("Server", (level >= 0) ? Integer.toString(level) : "");
+    }
+    
+    private void updateServerAskingForLevel() {
         levelQuestion.update();
         
         if (levelQuestion.isEscPressed()) {
@@ -357,6 +394,59 @@ public class NetplayState {
         if (!levelQuestion.isEnterPressed()) {
             return;
         }
+        
+        serverLevel = (byte) Integer.parseInt(levelQuestion.getValue());
+        final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
+        database.saveAsync(Database.OtherKeys.SERVER, config.setLevel(serverLevel));
+                        
+        if (clientLevel < 0) {
+            gotoServerWaitingForLevel();
+        } else {
+            gotoServerPlaying();
+        }
+    }
+    
+    private void gotoServerWaitingForLevel() {
+        channelState = ChannelState.WAITING_FOR_LEVEL;
+        disconnectMessageScreen.init("Server", "Waiting for client to enter level", MessageState.MessageType.WAITING);
+    }
+    
+    private void updateServerWaitingForLevel() {
+        if (clientLevel >= 0) {
+            gotoServerPlaying();
+            return;
+        }
+        
+        disconnectMessageScreen.update();
+        if (!disconnectMessageScreen.isSelected()) {
+            return;
+        }
+        
+        
+    }
+    
+    private void gotoServerPlaying() {
+        channelState = ChannelState.PLAYING;
+    }
+    
+    private void updateServerPlaying() {
+        
+    }
+    
+    private void gotoServerContinue() {
+        channelState = ChannelState.CONTINUE;
+    }
+    
+    private void updateServerContinue() {
+        
+    }
+    
+    private void gotoServerGiveUp() {
+        channelState = ChannelState.GIVE_UP;
+    }
+    
+    private void updateServerGiveUp() {
+        
     }
     
     private void gotoServerWaiting() {
@@ -533,7 +623,7 @@ public class NetplayState {
         state = State.CLIENT_START_WAITING;
         connectMenuState.init("Client", hostname, Integer.toString(port), CONNECTING_TO_SERVER_STR, 
                 MessageState.MessageType.WAITING);
-        client.setHost(hostname);
+        client.setHost(host);
         client.setPort(port);
         client.start();
     }
@@ -555,6 +645,11 @@ public class NetplayState {
                 gotoClientConfig();
             }
         }
+        
+        channel = client.getMessageChannel();
+        if (channel != null) {
+            gotoClientChannel();
+        }        
     }
     
     private void gotoClientStartError(final String error) {
@@ -573,7 +668,9 @@ public class NetplayState {
     private void gotoClientChannel() {
         state = State.CLIENT_CHANNEL;
         channelJustEstablished = true;
-        
+        serverLevel = -1;
+        clientLevel = -1;
+        gotoClientAskingForLevel();
     }
     
     private void updateClientChannel() {
@@ -587,6 +684,89 @@ public class NetplayState {
         if (channelJustEstablished) {
             channelJustEstablished = false;
         }
+        
+        switch (channelState) {
+            case ASKING_FOR_LEVEL:
+                updateClientAskingForLevel();
+                break;
+            case WAITING_FOR_LEVEL:
+                updateClientWaitingForLevel();
+                break;
+            case PLAYING:
+                updateClientPlaying();
+                break;
+            case CONTINUE:
+                updateClientContinue();
+                break;
+            case GIVE_UP:
+                updateClientGiveUp();
+                break;
+        }        
+    }
+    
+    private void gotoClientAskingForLevel() {
+        channelState = ChannelState.ASKING_FOR_LEVEL;
+        
+        final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
+        final byte level = config.getLevel();
+        levelQuestion.init("Client", (level >= 0) ? Integer.toString(level) : "");
+    }
+    
+    private void updateClientAskingForLevel() {
+        levelQuestion.update();
+        
+        if (levelQuestion.isEscPressed()) {
+            gotoClientConfig();
+            return;
+        }
+        
+        if (!levelQuestion.isEnterPressed()) {
+            return;
+        }
+        
+        clientLevel = (byte) Integer.parseInt(levelQuestion.getValue());
+        final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
+        database.saveAsync(Database.OtherKeys.CLIENT, config.setLevel(clientLevel));
+        
+        sendMessage(Message.Type.LEVEL, clientLevel);
+        
+        gotoClientWaitingForLevel();
+    }    
+    
+    private void gotoClientWaitingForLevel() {
+        channelState = ChannelState.WAITING_FOR_LEVEL;
+        disconnectMessageScreen.init("Client", "Waiting for server to enter level", MessageState.MessageType.WAITING);
+    }
+    
+    private void updateClientWaitingForLevel() {
+        disconnectMessageScreen.update();
+        if (!disconnectMessageScreen.isSelected()) {
+            return;
+        }
+    }
+    
+    private void gotoClientPlaying() {
+        channelState = ChannelState.PLAYING;
+    }
+    
+    private void updateClientPlaying() {
+        
+    }
+    
+    private void gotoClientContinue() {
+        channelState = ChannelState.CONTINUE;
+    }
+    
+    private void updateClientContinue() {
+        
+    }
+    
+    private void gotoClientGiveUp() {
+        channelState = ChannelState.GIVE_UP;
+    }
+    
+    private void updateClientGiveUp() {
+        
     }
 
     private void gotoClientWaiting() {
