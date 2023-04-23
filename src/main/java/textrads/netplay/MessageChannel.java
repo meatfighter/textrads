@@ -19,7 +19,7 @@ public class MessageChannel {
     
     private static final int DEFAULT_OUT_QUEUE_PLAYERS = 2;
     
-    private static final String HANDSHAKE_STR = "TEXTRADS 1.0.0";
+    private static final String HANDSHAKE_STR = "Textrads";
     
     private static enum State {
         NEW,
@@ -86,6 +86,8 @@ public class MessageChannel {
     
     public void stop() {
         
+        Thread.dumpStack(); // TODO REMOVE
+        
         synchronized (monitor) {
             if (state != State.RUNNING) {
                 return;
@@ -114,6 +116,7 @@ public class MessageChannel {
     private void closeSocket() {
         try {   
             if (socket != null) {
+                System.out.println("close socket.");
                 socket.close();
             }
         } catch (final IOException ignored) {            
@@ -219,6 +222,7 @@ public class MessageChannel {
                     }
                     out.flush();
                 } catch (final IOException ignored) {
+                    ignored.printStackTrace(); // TODO REMOVE
                     break;
                 }
             }
@@ -239,28 +243,33 @@ public class MessageChannel {
             while (true) {                
                 synchronized (monitor) {
                     if (state != State.RUNNING) {
+                        System.out.println("not running");
                         return;
                     }
                 }                      
                 try {
                     final byte type = in.readByte();
+                    System.out.println("read type: " + (int) type);
                     switch (type) {
                         case Message.Type.HEARTBEAT:
                             continue;
                         case Message.Type.HANDSHAKE: {
                             if (!HANDSHAKE_STR.equals(IOUtil.fromByteArray(IOUtil.readByteArray(in)))) {
                                 handshakeError = true;
+                                System.out.println("handshake error :( :( :(");
                                 return;
                             }
-                            break;
+                            continue;
                         }
                     }
                     if (inQueue.isFull()) {
+                        System.out.println("full queue");
                         break;
                     }
                     inQueue.getWriteMessage().read(in, type);
                     inQueue.incrementWriteIndex();   
                 } catch (final IOException | ClassNotFoundException ignored) {
+                    ignored.printStackTrace(); // TODO REMOVE
                     break;
                 }                                
             }

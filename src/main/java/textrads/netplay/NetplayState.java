@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.NetplayConfig;
+import textrads.ui.menu.BackExitState;
 import textrads.ui.menu.Chooser;
 import textrads.ui.menu.Menu;
 import textrads.ui.menu.MenuColumn;
@@ -74,9 +75,10 @@ public class NetplayState {
     private final Question clientHostQuestion = new Question(new TextField(null, new LengthValidator(1, 256), true));
     
     private final MessageScreen messageScreen = new MessageScreen();
+    private final MessageScreen disconnectMessageScreen = new MessageScreen("Continue", "Disconnect");
     
     private final Question levelQuestion = new Question(new TextField("Level (0\u2500\u250029)?", 
-            new NumberValidator(0, 29)));    
+            new NumberValidator(0, 29)), new BackExitState("Disconnect"));
     
     private State state;
     private ChannelState channelState;
@@ -359,12 +361,12 @@ public class NetplayState {
     
     private void gotoServerWaiting() {
         state = State.SERVER_WAITING;
-        messageScreen.init("Server", WAITING_FOR_CLIENT_STR, MessageState.MessageType.WAITING);
+        disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_STR, MessageState.MessageType.WAITING);
     }
     
     private void updateServerWaiting() {
-        messageScreen.update();
-        if (messageScreen.isSelected()) {            
+        disconnectMessageScreen.update();
+        if (disconnectMessageScreen.isSelected()) {            
             gotoServerConfig();
             return;
         }
@@ -388,12 +390,12 @@ public class NetplayState {
     
     private void gotoServerError(final String error) {
         state = State.SERVER_ERROR;
-        messageScreen.init("Server", error, MessageState.MessageType.ERROR);
+        disconnectMessageScreen.init("Server", error, MessageState.MessageType.ERROR);
     }
     
     private void updateServerError() {
-        messageScreen.update();
-        if (messageScreen.isSelected()) {            
+        disconnectMessageScreen.update();
+        if (disconnectMessageScreen.isSelected()) {            
             gotoServerConfig();
         }
     }
@@ -589,11 +591,11 @@ public class NetplayState {
 
     private void gotoClientWaiting() {
         state = State.CLIENT_WAITING;
-        messageScreen.init("Client", CONNECTING_TO_SERVER_STR, MessageState.MessageType.WAITING);
+        disconnectMessageScreen.init("Client", CONNECTING_TO_SERVER_STR, MessageState.MessageType.WAITING);
     }
     
     private void updateClientWaiting() {
-        messageScreen.update();
+        disconnectMessageScreen.update();
         if (messageScreen.isSelected()) {            
             gotoClientConfig();
             return;
@@ -618,11 +620,11 @@ public class NetplayState {
     
     private void gotoClientError(final String error) {
         state = State.CLIENT_ERROR;
-        messageScreen.init("Client", error, MessageState.MessageType.ERROR);
+        disconnectMessageScreen.init("Client", error, MessageState.MessageType.ERROR);
     }
     
     private void updateClientError() {
-        messageScreen.update();
+        disconnectMessageScreen.update();
         if (messageScreen.isSelected()) {            
             gotoClientConfig();
         }
@@ -714,6 +716,10 @@ public class NetplayState {
 
     public MessageScreen getMessageScreen() {
         return messageScreen;
+    }
+
+    public MessageScreen getDisconnectMessageScreen() {
+        return disconnectMessageScreen;
     }
 
     public ChannelState getChannelState() {

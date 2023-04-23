@@ -129,7 +129,8 @@ public final class IOUtil {
     
     public static byte[] readByteArray(final DataInputStream in) throws IOException {
         final int length = in.readInt();
-        if (length < 0 || length > MAX_BYTE_ARRAY_LENGTH) {
+        System.out.println("read byte array -- length: " + length);
+        if (length < 0 || length > MAX_BYTE_ARRAY_LENGTH) {            
             throw new IOException("Invalid byte array length.");
         }
         if (length == 0) {

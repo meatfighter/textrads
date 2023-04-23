@@ -11,15 +11,20 @@ public class Question {
     private static final int ESC_FRAMES = 3;
         
     private final TextField textField;
-    private final BackExitState backExitState = new BackExitState();
+    private final BackExitState backExitState;
     
     private String title;
     private int width;    
     private boolean escPressed;
     private int escTimer;
-    
+
     public Question(final TextField textField) {
+        this(textField, new BackExitState());
+    }
+    
+    public Question(final TextField textField, final BackExitState backExitState) {
         this.textField = textField;
+        this.backExitState = backExitState;
     }
     
     public void init(final String title, final String initialValue) {

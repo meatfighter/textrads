@@ -81,6 +81,13 @@ public class Server {
                     if (!running) {
                         break;
                     }
+                    
+                    // TODO TESTING
+                    if (channel != null && channel.isTerminated()) {
+                        System.out.println("Channel terminated.");
+                    }
+                    
+                    
                     if (channel != null && channel.isHandshakeError()) {
                         System.out.println("Bad handshake :(");
                         error = "Bad handshake.";

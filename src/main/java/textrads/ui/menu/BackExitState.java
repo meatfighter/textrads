@@ -19,6 +19,10 @@ public class BackExitState {
         this(DEFAULT_BACK_KEY_NAME, DEFAULT_BACK_LABEL, backEnabled);
     }
     
+    public BackExitState(final String backLabel) {
+        this(DEFAULT_BACK_KEY_NAME, backLabel, true);
+    }
+    
     public BackExitState(final String backKeyName, final String backLabel) {
         this(backKeyName, backLabel, true);
     }

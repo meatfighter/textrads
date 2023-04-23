@@ -108,7 +108,7 @@ public class NetplayRenderer {
                 questionRenderer.render(g, size, state.getLevelQuestion());
                 break;
             case WAITING_TO_PLAY:
-                messageScreenRenderer.render(g, size, state.getMessageScreen());
+                messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
                 break;
@@ -116,11 +116,11 @@ public class NetplayRenderer {
     }
     
     private void renderServerWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
-        messageScreenRenderer.render(g, size, state.getMessageScreen());
+        messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
     
     private void renderServerError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
-        messageScreenRenderer.render(g, size, state.getMessageScreen());
+        messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
     
     private void renderClientConfig(final TextGraphics g, final TerminalSize size, final NetplayState state) {
@@ -153,7 +153,7 @@ public class NetplayRenderer {
                 questionRenderer.render(g, size, state.getLevelQuestion());
                 break;
             case WAITING_TO_PLAY:
-                messageScreenRenderer.render(g, size, state.getMessageScreen());
+                messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
                 break;
@@ -161,10 +161,10 @@ public class NetplayRenderer {
     }
 
     private void renderClientWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
-        messageScreenRenderer.render(g, size, state.getMessageScreen());
+        messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
     
     private void renderClientError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
-        messageScreenRenderer.render(g, size, state.getMessageScreen());
+        messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }    
 }
