@@ -8,11 +8,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.NetplayConfig;
+import textrads.game.GameState;
+import textrads.game.GameStateSource;
+import textrads.input.InputEvent;
+import textrads.input.InputEventList;
 import textrads.ui.menu.BackExitState;
 import textrads.ui.menu.Chooser;
 import textrads.ui.menu.Menu;
@@ -94,6 +99,8 @@ public class NetplayState {
     private int port;
     private byte serverLevel;
     private byte clientLevel;
+    private int serverWins;
+    private int clientWins;
     
     private MessageChannel channel;
     private boolean channelJustEstablished;
@@ -319,7 +326,9 @@ public class NetplayState {
         state = State.SERVER_CHANNEL;
         channelJustEstablished = true;
         serverLevel = -1;
-        clientLevel = -1;        
+        clientLevel = -1;
+        clientWins = 0;
+        serverWins = 0;
         gotoServerGettingLevel();
     }
     
@@ -347,6 +356,8 @@ public class NetplayState {
             }
         }
         
+        // TODO WAIT FOR MESSAGE
+        
         final Message message = channel.getReadMessage();
         switch (message.getType()) {
             case Message.Type.LEVEL:
@@ -356,7 +367,18 @@ public class NetplayState {
                     channel.stop();
                     return;
                 }
-                break;                
+                if (clientLevel < 0) {
+                    channel.stop();
+                    return;                    
+                }
+                if (serverLevel >= 0) {
+                    initGameState();
+                    channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+                }
+                break;
+            case Message.Type.ACK_GAME_STATE:
+                gotoServerPlaying();
+                break;
         }
         channel.incrementReadIndex();
         
@@ -377,6 +399,11 @@ public class NetplayState {
                 updateServerGiveUp();
                 break;
         }
+    }
+    
+    private void initGameState() {
+        GameStateSource.getState().init(GameState.Mode.VS_HUMAN, ThreadLocalRandom.current().nextLong(), serverLevel,
+                clientLevel, 0, 0, false, serverWins, clientWins);
     }
     
     private void gotoServerGettingLevel() {
@@ -402,6 +429,11 @@ public class NetplayState {
         serverLevel = (byte) Integer.parseInt(levelQuestion.getValue());
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         database.saveAsync(Database.OtherKeys.SERVER, config.setLevel(serverLevel));
+        
+        if (serverLevel >= 0) {
+            initGameState();
+            channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+        }
                         
         gotoServerWaitingFor(clientLevel < 0 ? "Waiting for client to enter level" : "One moment");
     }
@@ -420,6 +452,7 @@ public class NetplayState {
     
     private void gotoServerPlaying() {
         channelState = ChannelState.PLAYING;
+        channel.write(Message.Type.PLAY);
     }
     
     private void updateServerPlaying() {
@@ -660,7 +693,6 @@ public class NetplayState {
 
     private void gotoClientChannel() {
         state = State.CLIENT_CHANNEL;
-        channelJustEstablished = true;
         serverLevel = -1;
         clientLevel = -1;
         gotoClientWaitingFor(WAITING_FOR_INSTRUCTIONS_STR);
@@ -674,15 +706,28 @@ public class NetplayState {
             return;
         }
         
-        if (channelJustEstablished) {
-            channelJustEstablished = false;
-        }
+        // TODO WAIT FOR MESSAGE
         
         final Message message = channel.getReadMessage();
         switch (message.getType()) {
             case Message.Type.GET_LEVEL:
                 gotoClientGettingLevel();
-                break;                
+                break;
+            case Message.Type.GAME_STATE:
+                try {
+                    GameStateSource.setState(IOUtil.fromByteArray(message.getData()));
+                } catch (final IOException | ClassNotFoundException ignored) {
+                    channel.stop();
+                    return;
+                }
+                channel.write(Message.Type.ACK_GAME_STATE);
+                break;
+            case Message.Type.PLAY:
+                gotoClientPlaying();
+                break;
+            case Message.Type.INPUT_EVENTS:
+                handleClientInputEvents(message.getInputEvents());
+                break;
         }
         channel.incrementReadIndex();        
         
@@ -703,6 +748,17 @@ public class NetplayState {
                 updateClientGiveUp();
                 break;
         }        
+    }
+    
+    private void handleClientInputEvents(final InputEventList[] eventLists) {
+        final GameState gameState = GameStateSource.getState();
+        for (int i = eventLists.length - 1; i >= 0; --i) {
+            final InputEventList eventList = eventLists[i];
+            for (int j = 0, end = eventList.size(); j < end; ++j) {
+                final byte event = eventList.get(j);
+                gameState.handleInputEvent(event, i);
+            }
+        }
     }
     
     private void gotoClientGettingLevel() {

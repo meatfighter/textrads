@@ -17,6 +17,9 @@ public class Message {
         byte GET_LEVEL = 3;
         byte LEVEL = 4;
         byte WAIT_LEVEL = 5;
+        byte GAME_STATE = 6;
+        byte ACK_GAME_STATE = 7;
+        byte PLAY = 8;
     }    
     
     private final InputEventList[] inputEvents;

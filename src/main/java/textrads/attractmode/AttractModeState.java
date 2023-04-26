@@ -303,7 +303,7 @@ public class AttractModeState {
         final long seed = random.nextLong();
         final int garbageHeight = (demoMode == GameState.Mode.GARBAGE_HEAP) ? DEMO_GARBAGE_HEIGHT : 0;
         final int floorHeight = (demoMode == GameState.Mode.FORTY_LINES) ? DEMO_FLOOR_HEIGHT : 0;
-        gameState.init(demoMode, seed, DEMO_LEVEL, garbageHeight, floorHeight, true, 0, 0);
+        gameState.init(demoMode, seed, DEMO_LEVEL, DEMO_LEVEL, garbageHeight, floorHeight, true, 0, 0);
         aiStates[0].reset();
         if (demoMode == GameState.Mode.VS_AI) {
             aiStates[1].reset();

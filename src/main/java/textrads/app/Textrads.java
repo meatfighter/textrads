@@ -499,7 +499,7 @@ public class Textrads {
         state = State.PLAY;
         final GameState gameState = GameStateSource.getState();
         final long seed = ThreadLocalRandom.current().nextLong();
-        gameState.init(gameMode, seed, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
+        gameState.init(gameMode, seed, level, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
                 (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, wins0, wins1);
         if (gameMode == GameState.Mode.VS_AI) {
             ai.init(GameState.Mode.VS_AI, seed, level, 0, 0, challenge, true);
