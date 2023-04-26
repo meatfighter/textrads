@@ -137,7 +137,13 @@ public class NetplayState {
                 break;
             case SERVER_CHANNEL:
                 updateServerChannel();
-                break;                
+                break;
+            case SERVER_WAITING:
+                updateServerWaiting();
+                break;
+            case SERVER_ERROR:
+                updateServerError();
+                break;
                 
             case CLIENT_CONFIG:
                 updateClientConfig();
@@ -160,6 +166,12 @@ public class NetplayState {
             case CLIENT_CHANNEL:
                 updateClientChannel();
                 break;
+            case CLIENT_WAITING:
+                updateClientWaiting();
+                break;
+            case CLIENT_ERROR:
+                updateClientError();
+                break;                
         }
     }
     
