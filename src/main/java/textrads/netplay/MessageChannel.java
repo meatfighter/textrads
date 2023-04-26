@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import textrads.app.Textrads;
@@ -121,7 +122,29 @@ public class MessageChannel {
             }
         } catch (final IOException ignored) {            
         }
-    } 
+    }
+    
+    public void write(final byte type) {
+        write(type, null);
+    }
+    
+    public void write(final byte type, final Serializable obj) {
+        final Message message = getWriteMessage();
+        if (message == null) {
+            stop();
+            return;
+        }
+        message.setType(type);
+        if (obj != null) {
+            try {
+                message.setData(IOUtil.toByteArray(obj));
+            } catch (final IOException ignored) {
+                stop();
+                return;
+            }
+        }
+        incrementWriteIndex();
+    }    
 
     public Message getWriteMessage() {
         

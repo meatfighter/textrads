@@ -31,6 +31,7 @@ public class NetplayState {
 
     private static String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
     private static String CONNECTING_TO_SERVER_STR = "Connecting to server";
+    private static String WAITING_FOR_INSTRUCTIONS_STR = "Waiting for instructions";
     
     static enum State {
         PLAY_AS,
@@ -56,8 +57,8 @@ public class NetplayState {
     }
     
     static enum ChannelState {
-        ASKING_FOR_LEVEL,
-        WAITING_FOR_LEVEL,
+        GETTING_LEVEL,
+        WAITING_FOR,
         PLAYING,
         CONTINUE,
         GIVE_UP,
@@ -307,29 +308,7 @@ public class NetplayState {
         channelJustEstablished = true;
         serverLevel = -1;
         clientLevel = -1;        
-        gotoServerAskingForLevel();
-    }
-    
-    private void sendMessage(final byte type) {
-        sendMessage(type, null);
-    }
-    
-    private void sendMessage(final byte type, final Serializable obj) {
-        final Message message = channel.getWriteMessage();
-        if (message == null) {
-            channel.stop();
-            return;
-        }
-        message.setType(type);
-        if (obj != null) {
-            try {
-                message.setData(IOUtil.toByteArray(obj));
-            } catch (final IOException ignored) {
-                channel.stop();
-                return;
-            }
-        }
-        channel.incrementWriteIndex();
+        gotoServerGettingLevel();
     }
     
     private void updateServerChannel() {
@@ -344,9 +323,9 @@ public class NetplayState {
             channelJustEstablished = false;
             
             if (clientLevel < 0) {
-                sendMessage(Message.Type.ASK_FOR_LEVEL);
+                channel.write(Message.Type.GET_LEVEL);
             } else if (serverLevel < 0) {
-                sendMessage(Message.Type.WAIT_FOR_LEVEL);
+                channel.write(Message.Type.WAIT_LEVEL);
             } else {            
                 switch (channelState) {
                     case PLAYING:
@@ -356,12 +335,25 @@ public class NetplayState {
             }
         }
         
+        final Message message = channel.getReadMessage();
+        switch (message.getType()) {
+            case Message.Type.LEVEL:
+                try {
+                    clientLevel = IOUtil.fromByteArray(message.getData());
+                } catch (final IOException | ClassNotFoundException ignored) {
+                    channel.stop();
+                    return;
+                }
+                break;                
+        }
+        channel.incrementReadIndex();
+        
         switch (channelState) {
-            case ASKING_FOR_LEVEL:
-                updateServerAskingForLevel();
+            case GETTING_LEVEL:
+                updateServerGettingLevel();
                 break;
-            case WAITING_FOR_LEVEL:
-                updateServerWaitingForLevel();
+            case WAITING_FOR:
+                updateServerWaitingFor();
                 break;
             case PLAYING:
                 updateServerPlaying();
@@ -375,15 +367,15 @@ public class NetplayState {
         }
     }
     
-    private void gotoServerAskingForLevel() {
-        channelState = ChannelState.ASKING_FOR_LEVEL;
+    private void gotoServerGettingLevel() {
+        channelState = ChannelState.GETTING_LEVEL;
         
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         final byte level = config.getLevel();
         levelQuestion.init("Server", (level >= 0) ? Integer.toString(level) : "");
     }
     
-    private void updateServerAskingForLevel() {
+    private void updateServerGettingLevel() {
         levelQuestion.update();
         
         if (levelQuestion.isEscPressed()) {
@@ -399,30 +391,19 @@ public class NetplayState {
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         database.saveAsync(Database.OtherKeys.SERVER, config.setLevel(serverLevel));
                         
-        if (clientLevel < 0) {
-            gotoServerWaitingForLevel();
-        } else {
-            gotoServerPlaying();
-        }
+        gotoServerWaitingFor(clientLevel < 0 ? "Waiting for client to enter level" : "One moment");
     }
     
-    private void gotoServerWaitingForLevel() {
-        channelState = ChannelState.WAITING_FOR_LEVEL;
-        disconnectMessageScreen.init("Server", "Waiting for client to enter level", MessageState.MessageType.WAITING);
+    private void gotoServerWaitingFor(final String reason) {
+        channelState = ChannelState.WAITING_FOR;
+        disconnectMessageScreen.init("Server", reason, MessageState.MessageType.WAITING);
     }
     
-    private void updateServerWaitingForLevel() {
-        if (clientLevel >= 0) {
-            gotoServerPlaying();
-            return;
-        }
-        
+    private void updateServerWaitingFor() {
         disconnectMessageScreen.update();
-        if (!disconnectMessageScreen.isSelected()) {
-            return;
+        if (disconnectMessageScreen.isSelected()) {
+            gotoServerConfig();
         }
-        
-        
     }
     
     private void gotoServerPlaying() {
@@ -670,7 +651,7 @@ public class NetplayState {
         channelJustEstablished = true;
         serverLevel = -1;
         clientLevel = -1;
-        gotoClientAskingForLevel();
+        gotoClientWaitingFor(WAITING_FOR_INSTRUCTIONS_STR);
     }
     
     private void updateClientChannel() {
@@ -685,12 +666,20 @@ public class NetplayState {
             channelJustEstablished = false;
         }
         
+        final Message message = channel.getReadMessage();
+        switch (message.getType()) {
+            case Message.Type.GET_LEVEL:
+                gotoClientGettingLevel();
+                break;                
+        }
+        channel.incrementReadIndex();        
+        
         switch (channelState) {
-            case ASKING_FOR_LEVEL:
-                updateClientAskingForLevel();
+            case GETTING_LEVEL:
+                updateClientGettingLevel();
                 break;
-            case WAITING_FOR_LEVEL:
-                updateClientWaitingForLevel();
+            case WAITING_FOR:
+                updateClientWaitingFor();
                 break;
             case PLAYING:
                 updateClientPlaying();
@@ -704,15 +693,15 @@ public class NetplayState {
         }        
     }
     
-    private void gotoClientAskingForLevel() {
-        channelState = ChannelState.ASKING_FOR_LEVEL;
+    private void gotoClientGettingLevel() {
+        channelState = ChannelState.GETTING_LEVEL;
         
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
         final byte level = config.getLevel();
         levelQuestion.init("Client", (level >= 0) ? Integer.toString(level) : "");
     }
     
-    private void updateClientAskingForLevel() {
+    private void updateClientGettingLevel() {
         levelQuestion.update();
         
         if (levelQuestion.isEscPressed()) {
@@ -728,20 +717,20 @@ public class NetplayState {
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
         database.saveAsync(Database.OtherKeys.CLIENT, config.setLevel(clientLevel));
         
-        sendMessage(Message.Type.LEVEL, clientLevel);
+        channel.write(Message.Type.LEVEL, clientLevel);
         
-        gotoClientWaitingForLevel();
+        gotoClientWaitingFor(WAITING_FOR_INSTRUCTIONS_STR);
     }    
     
-    private void gotoClientWaitingForLevel() {
-        channelState = ChannelState.WAITING_FOR_LEVEL;
-        disconnectMessageScreen.init("Client", "Waiting for server to enter level", MessageState.MessageType.WAITING);
+    private void gotoClientWaitingFor(final String reason) {
+        channelState = ChannelState.WAITING_FOR;
+        disconnectMessageScreen.init("Client", reason, MessageState.MessageType.WAITING);
     }
     
-    private void updateClientWaitingForLevel() {
+    private void updateClientWaitingFor() {
         disconnectMessageScreen.update();
-        if (!disconnectMessageScreen.isSelected()) {
-            return;
+        if (disconnectMessageScreen.isSelected()) {
+            gotoClientConfig();
         }
     }
     
