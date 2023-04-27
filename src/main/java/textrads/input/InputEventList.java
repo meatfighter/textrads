@@ -52,6 +52,14 @@ public class InputEventList {
         return data;
     }
     
+    public boolean isFull() {
+        return size == data.length;
+    }
+    
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    
     public void read(final DataInputStream in) throws IOException {
         final int length = in.read();
         if (length < 0 || length > InputEventSource.MAX_POLLS) {

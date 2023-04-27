@@ -18,6 +18,7 @@ import textrads.game.GameState;
 import textrads.game.GameStateSource;
 import textrads.input.InputEvent;
 import textrads.input.InputEventList;
+import textrads.input.InputEventSource;
 import textrads.ui.menu.BackExitState;
 import textrads.ui.menu.Chooser;
 import textrads.ui.menu.Menu;
@@ -70,6 +71,7 @@ public class NetplayState {
     }
     
     private final Database database = DatabaseSource.getDatabase();
+    private final InputQueue inputQueue = new InputQueue();
     
     private final Server server = new Server();
     private final Client client = new Client();
@@ -101,6 +103,7 @@ public class NetplayState {
     private byte clientLevel;
     private int serverWins;
     private int clientWins;
+    private boolean clientAckedGameState;
     
     private MessageChannel channel;
     private boolean channelJustEstablished;
@@ -219,6 +222,7 @@ public class NetplayState {
         state = State.SERVER_CONFIG;
         
         server.stop();
+        inputQueue.clear();
         
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         final NetworkInterfaceAddress nia = toNetworkInterfaceAddress(config.getHost());
@@ -324,11 +328,13 @@ public class NetplayState {
     
     private void gotoServerChannel() {
         state = State.SERVER_CHANNEL;
-        channelJustEstablished = true;
+        channelJustEstablished = true;        
         serverLevel = -1;
         clientLevel = -1;
         clientWins = 0;
         serverWins = 0;
+        clientAckedGameState = false;
+        inputQueue.clear();
         gotoServerGettingLevel();
     }
     
@@ -336,6 +342,9 @@ public class NetplayState {
         
         if (channel.isTerminated()) {
             channel = null;
+            channelJustEstablished = false;
+            clientAckedGameState = false;
+            inputQueue.clear();
             gotoServerWaiting();
             return;
         }
@@ -347,16 +356,10 @@ public class NetplayState {
                 channel.write(Message.Type.GET_LEVEL);
             } else if (serverLevel < 0) {
                 channel.write(Message.Type.WAIT_LEVEL);
-            } else {            
-                switch (channelState) {
-                    case PLAYING:
-
-                        break;
-                }
+            } else if (!clientAckedGameState) {            
+                channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
             }
         }
-        
-        // TODO WAIT FOR MESSAGE
         
         for (int i = channel.getAvailableMessages() - 1; i >= 0; --i) {
             final Message message = channel.getReadMessage();
@@ -382,10 +385,11 @@ public class NetplayState {
                     }
                     break;
                 case Message.Type.ACK_GAME_STATE:
+                    clientAckedGameState = true;
                     gotoServerPlaying();
                     break;
                 case Message.Type.INPUT_EVENTS:
-                    // TODO STORE THE LAST FEW RECEIVED EVENTS
+                    inputQueue.enqueue(message.getInputEvents(0));
                     break;
             }
             channel.incrementReadIndex();
@@ -439,12 +443,12 @@ public class NetplayState {
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
         database.saveAsync(Database.OtherKeys.SERVER, config.setLevel(serverLevel));
         
-        if (serverLevel >= 0) {
+        if (clientLevel >= 0) {
             initGameState();
             channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
         }
                         
-        gotoServerWaitingFor(clientLevel < 0 ? "Waiting for client to enter level" : "One moment");
+        gotoServerWaitingFor("Waiting for client to enter level");
     }
     
     private void gotoServerWaitingFor(final String reason) {
@@ -466,6 +470,43 @@ public class NetplayState {
     
     private void updateServerPlaying() {
         
+        final Message message = channel.getWriteMessage();
+        if (message == null) {
+            channel.stop();
+            return;
+        }
+        
+        message.setType(Message.Type.INPUT_EVENTS);
+        
+        final InputEventList serverEvents = message.getInputEvents(0);
+        InputEventSource.poll(serverEvents);
+        
+        final InputEventList clientEvents = message.getInputEvents(1);
+        inputQueue.dequeue(clientEvents);
+        
+        channel.incrementWriteIndex();
+                
+        final GameState gameState = GameStateSource.getState();
+
+        for (int i = 0, end = serverEvents.size(); i < end; ++i) {
+            final byte event = serverEvents.get(i);
+//            if (event == InputEvent.GIVE_UP_PRESSED) {
+//                gotoGiveUp();
+//                return;
+//            }
+            gameState.handleInputEvent(event, 0);
+        }
+        
+        for (int i = 0, end = clientEvents.size(); i < end; ++i) {
+            final byte event = clientEvents.get(i);
+//            if (event == InputEvent.GIVE_UP_PRESSED) {
+//                gotoGiveUp();
+//                return;
+//            }
+            gameState.handleInputEvent(event, 1);
+        }        
+        
+        gameState.update();
     }
     
     private void gotoServerContinue() {
@@ -510,6 +551,7 @@ public class NetplayState {
         if (channel != null) {
             state = State.SERVER_CHANNEL;
             channelJustEstablished = true;
+            inputQueue.clear();
         }        
     }
     
@@ -715,7 +757,9 @@ public class NetplayState {
             return;
         }
         
-        // TODO WAIT FOR MESSAGE
+        if (channelState == ChannelState.PLAYING) {
+            channel.waitForMessage();
+        }
         
         for (int i = channel.getAvailableMessages() - 1; i >= 0; --i) {
             final Message message = channel.getReadMessage();
@@ -774,6 +818,7 @@ public class NetplayState {
                 gameState.handleInputEvent(event, i);
             }
         }
+        gameState.update();
     }
     
     private void gotoClientGettingLevel() {
@@ -823,6 +868,18 @@ public class NetplayState {
     
     private void updateClientPlaying() {
         
+        final Message message = channel.getWriteMessage();
+        if (message == null) {
+            channel.stop();
+            return;
+        }
+        
+        message.setType(Message.Type.INPUT_EVENTS);
+        
+        final InputEventList events = message.getInputEvents(0);
+        InputEventSource.poll(events);
+
+        channel.incrementWriteIndex();
     }
     
     private void gotoClientContinue() {
@@ -865,7 +922,7 @@ public class NetplayState {
 
         channel = server.getMessageChannel();
         if (channel != null) {
-            state = State.SERVER_CHANNEL;
+            state = State.CLIENT_CHANNEL;
             channelJustEstablished = true;
         }        
     }

@@ -2,6 +2,8 @@ package textrads.netplay;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import textrads.game.GameRenderer;
+import textrads.game.GameStateSource;
 import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.MenuRenderer;
 import textrads.ui.message.MessageScreenRenderer;
@@ -16,6 +18,7 @@ public class NetplayRenderer {
     private final ChooserRenderer chooserRenderer = new ChooserRenderer();
     private final QuestionRenderer questionRenderer = new QuestionRenderer();
     private final MessageScreenRenderer messageScreenRenderer = new MessageScreenRenderer();
+    private final GameRenderer gameRenderer = new GameRenderer();
     
     public void render(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         switch (state.getState()) {
@@ -111,6 +114,7 @@ public class NetplayRenderer {
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
+                gameRenderer.render(g, size, GameStateSource.getState(), null);
                 break;
         }
     }
@@ -156,6 +160,7 @@ public class NetplayRenderer {
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
+                gameRenderer.render(g, size, GameStateSource.getState(), null);
                 break;
         }
     }
