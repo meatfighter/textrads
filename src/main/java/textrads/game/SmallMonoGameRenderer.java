@@ -164,7 +164,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         }
                     }
                 }
-                if (gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) {
+                if (gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) { // TODO SET GAMESTATE PLAYER WHEN STATE RECEIVED TO ENABLE RENDER TO RENDER IT
                     break;
                 }
                 if ((state.isWon() && gameMode != GameState.Mode.VS_AI) || t >= 110) {
