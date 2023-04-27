@@ -178,6 +178,16 @@ public class MessageChannel {
         outQueue.incrementWriteIndex();
     }
     
+    public int getAvailableMessages() {
+        synchronized (monitor) {
+            if (state != State.RUNNING) {
+                return 0;
+            }
+        }
+        
+        return inQueue.size();
+    }
+    
     public int waitForMessage() {
         
         synchronized (monitor) {

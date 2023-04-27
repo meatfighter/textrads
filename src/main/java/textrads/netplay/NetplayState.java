@@ -358,29 +358,38 @@ public class NetplayState {
         
         // TODO WAIT FOR MESSAGE
         
-        final Message message = channel.getReadMessage();
-        switch (message.getType()) {
-            case Message.Type.LEVEL:
-                try {
-                    clientLevel = IOUtil.fromByteArray(message.getData());
-                } catch (final IOException | ClassNotFoundException ignored) {
-                    channel.stop();
-                    return;
-                }
-                if (clientLevel < 0) {
-                    channel.stop();
-                    return;                    
-                }
-                if (serverLevel >= 0) {
-                    initGameState();
-                    channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
-                }
-                break;
-            case Message.Type.ACK_GAME_STATE:
-                gotoServerPlaying();
-                break;
+        for (int i = channel.getAvailableMessages() - 1; i >= 0; --i) {
+            final Message message = channel.getReadMessage();
+            if (message == null) {
+                channel.stop();
+                return;
+            }
+            switch (message.getType()) {
+                case Message.Type.LEVEL:
+                    try {
+                        clientLevel = IOUtil.fromByteArray(message.getData());
+                    } catch (final IOException | ClassNotFoundException ignored) {
+                        channel.stop();
+                        return;
+                    }
+                    if (clientLevel < 0) {
+                        channel.stop();
+                        return;                    
+                    }
+                    if (serverLevel >= 0) {
+                        initGameState();
+                        channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+                    }
+                    break;
+                case Message.Type.ACK_GAME_STATE:
+                    gotoServerPlaying();
+                    break;
+                case Message.Type.INPUT_EVENTS:
+                    // TODO STORE THE LAST FEW RECEIVED EVENTS
+                    break;
+            }
+            channel.incrementReadIndex();
         }
-        channel.incrementReadIndex();
         
         switch (channelState) {
             case GETTING_LEVEL:
@@ -708,28 +717,34 @@ public class NetplayState {
         
         // TODO WAIT FOR MESSAGE
         
-        final Message message = channel.getReadMessage();
-        switch (message.getType()) {
-            case Message.Type.GET_LEVEL:
-                gotoClientGettingLevel();
-                break;
-            case Message.Type.GAME_STATE:
-                try {
-                    GameStateSource.setState(IOUtil.fromByteArray(message.getData()));
-                } catch (final IOException | ClassNotFoundException ignored) {
-                    channel.stop();
-                    return;
-                }
-                channel.write(Message.Type.ACK_GAME_STATE);
-                break;
-            case Message.Type.PLAY:
-                gotoClientPlaying();
-                break;
-            case Message.Type.INPUT_EVENTS:
-                handleClientInputEvents(message.getInputEvents());
-                break;
+        for (int i = channel.getAvailableMessages() - 1; i >= 0; --i) {
+            final Message message = channel.getReadMessage();
+            if (message == null) {
+                channel.stop();
+                return;
+            }
+            switch (message.getType()) {
+                case Message.Type.GET_LEVEL:
+                    gotoClientGettingLevel();
+                    break;
+                case Message.Type.GAME_STATE:
+                    try {
+                        GameStateSource.setState(IOUtil.fromByteArray(message.getData()));
+                    } catch (final IOException | ClassNotFoundException ignored) {
+                        channel.stop();
+                        return;
+                    }
+                    channel.write(Message.Type.ACK_GAME_STATE);
+                    break;
+                case Message.Type.PLAY:
+                    gotoClientPlaying();
+                    break;
+                case Message.Type.INPUT_EVENTS:
+                    handleClientInputEvents(message.getInputEvents());
+                    break;
+            }
+            channel.incrementReadIndex();
         }
-        channel.incrementReadIndex();        
         
         switch (channelState) {
             case GETTING_LEVEL:
