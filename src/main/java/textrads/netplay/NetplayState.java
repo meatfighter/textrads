@@ -769,9 +769,11 @@ public class NetplayState {
             }
             switch (message.getType()) {
                 case Message.Type.GET_LEVEL:
+                    System.out.println("Received: GET_LEVEL"); // TODO REMOVE
                     gotoClientGettingLevel();
                     break;
                 case Message.Type.GAME_STATE:
+                    System.out.println("Received: GAME_STATE"); // TODO REMOVE
                     try {
                         GameStateSource.setState(IOUtil.fromByteArray(message.getData()));
                     } catch (final IOException | ClassNotFoundException ignored) {
@@ -781,6 +783,7 @@ public class NetplayState {
                     channel.write(Message.Type.ACK_GAME_STATE);
                     break;
                 case Message.Type.PLAY:
+                    System.out.println("Received: PLAY"); // TODO REMOVE
                     gotoClientPlaying();
                     break;
                 case Message.Type.INPUT_EVENTS:
@@ -920,10 +923,9 @@ public class NetplayState {
             return;
         }
 
-        channel = server.getMessageChannel();
+        channel = client.getMessageChannel();
         if (channel != null) {
-            state = State.CLIENT_CHANNEL;
-            channelJustEstablished = true;
+            gotoClientChannel();
         }        
     }
     
