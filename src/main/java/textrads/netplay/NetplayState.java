@@ -16,6 +16,7 @@ import textrads.db.DatabaseSource;
 import textrads.db.NetplayConfig;
 import textrads.game.GameState;
 import textrads.game.GameStateSource;
+import textrads.game.MonoGameState;
 import textrads.input.InputEvent;
 import textrads.input.InputEventList;
 import textrads.input.InputEventSource;
@@ -415,8 +416,12 @@ public class NetplayState {
     }
     
     private void initGameState() {
-        GameStateSource.getState().init(GameState.Mode.VS_HUMAN, ThreadLocalRandom.current().nextLong(), serverLevel,
-                clientLevel, 0, 0, false, serverWins, clientWins);
+        final GameState gameState = GameStateSource.getState();
+        gameState.init(GameState.Mode.VS_HUMAN, ThreadLocalRandom.current().nextLong(), serverLevel, clientLevel, 0, 0, 
+                false, serverWins, clientWins);
+        final MonoGameState[] monoGameStates = gameState.getStates();
+        monoGameStates[0].setLocalPlayer(true);
+        monoGameStates[1].setLocalPlayer(false);
     }
     
     private void gotoServerGettingLevel() {
@@ -775,7 +780,11 @@ public class NetplayState {
                 case Message.Type.GAME_STATE:
                     System.out.println("Received: GAME_STATE"); // TODO REMOVE
                     try {
-                        GameStateSource.setState(IOUtil.fromByteArray(message.getData()));
+                        final GameState gameState = IOUtil.fromByteArray(message.getData());
+                        final MonoGameState[] monoGameStates = gameState.getStates();
+                        monoGameStates[0].setLocalPlayer(false);
+                        monoGameStates[1].setLocalPlayer(true);
+                        GameStateSource.setState(gameState);
                     } catch (final IOException | ClassNotFoundException ignored) {
                         channel.stop();
                         return;

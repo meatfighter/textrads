@@ -164,10 +164,12 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                         }
                     }
                 }
-                if (gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) { // TODO SET GAMESTATE PLAYER WHEN STATE RECEIVED TO ENABLE RENDER TO RENDER IT
+                if ((gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) 
+                        || (gameMode == GameState.Mode.VS_HUMAN && !state.isLocalPlayer())) {
                     break;
                 }
-                if ((state.isWon() && gameMode != GameState.Mode.VS_AI) || t >= 110) {
+                if (t >= 110 || (state.isWon() && gameMode != GameState.Mode.VS_AI 
+                        && gameMode != GameState.Mode.VS_HUMAN)) {
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
                     for (int i = 7; i >= 0; --i) {
                         g.putString(x + 6, y + 7 + i, "              ");
@@ -187,7 +189,7 @@ public class SmallMonoGameRenderer extends MonoGameRenderer {
                     }
 
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
-                    if (gameMode == GameState.Mode.VS_AI) {
+                    if (gameMode == GameState.Mode.VS_AI || gameMode == GameState.Mode.VS_HUMAN) {
                         if (state.isWon()) {
                             if (state.getWins() == 3) {
                                 g.putString(x + 9, y + 8, "Success!");

@@ -10,7 +10,6 @@ import textrads.ui.common.Dimensions;
 import textrads.ui.common.Offset;
 import textrads.app.Tetromino;
 import static textrads.game.MonoGameRenderer.BACKGROUND_COLOR;
-import textrads.ui.common.Colors;
 import textrads.ui.menu.MenuItemRenderer;
 import textrads.util.GraphicsUtil;
 
@@ -171,10 +170,12 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                         }
                     }
                 }
-                if (gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) {
+                if ((gameMode == GameState.Mode.VS_AI && gameState.getIndex(state) != 0) 
+                        || (gameMode == GameState.Mode.VS_HUMAN && !state.isLocalPlayer())) {
                     break;
                 }                
-                if ((state.isWon() && gameMode != GameState.Mode.VS_AI) || t >= 110) {
+                if (t >= 110 || (state.isWon() && gameMode != GameState.Mode.VS_AI 
+                        && gameMode != GameState.Mode.VS_HUMAN)) {
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, BACKGROUND_COLOR);
                     for (int i = 7; i >= 0; --i) {
                         g.putString(x + 13, y + 17 + i, "                      ");
@@ -194,7 +195,7 @@ public class BigMonoGameRenderer extends MonoGameRenderer {
                     }
                     
                     GraphicsUtil.setColor(g, BACKGROUND_COLOR, END_TITLE_COLOR);
-                    if (gameMode == GameState.Mode.VS_AI) {
+                    if (gameMode == GameState.Mode.VS_AI || gameMode == GameState.Mode.VS_HUMAN) {
                         if (state.isWon()) {
                             if (state.getWins() == 3) {
                                 g.putString(x + 20, y + 18, "Success!");

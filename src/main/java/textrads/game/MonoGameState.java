@@ -148,6 +148,8 @@ public class MonoGameState implements Serializable {
     
     private int updates;
     
+    private transient boolean localPlayer;
+    
     public MonoGameState(final GameState gameState) {
         this.gameState = gameState;        
     }
@@ -760,5 +762,13 @@ public class MonoGameState implements Serializable {
     
     public boolean isEnd() {
         return mode == Mode.END && (won || endTimer >= 110);
+    }
+
+    public boolean isLocalPlayer() {
+        return localPlayer;
+    }
+
+    public void setLocalPlayer(final boolean localPlayer) {
+        this.localPlayer = localPlayer;
     }
 }
