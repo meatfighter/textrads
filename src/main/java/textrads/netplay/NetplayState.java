@@ -20,6 +20,7 @@ import textrads.game.MonoGameState;
 import textrads.input.InputEvent;
 import textrads.input.InputEventList;
 import textrads.input.InputEventSource;
+import textrads.input.InputSource;
 import textrads.ui.menu.BackExitState;
 import textrads.ui.menu.Chooser;
 import textrads.ui.menu.Menu;
@@ -101,10 +102,11 @@ public class NetplayState {
     private InetAddress host;
     private int port;
     private byte serverLevel;
-    private byte clientLevel;
+    private byte clientLevel;    
     private int serverWins;
     private int clientWins;
     private boolean clientAckedGameState;
+    private int selectionTimer;
     
     private MessageChannel channel;
     private boolean channelJustEstablished;
@@ -471,9 +473,16 @@ public class NetplayState {
     private void gotoServerPlaying() {
         channelState = ChannelState.PLAYING;
         channel.write(Message.Type.PLAY);
+        InputSource.clear();
     }
     
     private void updateServerPlaying() {
+
+        final GameState gameState = GameStateSource.getState();
+        if (gameState.isContinueMessage()) {
+            gotoServerContinue();
+            return;
+        }
         
         final Message message = channel.getWriteMessage();
         if (message == null) {
@@ -491,8 +500,6 @@ public class NetplayState {
         
         channel.incrementWriteIndex();
                 
-        final GameState gameState = GameStateSource.getState();
-
         for (int i = 0, end = serverEvents.size(); i < end; ++i) {
             final byte event = serverEvents.get(i);
 //            if (event == InputEvent.GIVE_UP_PRESSED) {
@@ -516,9 +523,36 @@ public class NetplayState {
     
     private void gotoServerContinue() {
         channelState = ChannelState.CONTINUE;
+        InputSource.clear();
+        GameStateSource.getState().setSelection((byte) -1);
+        selectionTimer = Menu.SELECTION_FRAMES;
     }
     
     private void updateServerContinue() {
+        final GameState gameState = GameStateSource.getState();
+        if (gameState.getSelection() >= 0) {
+            InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            } else {
+                handleServerContinue();
+            }
+            return;
+        } 
+        
+        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            } 
+            if (keyStroke.getKeyType() == KeyType.Enter) {
+                gameState.setSelection((byte) 0);
+                break;
+            }
+        }        
+    }
+    
+    private void handleServerContinue() {
         
     }
     
@@ -876,6 +910,7 @@ public class NetplayState {
     
     private void gotoClientPlaying() {
         channelState = ChannelState.PLAYING;
+        InputSource.clear();
     }
     
     private void updateClientPlaying() {
@@ -896,9 +931,36 @@ public class NetplayState {
     
     private void gotoClientContinue() {
         channelState = ChannelState.CONTINUE;
+        InputSource.clear();
+        GameStateSource.getState().setSelection((byte) -1);
+        selectionTimer = Menu.SELECTION_FRAMES;
     }
     
     private void updateClientContinue() {
+        final GameState gameState = GameStateSource.getState();
+        if (gameState.getSelection() >= 0) {
+            InputSource.clear();
+            if (selectionTimer > 0) {
+                --selectionTimer;
+            } else {
+                handleClientContinue();
+            }
+            return;
+        } 
+        
+        for (int i = InputSource.MAX_POLLS - 1; i >= 0; --i) {
+            final KeyStroke keyStroke = InputSource.poll();
+            if (keyStroke == null) {
+                break;
+            } 
+            if (keyStroke.getKeyType() == KeyType.Enter) {
+                gameState.setSelection((byte) 0);
+                break;
+            }
+        }        
+    }
+    
+    private void handleClientContinue() {
         
     }
     
