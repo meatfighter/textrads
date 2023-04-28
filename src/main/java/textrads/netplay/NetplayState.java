@@ -359,7 +359,7 @@ public class NetplayState {
                 channel.write(Message.Type.GET_LEVEL);
             } else if (serverLevel < 0) {
                 channel.write(Message.Type.WAIT_LEVEL);
-            } else if (!clientAckedGameState) {            
+            } else if (!clientAckedGameState) {
                 channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
             }
         }
