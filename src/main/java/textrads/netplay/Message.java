@@ -20,6 +20,8 @@ public class Message {
         byte GAME_STATE = 6;
         byte ACK_GAME_STATE = 7;
         byte PLAY = 8;
+        byte GET_CONTINUE = 9;
+        byte CONTINUE = 10;
     }    
     
     private final InputEventList[] inputEvents;

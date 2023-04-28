@@ -526,6 +526,7 @@ public class NetplayState {
         InputSource.clear();
         GameStateSource.getState().setSelection((byte) -1);
         selectionTimer = Menu.SELECTION_FRAMES;
+        channel.write(Message.Type.GET_CONTINUE);
     }
     
     private void updateServerContinue() {
@@ -808,11 +809,9 @@ public class NetplayState {
             }
             switch (message.getType()) {
                 case Message.Type.GET_LEVEL:
-                    System.out.println("Received: GET_LEVEL"); // TODO REMOVE
                     gotoClientGettingLevel();
                     break;
                 case Message.Type.GAME_STATE:
-                    System.out.println("Received: GAME_STATE"); // TODO REMOVE
                     try {
                         final GameState gameState = IOUtil.fromByteArray(message.getData());
                         final MonoGameState[] monoGameStates = gameState.getStates();
@@ -826,11 +825,13 @@ public class NetplayState {
                     channel.write(Message.Type.ACK_GAME_STATE);
                     break;
                 case Message.Type.PLAY:
-                    System.out.println("Received: PLAY"); // TODO REMOVE
                     gotoClientPlaying();
                     break;
                 case Message.Type.INPUT_EVENTS:
                     handleClientInputEvents(message.getInputEvents());
+                    break;
+                case Message.Type.GET_CONTINUE:
+                    gotoClientContinue();
                     break;
             }
             channel.incrementReadIndex();
@@ -961,7 +962,7 @@ public class NetplayState {
     }
     
     private void handleClientContinue() {
-        
+        channel.write(Message.Type.CONTINUE);
     }
     
     private void gotoClientGiveUp() {
