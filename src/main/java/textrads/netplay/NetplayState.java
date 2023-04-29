@@ -50,6 +50,7 @@ public class NetplayState {
         SERVER_START_ERROR,
         SERVER_CHANNEL,
         SERVER_WAITING,
+        SERVER_INFORMING,
         SERVER_ERROR,
         
         CLIENT_CONFIG,
@@ -60,6 +61,7 @@ public class NetplayState {
         CLIENT_START_ERROR,
         CLIENT_CHANNEL,
         CLIENT_WAITING,
+        CLIENT_INFORMING,
         CLIENT_ERROR,
     }
     
@@ -106,6 +108,7 @@ public class NetplayState {
     private byte clientWins;
     private boolean clientAckedGameState;
     private boolean waitClientContinue;
+    private boolean requestedDisconnect;
     private int selectionTimer;
     
     private MessageChannel channel;
@@ -154,6 +157,9 @@ public class NetplayState {
             case SERVER_WAITING:
                 updateServerWaiting();
                 break;
+            case SERVER_INFORMING:
+                updateServerInforming();
+                break;
             case SERVER_ERROR:
                 updateServerError();
                 break;
@@ -181,6 +187,9 @@ public class NetplayState {
                 break;
             case CLIENT_WAITING:
                 updateClientWaiting();
+                break;
+            case CLIENT_INFORMING:
+                updateClientInforming();
                 break;
             case CLIENT_ERROR:
                 updateClientError();
@@ -338,6 +347,7 @@ public class NetplayState {
         serverWins = 0;
         clientAckedGameState = false;
         waitClientContinue = false;
+        requestedDisconnect = false;
         inputQueue.clear();
         gotoServerGettingLevel();
     }
@@ -349,7 +359,12 @@ public class NetplayState {
             channelJustEstablished = false;
             clientAckedGameState = false;
             inputQueue.clear();
-            gotoServerWaiting();
+            if (requestedDisconnect) {
+                requestedDisconnect = false;
+                gotoServerInforming("Client disconnected.");
+            } else {
+                gotoServerWaiting();
+            }
             return;
         }
         
@@ -412,6 +427,10 @@ public class NetplayState {
                         initGameState();
                         channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
                     } 
+                    break;
+                case Message.Type.REQUEST_DISCONNECT:
+                    requestedDisconnect = true;
+                    channel.write(Message.Type.DISCONNECT);
                     break;
             }
             channel.incrementReadIndex();
@@ -639,6 +658,18 @@ public class NetplayState {
             inputQueue.clear();
         }        
     }
+    
+    private void gotoServerInforming(final String error) {
+        state = State.SERVER_INFORMING;
+        messageScreen.init("Server", error, MessageState.MessageType.INFORM);
+    }
+    
+    private void updateServerInforming() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
+            gotoServerConfig();
+        }
+    }    
     
     private void gotoServerError(final String error) {
         state = State.SERVER_ERROR;
@@ -878,6 +909,9 @@ public class NetplayState {
                 case Message.Type.GET_CONTINUE:
                     gotoClientContinue();
                     break;
+                case Message.Type.DISCONNECT:
+                    gotoClientConfig();
+                    return;
             }
             channel.incrementReadIndex();
         }
@@ -925,7 +959,8 @@ public class NetplayState {
         levelQuestion.update();
         
         if (levelQuestion.isEscPressed()) {
-            gotoClientConfig();
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoClientWaitingFor("Waiting to disconnect");
             return;
         }
         
@@ -950,7 +985,8 @@ public class NetplayState {
     private void updateClientWaitingFor() {
         disconnectMessageScreen.update();
         if (disconnectMessageScreen.isSelected()) {
-            gotoClientConfig();
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoClientWaitingFor("Waiting to disconnect");
         }
     }
     
@@ -1026,7 +1062,7 @@ public class NetplayState {
     
     private void updateClientWaiting() {
         disconnectMessageScreen.update();
-        if (messageScreen.isSelected()) {            
+        if (disconnectMessageScreen.isSelected()) {            
             gotoClientConfig();
             return;
         }
@@ -1047,6 +1083,18 @@ public class NetplayState {
         }        
     }
     
+    private void gotoClientInfo(final String error) {
+        state = State.CLIENT_INFORMING;
+        messageScreen.init("Client", error, MessageState.MessageType.INFORM);
+    }
+    
+    private void updateClientInforming() {
+        messageScreen.update();
+        if (messageScreen.isSelected()) {            
+            gotoClientConfig();
+        }
+    }    
+    
     private void gotoClientError(final String error) {
         state = State.CLIENT_ERROR;
         disconnectMessageScreen.init("Client", error, MessageState.MessageType.ERROR);
@@ -1054,7 +1102,7 @@ public class NetplayState {
     
     private void updateClientError() {
         disconnectMessageScreen.update();
-        if (messageScreen.isSelected()) {            
+        if (disconnectMessageScreen.isSelected()) {            
             gotoClientConfig();
         }
     }    

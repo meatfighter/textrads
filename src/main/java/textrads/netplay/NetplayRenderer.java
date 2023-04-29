@@ -45,6 +45,9 @@ public class NetplayRenderer {
             case SERVER_WAITING:
                 renderServerWaiting(g, size, state);
                 break;
+            case SERVER_INFORMING:
+                renderServerInforming(g, size, state);
+                break;
             case SERVER_ERROR:
                 renderServerError(g, size, state);
                 break;
@@ -72,6 +75,9 @@ public class NetplayRenderer {
                 break;
             case CLIENT_WAITING:
                 renderClientWaiting(g, size, state);
+                break;
+            case CLIENT_INFORMING:
+                renderClientInforming(g, size, state);
                 break;
             case CLIENT_ERROR:
                 renderClientError(g, size, state);
@@ -124,6 +130,10 @@ public class NetplayRenderer {
         messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
     
+    private void renderServerInforming(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
+    }
+    
     private void renderServerError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
@@ -172,6 +182,10 @@ public class NetplayRenderer {
     private void renderClientWaiting(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
     }
+    
+    private void renderClientInforming(final TextGraphics g, final TerminalSize size, final NetplayState state) {
+        messageScreenRenderer.render(g, size, state.getMessageScreen());
+    }    
     
     private void renderClientError(final TextGraphics g, final TerminalSize size, final NetplayState state) {
         messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());

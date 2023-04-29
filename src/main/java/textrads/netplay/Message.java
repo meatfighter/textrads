@@ -22,6 +22,8 @@ public class Message {
         byte PLAY = 8;
         byte GET_CONTINUE = 9;
         byte CONTINUE = 10;
+        byte REQUEST_DISCONNECT = 11;
+        byte DISCONNECT = 12;
     }    
     
     private final InputEventList[] inputEvents;
