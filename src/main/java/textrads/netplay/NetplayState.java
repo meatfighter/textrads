@@ -34,6 +34,8 @@ import textrads.util.IOUtil.NetworkInterfaceAddress;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+// TODO AFTER CLIENT RECONNECTS ON CONTINUE SCREEN, MESSAGE DOES NOT SWITCH BACK TO WATIING FOR CLIENT TO CONTINUE
+
 public class NetplayState {
 
     private static String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
@@ -432,6 +434,9 @@ public class NetplayState {
                     requestedDisconnect = true;
                     channel.write(Message.Type.DISCONNECT);
                     break;
+                case Message.Type.DISCONNECT:
+                    gotoServerConfig();
+                    break;
             }
             channel.incrementReadIndex();
         }
@@ -475,8 +480,9 @@ public class NetplayState {
     private void updateServerGettingLevel() {
         levelQuestion.update();
         
-        if (levelQuestion.isEscPressed()) {
-            gotoServerConfig();
+        if (levelQuestion.isEscPressed()) {            
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoServerWaitingFor("Waiting to disconnect");
             return;
         }
         
@@ -504,7 +510,8 @@ public class NetplayState {
     private void updateServerWaitingFor() {
         disconnectMessageScreen.update();
         if (disconnectMessageScreen.isSelected()) {
-            gotoServerConfig();
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoServerWaitingFor("Waiting to disconnect");
         }
     }
     
@@ -862,6 +869,8 @@ public class NetplayState {
         state = State.CLIENT_CHANNEL;
         serverLevel = -1;
         clientLevel = -1;
+        requestedDisconnect = false;
+        inputQueue.clear();
         gotoClientWaitingFor(WAITING_FOR_SERVER_STR);
     }
     
@@ -869,7 +878,13 @@ public class NetplayState {
         
         if (channel.isTerminated()) {
             channel = null;
-            gotoClientWaiting();
+            inputQueue.clear();
+            if (requestedDisconnect) {
+                requestedDisconnect = false;
+                gotoClientInforming("Server disconnected.");
+            } else {
+                gotoClientWaiting();
+            }
             return;
         }
         
@@ -909,6 +924,10 @@ public class NetplayState {
                 case Message.Type.GET_CONTINUE:
                     gotoClientContinue();
                     break;
+                case Message.Type.REQUEST_DISCONNECT:
+                    requestedDisconnect = true;
+                    channel.write(Message.Type.DISCONNECT);
+                    break;                    
                 case Message.Type.DISCONNECT:
                     gotoClientConfig();
                     return;
@@ -1083,7 +1102,7 @@ public class NetplayState {
         }        
     }
     
-    private void gotoClientInfo(final String error) {
+    private void gotoClientInforming(final String error) {
         state = State.CLIENT_INFORMING;
         messageScreen.init("Client", error, MessageState.MessageType.INFORM);
     }
