@@ -634,7 +634,7 @@ public class Textrads {
         
         final GameState gameState = GameStateSource.getState();
         
-        if (gameMode == GameState.Mode.VS_AI || gameMode == GameState.Mode.VS_HUMAN) {
+        if (gameMode == GameState.Mode.VS_AI) {
             final MonoGameState[] states = gameState.getStates();
             wins0 = states[0].getWins();
             wins1 = states[1].getWins();

@@ -77,7 +77,8 @@ public class GameState implements Serializable {
     }
     
     public boolean isContinueMessage() {
-        return (states[0].isWon() && mode != GameState.Mode.VS_AI) || states[0].getEndTimer() >= 110;
+        return (states[0].isWon() && mode != GameState.Mode.VS_AI && mode != GameState.Mode.VS_HUMAN) 
+                || (states[0].getEndTimer() >= 110 && states[1].getEndTimer() >= 110);
     }
     
     public boolean isEnd() {
