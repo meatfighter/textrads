@@ -3,14 +3,11 @@ package textrads.netplay;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
 import textrads.db.NetplayConfig;
@@ -34,11 +31,14 @@ import textrads.ui.question.TextField;
 import textrads.util.IOUtil;
 import textrads.util.IOUtil.NetworkInterfaceAddress;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class NetplayState {
 
     private static String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
     private static String CONNECTING_TO_SERVER_STR = "Connecting to server";
-    private static String WAITING_FOR_INSTRUCTIONS_STR = "Waiting for instructions";
+    private static String WAITING_FOR_SERVER_STR = "Waiting for server";
     
     static enum State {
         PLAY_AS,
@@ -403,11 +403,11 @@ public class NetplayState {
                 case Message.Type.INPUT_EVENTS:
                     inputQueue.enqueue(message.getInputEvents(0));
                     break;
-                case Message.Type.CONTINUE:
+                case Message.Type.CONTINUE:                    
                     waitClientContinue = false;
                     if (clientLevel == -1 || clientWins == 3 || serverWins == 3) {
                         channel.write(Message.Type.GET_LEVEL);
-                    } else {
+                    } else if (channelState != ChannelState.CONTINUE) {
                         clientAckedGameState = false;
                         initGameState();
                         channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
@@ -474,7 +474,7 @@ public class NetplayState {
             channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
         }
                         
-        gotoServerWaitingFor("Waiting for client to enter level");
+        gotoServerWaitingFor("Waiting for client's level");
     }
     
     private void gotoServerWaitingFor(final String reason) {
@@ -592,7 +592,7 @@ public class NetplayState {
             gotoServerGettingLevel();
         } else {
             channelState = ChannelState.WAITING_FOR;
-            disconnectMessageScreen.init("Server", "Waiting for client player to press continue", 
+            disconnectMessageScreen.init("Server", "Waiting for client to continue", 
                     MessageState.MessageType.WAITING);
             if (!waitClientContinue) {
                 clientAckedGameState = false;
@@ -831,7 +831,7 @@ public class NetplayState {
         state = State.CLIENT_CHANNEL;
         serverLevel = -1;
         clientLevel = -1;
-        gotoClientWaitingFor(WAITING_FOR_INSTRUCTIONS_STR);
+        gotoClientWaitingFor(WAITING_FOR_SERVER_STR);
     }
     
     private void updateClientChannel() {
@@ -939,7 +939,7 @@ public class NetplayState {
         
         channel.write(Message.Type.LEVEL, clientLevel);
         
-        gotoClientWaitingFor(WAITING_FOR_INSTRUCTIONS_STR);
+        gotoClientWaitingFor("Waiting for server's level");
     }    
     
     private void gotoClientWaitingFor(final String reason) {
@@ -1008,7 +1008,7 @@ public class NetplayState {
     
     private void handleClientContinue() {
         channel.write(Message.Type.CONTINUE);
-        gotoClientWaitingFor("Waiting for server player to press continue");
+        gotoClientWaitingFor("Waiting for server to continue");
     }
     
     private void gotoClientGiveUp() {

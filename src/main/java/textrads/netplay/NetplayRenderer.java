@@ -8,8 +8,6 @@ import textrads.ui.menu.ChooserRenderer;
 import textrads.ui.menu.MenuRenderer;
 import textrads.ui.message.MessageScreenRenderer;
 import textrads.ui.question.QuestionRenderer;
-import static textrads.netplay.NetplayState.State.CLIENT_CONFIG_HOST_ERROR;
-import static textrads.netplay.NetplayState.State.SERVER_START_WAITING;
 
 public class NetplayRenderer {
     
@@ -114,7 +112,10 @@ public class NetplayRenderer {
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
+            case CONTINUE:    
                 gameRenderer.render(g, size, GameStateSource.getState(), null);
+                break;
+            case GIVE_UP:
                 break;
         }
     }
@@ -160,7 +161,10 @@ public class NetplayRenderer {
                 messageScreenRenderer.render(g, size, state.getDisconnectMessageScreen());
                 break;
             case PLAYING:
+            case CONTINUE:                
                 gameRenderer.render(g, size, GameStateSource.getState(), null);
+                break;
+            case GIVE_UP:
                 break;
         }
     }
