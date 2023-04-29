@@ -102,8 +102,8 @@ public class NetplayState {
     private int port;
     private byte serverLevel;
     private byte clientLevel;    
-    private int serverWins;
-    private int clientWins;
+    private byte serverWins;
+    private byte clientWins;
     private boolean clientAckedGameState;
     private boolean waitClientContinue;
     private int selectionTimer;
@@ -396,7 +396,7 @@ public class NetplayState {
                     clientAckedGameState = true;
                     if (waitClientContinue) {
                         channel.write(Message.Type.GET_CONTINUE);
-                    } else {
+                    } else if (channelState != ChannelState.CONTINUE) {
                         gotoServerPlaying();
                     }
                     break;
@@ -405,19 +405,13 @@ public class NetplayState {
                     break;
                 case Message.Type.CONTINUE:
                     waitClientContinue = false;
-                    if (serverWins < 3 && clientWins < 3) {
+                    if (clientLevel == -1 || clientWins == 3 || serverWins == 3) {
+                        channel.write(Message.Type.GET_LEVEL);
+                    } else {
                         clientAckedGameState = false;
                         initGameState();
                         channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
-                    } else if (channelState != ChannelState.CONTINUE) {
-                        serverLevel = -1;
-                        clientLevel = -1;
-                        clientWins = 0;
-                        serverWins = 0;
-                        channel.write(Message.Type.GET_LEVEL);
-                        inputQueue.clear();
-                        gotoServerGettingLevel();
-                    }
+                    } 
                     break;
             }
             channel.incrementReadIndex();
@@ -548,11 +542,19 @@ public class NetplayState {
     
     private void gotoServerContinue() {
         channelState = ChannelState.CONTINUE;
-        InputSource.clear();
-        GameStateSource.getState().setSelection((byte) -1);
         selectionTimer = Menu.SELECTION_FRAMES;
         waitClientContinue = true;
+        
+        final GameState gameState = GameStateSource.getState();
+        gameState.setSelection((byte) -1);
+        
+        final MonoGameState[] states = gameState.getStates();
+        serverWins = states[0].getWins();
+        clientWins = states[1].getWins();
+
         channel.write(Message.Type.GET_CONTINUE);
+        
+        InputSource.clear();
     }
     
     private void updateServerContinue() {
@@ -580,22 +582,23 @@ public class NetplayState {
     }
     
     private void handleServerContinue() {
-        channelState = ChannelState.WAITING_FOR;
-        disconnectMessageScreen.init("Server", "Waiting for client player to press continue", 
-                MessageState.MessageType.WAITING);
-        if (waitClientContinue) {
-            // wait for client plalyer to press continue
-        } else if (serverWins < 3 && clientWins < 3) {
-            clientAckedGameState = false;
-            initGameState();
-            channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
-        } else {
+        
+        if (serverWins == 3 || clientWins == 3) {
             serverLevel = -1;
             clientLevel = -1;
             clientWins = 0;
             serverWins = 0;            
             inputQueue.clear();
             gotoServerGettingLevel();
+        } else {
+            channelState = ChannelState.WAITING_FOR;
+            disconnectMessageScreen.init("Server", "Waiting for client player to press continue", 
+                    MessageState.MessageType.WAITING);
+            if (!waitClientContinue) {
+                clientAckedGameState = false;
+                initGameState();
+                channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+            }
         }
     }
     
