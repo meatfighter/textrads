@@ -1,6 +1,7 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.TimeUnit;
@@ -8,7 +9,7 @@ import textrads.util.ThreadUtil;
 
 public class Server {
     
-    static final long MAX_HANDSHAKE_WAIT_MILLIS = TimeUnit.SECONDS.toMillis(30);
+    static final long MAX_HANDSHAKE_WAIT_MILLIS = TimeUnit.SECONDS.toMillis(10);
      
     public static final int DEFAULT_PORT = 8080;
 
@@ -65,7 +66,12 @@ public class Server {
                 System.out.println("listening on: " + port + " " + bindAddress);
             }
         } catch (final IOException e) {
-            error = e.getMessage();
+            e.printStackTrace(); // TODO REMOVE
+            if (e instanceof BindException) {
+                error = "Port already in use.";                
+            } else {
+                error = e.getMessage();
+            }
             stop();
             return;
         }
