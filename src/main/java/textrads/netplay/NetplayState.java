@@ -38,9 +38,10 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class NetplayState {
 
-    private static String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
-    private static String CONNECTING_TO_SERVER_STR = "Connecting to server";
-    private static String WAITING_FOR_SERVER_STR = "Waiting for server";
+    private static final String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
+    private static final String CONNECTING_TO_SERVER_STR = "Connecting to server";
+    private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
+    private static final String WAITING_FOR_CLIENT_TO_CONTINUE = "Waiting for client to continue";
     
     static enum State {
         PLAY_AS,
@@ -387,6 +388,10 @@ public class NetplayState {
                 gameState.setSelection((byte) -1);
                 channel.write(Message.Type.GAME_STATE, gameState);
                 gameState.setSelection(selection);
+                if (waitClientContinue) {
+                    disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE, 
+                            MessageState.MessageType.WAITING);
+                }
             }
         }
         
@@ -628,7 +633,7 @@ public class NetplayState {
             gotoServerGettingLevel();
         } else {
             channelState = ChannelState.WAITING_FOR;
-            disconnectMessageScreen.init("Server", "Waiting for client to continue", 
+            disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE, 
                     MessageState.MessageType.WAITING);
             if (!waitClientContinue) {
                 clientAckedGameState = false;
@@ -891,7 +896,7 @@ public class NetplayState {
             inputQueue.clear();
             if (requestedDisconnect) {
                 requestedDisconnect = false;
-                gotoClientInforming("Server disconnected.");
+                gotoClientInforming("Server disconnected."); // TODO STILL ACCEPT CONNECTIONS?!
             } else {
                 gotoClientWaiting();
             }
