@@ -14,6 +14,7 @@ import textrads.db.NetplayConfig;
 import textrads.game.GameState;
 import textrads.game.GameStateSource;
 import textrads.game.MonoGameState;
+import textrads.input.InputEvent;
 import textrads.input.InputEventList;
 import textrads.input.InputEventSource;
 import textrads.input.InputSource;
@@ -33,8 +34,6 @@ import textrads.util.IOUtil.NetworkInterfaceAddress;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-// TODO AFTER CLIENT RECONNECTS ON CONTINUE SCREEN, MESSAGE DOES NOT SWITCH BACK TO WATIING FOR CLIENT TO CONTINUE
 
 public class NetplayState {
 
@@ -83,6 +82,7 @@ public class NetplayState {
     private final Client client = new Client();
     
     private final Menu playAsMenu = createPlayAsMenu();
+    private final Menu giveUpMenu = createGiveUpMenu();
     
     private final Chooser<IOUtil.NetworkInterfaceAddress> serverHostChooser 
             = new Chooser<>("Which host will the server accept connections from?");    
@@ -128,6 +128,20 @@ public class NetplayState {
         menuColumns.add(new MenuColumn(menuItems));
         
         return new Menu(menuColumns, "Vs. Human");
+    }
+
+    private Menu createGiveUpMenu() {
+        final List<MenuItem> menuItems0 = new ArrayList<>();
+        menuItems0.add(new MenuItem("Yes"));
+        
+        final List<MenuItem> menuItems1 = new ArrayList<>();
+        menuItems1.add(new MenuItem("No"));
+        
+        final List<MenuColumn> menuColumns = new ArrayList<>();
+        menuColumns.add(new MenuColumn(menuItems0));
+        menuColumns.add(new MenuColumn(menuItems1));
+        
+        return new Menu(menuColumns, "Give Up?", new BackExitState("Disconnect"));
     }    
     
     public void reset() {
@@ -492,7 +506,8 @@ public class NetplayState {
     private void updateServerGettingLevel() {
         levelQuestion.update();
         
-        if (levelQuestion.isEscPressed()) {            
+        if (levelQuestion.isEscPressed()) {
+            requestedDisconnect = true;            
             channel.write(Message.Type.REQUEST_DISCONNECT);
             gotoServerWaitingFor("Waiting to disconnect");
             return;
@@ -522,6 +537,7 @@ public class NetplayState {
     private void updateServerWaitingFor() {
         disconnectMessageScreen.update();
         if (disconnectMessageScreen.isSelected()) {
+            requestedDisconnect = true;
             channel.write(Message.Type.REQUEST_DISCONNECT);
             gotoServerWaitingFor("Waiting to disconnect");
         }
@@ -559,10 +575,10 @@ public class NetplayState {
                 
         for (int i = 0, end = serverEvents.size(); i < end; ++i) {
             final byte event = serverEvents.get(i);
-//            if (event == InputEvent.GIVE_UP_PRESSED) {
-//                gotoGiveUp();
-//                return;
-//            }
+            if (event == InputEvent.GIVE_UP_PRESSED) {
+                gotoServerGiveUp();
+                return;
+            }
             gameState.handleInputEvent(event, 0);
         }
         
@@ -645,11 +661,35 @@ public class NetplayState {
     }
     
     private void gotoServerGiveUp() {
+        channel.write(Message.Type.WAIT_GIVE_UP);
         channelState = ChannelState.GIVE_UP;
+        giveUpMenu.reset();
     }
     
     private void updateServerGiveUp() {
-        
+        giveUpMenu.update();
+        final KeyStroke selection = giveUpMenu.getSelection();
+        if (selection == null) {
+            return;
+        }
+        if (selection.getKeyType() == KeyType.Escape) {
+            requestedDisconnect = true;
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoServerWaitingFor("Waiting to disconnect");
+            return;
+        }
+        final Character c = selection.getCharacter();
+        if (c == null) {
+            return;
+        }
+        switch (Character.toUpperCase(c)) {
+            case 'Y':
+                gotoServerChannel();
+                break;
+            case 'N':
+                // TODO RETURN TO GAME
+                break;
+        }
     }
     
     private void gotoServerWaiting() {
@@ -948,6 +988,9 @@ public class NetplayState {
                 case Message.Type.DISCONNECT:
                     gotoClientConfig();
                     return;
+                case Message.Type.WAIT_GIVE_UP:
+                    gotoClientWaitingFor("Server might resign");
+                    break;
             }
             channel.incrementReadIndex();
         }

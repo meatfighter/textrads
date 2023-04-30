@@ -26,36 +26,44 @@ public class Menu {
     private int selectionTimer;
     
     public Menu(final List<MenuColumn> menuColumns, final String title) {
-        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, true);
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, new BackExitState(true));
     }    
 
     public Menu(final List<MenuColumn> menuColumns, final String title, final boolean escapeEnabled) {
-        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, escapeEnabled);
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, new BackExitState(escapeEnabled));
     }
     
+    public Menu(final List<MenuColumn> menuColumns, final String title, final BackExitState backExitState) {
+        this(menuColumns, title, DEFAULT_TITLE_MARGIN, DEFAULT_BACK_EXIT_MARGIN, backExitState);
+    }    
+    
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin) {
-        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, true);
+        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, new BackExitState(true));
     }
     
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
             final boolean escapeEnabled) {
-        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, escapeEnabled);
+        this(menuColumns, title, titleMargin, DEFAULT_BACK_EXIT_MARGIN, new BackExitState(escapeEnabled));
     }
     
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
             final int backExitMargin) {
-        this(menuColumns, title, titleMargin, backExitMargin, true);
+        this(menuColumns, title, titleMargin, backExitMargin, new BackExitState(true));
     }
     
     public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
             final int backExitMargin, final boolean escapeEnabled) {
+        this(menuColumns, title, titleMargin, backExitMargin, new BackExitState(escapeEnabled));
+    }
+    
+    public Menu(final List<MenuColumn> menuColumns, final String title, final int titleMargin, 
+            final int backExitMargin, final BackExitState backExitState) {
         
         this.menuColumns = menuColumns;
         this.title = title;
         this.titleMargin = titleMargin;
-        this.backExitMargin = backExitMargin;
-        
-        backExitState = new BackExitState(escapeEnabled);
+        this.backExitMargin = backExitMargin;        
+        this.backExitState = backExitState;
         
         int w = 0;
         int h = 0;
