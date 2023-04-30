@@ -3,9 +3,12 @@ package textrads.netplay;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.concurrent.TimeUnit;
 import textrads.util.ThreadUtil;
 
 public class Server {
+    
+    static final long MAX_HANDSHAKE_WAIT_MILLIS = TimeUnit.SECONDS.toMillis(30);
      
     public static final int DEFAULT_PORT = 8080;
 
@@ -87,12 +90,6 @@ public class Server {
                         System.out.println("Channel terminated.");
                     }
                     
-                    
-                    if (channel != null && channel.isHandshakeError()) {
-                        System.out.println("Bad handshake :(");
-                        error = "Bad handshake.";
-                        return;
-                    }
                     channel = null;
                     ss = serverSocket;
                 }
@@ -116,9 +113,35 @@ public class Server {
                     continue;
                 }                
 
-                synchronized (monitor) {
-                    System.out.println("Connected.");
-                    channel = c;
+                synchronized (monitor) {                    
+                    final long startTime = System.currentTimeMillis();
+                    while (running && !c.isTerminated() 
+                            && c.getHandshakeStatus() == MessageChannel.HandshakeStatus.PENDING) {
+                        final long remainingTime = MAX_HANDSHAKE_WAIT_MILLIS - (System.currentTimeMillis() - startTime);
+                        if (remainingTime <= 0) {                            
+                            break;
+                        }
+                        try {
+                            monitor.wait(remainingTime);
+                        } catch (final InterruptedException ignored) {
+                        }
+                    }                    
+                    if (!running) {
+                        break;
+                    }
+                    
+                    switch (c.getHandshakeStatus()) {
+                        case SUCCESS:
+                            channel = c;
+                            break;
+                        case FAIL:
+                            c.stop();
+                            error = "Bad handshake.";
+                            return;
+                        case PENDING:
+                            c.stop();
+                            break;                            
+                    }
                 }
             }
         } finally {

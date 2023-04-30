@@ -1,12 +1,15 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import textrads.util.ThreadUtil;
 
+import static textrads.netplay.Server.MAX_HANDSHAKE_WAIT_MILLIS;
+
 public class Client {
-        
+    
     private volatile InetAddress host;
     private volatile int port = Server.DEFAULT_PORT;
     
@@ -70,11 +73,6 @@ public class Client {
                         System.out.println("Channel terminated.");
                     }
                     
-                    if (channel != null && channel.isHandshakeError()) {
-                        System.out.println("Bad handshake :(");
-                        error = "Bad handshake.";
-                        return;
-                    }
                     channel = null;
                 }
 
@@ -86,13 +84,17 @@ public class Client {
                             monitor.notifyAll();
                         }
                     });
-                    c.start();
+                    c.start();                    
                 } catch (final IOException e) {
-                    System.out.println("Connection error: " + e.getMessage());
+                    e.printStackTrace(); // TODO REMOVE
                     synchronized (monitor) {
-                        if (firstConnectionAttempt) {                            
-                            error = e.getMessage();
-                            return;
+                        if (firstConnectionAttempt) {
+                            if (e instanceof ConnectException) {
+                                error = "Connection refused.";
+                            } else {
+                                error = e.getMessage();
+                            }
+                            break;
                         }
                     }
                     ThreadUtil.sleepOneSecond();
@@ -100,8 +102,43 @@ public class Client {
                 }
                 
                 synchronized (monitor) {
-                    firstConnectionAttempt = false;                    
-                    channel = c;                    
+                    final long startTime = System.currentTimeMillis();
+                    while (running && !c.isTerminated() 
+                            && c.getHandshakeStatus() == MessageChannel.HandshakeStatus.PENDING) {
+                        final long remainingTime = MAX_HANDSHAKE_WAIT_MILLIS - (System.currentTimeMillis() - startTime);
+                        if (remainingTime <= 0) {                            
+                            break;
+                        }
+                        try {
+                            monitor.wait(remainingTime);
+                        } catch (final InterruptedException ignored) {
+                        }
+                    }                    
+                    if (!running) {
+                        break;
+                    }
+                    
+                    switch (c.getHandshakeStatus()) {
+                        case SUCCESS:
+                            channel = c;
+                            break;
+                        case FAIL:
+                            c.stop();
+                            if (firstConnectionAttempt) {
+                                error = "Bad handshake.";
+                                return;
+                            }
+                            break;
+                        case PENDING:
+                            c.stop();
+                            if (firstConnectionAttempt) {
+                                error = "Failed to receive handshake.";
+                                return;
+                            }
+                            break;                            
+                    }   
+                    
+                    firstConnectionAttempt = false;
                 }
             }
         } finally {

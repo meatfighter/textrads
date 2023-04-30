@@ -22,6 +22,12 @@ public class MessageChannel {
     
     private static final String HANDSHAKE_STR = "Textrads";
     
+    public static enum HandshakeStatus {
+        PENDING,
+        SUCCESS,
+        FAIL,
+    }
+    
     private static enum State {
         NEW,
         RUNNING,
@@ -30,7 +36,7 @@ public class MessageChannel {
     }
     
     private final Socket socket;
-    private final TerminatedListener terminatedListener;
+    private final StatusListener statusListener;
     private final DataInputStream in;
     private final DataOutputStream out;
 
@@ -42,22 +48,22 @@ public class MessageChannel {
     
     private final Object monitor = new Object();
     private State state = State.NEW;
-    
-    private volatile boolean handshakeError;
+
+    private HandshakeStatus handshakeStatus = HandshakeStatus.PENDING;
     
     public MessageChannel(final Socket socket) throws IOException {
         this(socket, null, DEFAULT_OUT_QUEUE_PLAYERS);
     }
     
-    public MessageChannel(final Socket socket, final TerminatedListener terminatedListener) throws IOException {
-        this(socket, terminatedListener, DEFAULT_OUT_QUEUE_PLAYERS);
+    public MessageChannel(final Socket socket, final StatusListener statusListener) throws IOException {
+        this(socket, statusListener, DEFAULT_OUT_QUEUE_PLAYERS);
     }
     
-    public MessageChannel(final Socket socket, final TerminatedListener terminatedListener, final int outPlayers) 
+    public MessageChannel(final Socket socket, final StatusListener statusListener, final int outPlayers) 
             throws IOException {        
         
         this.socket = socket;
-        this.terminatedListener = terminatedListener;
+        this.statusListener = statusListener;
         
         inQueue = new MessageQueue();
         outQueue = new MessageQueue(outPlayers);
@@ -265,8 +271,8 @@ public class MessageChannel {
             synchronized (monitor) {
                 state = State.TERMINATED;
             }
-            if (terminatedListener != null) {
-                terminatedListener.handleTerminated(this);
+            if (statusListener != null) {
+                statusListener.statusChanged(this);
             }
         }                
     }
@@ -287,9 +293,20 @@ public class MessageChannel {
                         case Message.Type.HEARTBEAT:
                             continue;
                         case Message.Type.HANDSHAKE: {
-                            if (!HANDSHAKE_STR.equals(IOUtil.fromByteArray(IOUtil.readByteArray(in)))) {
-                                handshakeError = true;
-                                System.out.println("handshake error :( :( :(");
+                            if (HANDSHAKE_STR.equals(IOUtil.fromByteArray(IOUtil.readByteArray(in)))) {
+                                synchronized (monitor) {
+                                    handshakeStatus = HandshakeStatus.SUCCESS;
+                                }
+                                if (statusListener != null) {
+                                    statusListener.statusChanged(this);
+                                }
+                            } else {
+                                synchronized (monitor) {
+                                    handshakeStatus = HandshakeStatus.FAIL;
+                                }
+                                if (statusListener != null) {
+                                    statusListener.statusChanged(this);
+                                }
                                 return;
                             }
                             continue;
@@ -311,7 +328,9 @@ public class MessageChannel {
         }
     }
 
-    public boolean isHandshakeError() {
-        return handshakeError;
+    public HandshakeStatus getHandshakeStatus() {
+        synchronized (monitor) {
+            return handshakeStatus;
+        }
     }
 }

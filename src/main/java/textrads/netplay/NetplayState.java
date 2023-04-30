@@ -368,6 +368,7 @@ public class NetplayState {
             inputQueue.clear();
             if (requestedDisconnect) {
                 requestedDisconnect = false;
+                server.stop();
                 gotoServerInforming("Client disconnected.");
             } else {
                 gotoServerWaiting();
@@ -896,7 +897,8 @@ public class NetplayState {
             inputQueue.clear();
             if (requestedDisconnect) {
                 requestedDisconnect = false;
-                gotoClientInforming("Server disconnected."); // TODO STILL ACCEPT CONNECTIONS?!
+                client.stop();
+                gotoClientInforming("Server disconnected.");
             } else {
                 gotoClientWaiting();
             }
