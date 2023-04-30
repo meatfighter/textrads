@@ -111,6 +111,8 @@ public class NetplayState {
     private byte clientWins;
     private int serverUpdates;
     private int clientUpdates;
+    private boolean serverMayResign;
+    private boolean clientMayResign;
     private boolean clientAckedGameState;
     private boolean waitClientContinue;
     private boolean requestedDisconnect;
@@ -369,11 +371,15 @@ public class NetplayState {
         clientAckedGameState = false;
         waitClientContinue = false;
         requestedDisconnect = false;
+        clientMayResign = false;
+        serverMayResign = false;        
         inputQueue.clear();
         gotoServerGettingLevel();
     }
     
     private void updateServerChannel() {
+        
+        // TODO handle serverMayResign and clientMayResign states
         
         if (channel.isTerminated()) {
             channel = null;
@@ -663,6 +669,7 @@ public class NetplayState {
     private void gotoServerGiveUp() {
         channel.write(Message.Type.WAIT_GIVE_UP);
         channelState = ChannelState.GIVE_UP;
+        serverMayResign = true;
         giveUpMenu.reset();
     }
     
@@ -687,7 +694,9 @@ public class NetplayState {
                 gotoServerChannel();
                 break;
             case 'N':
-                // TODO RETURN TO GAME
+                clientAckedGameState = false;
+                channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+                gotoServerWaitingFor("Resuming game");
                 break;
         }
     }
@@ -1284,5 +1293,9 @@ public class NetplayState {
 
     public Question getLevelQuestion() {
         return levelQuestion;
+    }
+
+    public Menu getGiveUpMenu() {
+        return giveUpMenu;
     }
 }

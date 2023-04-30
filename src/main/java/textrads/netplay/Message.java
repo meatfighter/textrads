@@ -24,6 +24,7 @@ public class Message {
         byte CONTINUE = 10;
         byte REQUEST_DISCONNECT = 11;
         byte DISCONNECT = 12;
+        byte WAIT_GIVE_UP = 13;
     }    
     
     private final InputEventList[] inputEvents;

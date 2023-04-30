@@ -558,7 +558,7 @@ public class Textrads {
     
     private void gotoGiveUp() {
         state = State.GIVE_UP;
-        giveUpMenu.reset();        
+        giveUpMenu.reset();
     }
     
     private void updateGiveUp() {

@@ -122,6 +122,7 @@ public class NetplayRenderer {
                 gameRenderer.render(g, size, GameStateSource.getState(), null);
                 break;
             case GIVE_UP:
+                menuRenderer.render(g, size, state.getGiveUpMenu());
                 break;
         }
     }
@@ -175,6 +176,7 @@ public class NetplayRenderer {
                 gameRenderer.render(g, size, GameStateSource.getState(), null);
                 break;
             case GIVE_UP:
+                menuRenderer.render(g, size, state.getGiveUpMenu());
                 break;
         }
     }
