@@ -108,6 +108,8 @@ public class NetplayState {
     private byte clientLevel;    
     private byte serverWins;
     private byte clientWins;
+    private int serverUpdates;
+    private int clientUpdates;
     private boolean clientAckedGameState;
     private boolean waitClientContinue;
     private boolean requestedDisconnect;
@@ -347,6 +349,8 @@ public class NetplayState {
         clientLevel = -1;
         clientWins = 0;
         serverWins = 0;
+        clientUpdates = 0;
+        serverUpdates = 0;
         clientAckedGameState = false;
         waitClientContinue = false;
         requestedDisconnect = false;
@@ -467,6 +471,8 @@ public class NetplayState {
         final MonoGameState[] monoGameStates = gameState.getStates();
         monoGameStates[0].setLocalPlayer(true);
         monoGameStates[1].setLocalPlayer(false);
+        monoGameStates[0].setUpdates(serverUpdates);
+        monoGameStates[1].setUpdates(clientUpdates);
     }
     
     private void gotoServerGettingLevel() {
@@ -577,6 +583,8 @@ public class NetplayState {
         final MonoGameState[] states = gameState.getStates();
         serverWins = states[0].getWins();
         clientWins = states[1].getWins();
+        serverUpdates = states[0].getUpdates();
+        clientUpdates = states[1].getUpdates();
 
         channel.write(Message.Type.GET_CONTINUE);
         
@@ -613,7 +621,9 @@ public class NetplayState {
             serverLevel = -1;
             clientLevel = -1;
             clientWins = 0;
-            serverWins = 0;            
+            serverWins = 0;
+            clientUpdates = 0;
+            serverUpdates = 0;
             inputQueue.clear();
             gotoServerGettingLevel();
         } else {

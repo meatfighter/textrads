@@ -125,6 +125,8 @@ public class Textrads {
     private int selectionTimer;
     private int wins0;
     private int wins1;
+    private int updates0;
+    private int updates1;
     private String gameModeName;
     private String allTimesKey;
     private String todaysKey;
@@ -424,7 +426,7 @@ public class Textrads {
                 gotoDifficultyConfig();
                 break;
             default:
-                wins0 = wins1 = 0;
+                updates0 = updates1 = wins0 = wins1 = 0;
                 gotoPlay();
                 break;
         }                
@@ -456,7 +458,7 @@ public class Textrads {
         challenge = Byte.parseByte(heightQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
-        wins0 = wins1 = 0;
+        updates0 = updates1 = wins0 = wins1 = 0;
         gotoPlay();
     }
     
@@ -487,7 +489,7 @@ public class Textrads {
         challenge = Byte.parseByte(difficultyQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
-        wins0 = wins1 = 0;
+        updates0 = updates1 = wins0 = wins1 = 0;
         gotoPlay();
     }
     
@@ -502,6 +504,9 @@ public class Textrads {
         gameState.init(gameMode, seed, level, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
                 (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, wins0, wins1);
         if (gameMode == GameState.Mode.VS_AI) {
+            final MonoGameState[] states = gameState.getStates();
+            states[0].setUpdates(updates0);
+            states[1].setUpdates(updates1);
             ai.init(GameState.Mode.VS_AI, seed, level, 0, 0, challenge, true);
             framesPerMove = Ai.getFramesPerMove(challenge);
             moveTimer = Float.MAX_VALUE;
@@ -638,6 +643,8 @@ public class Textrads {
             final MonoGameState[] states = gameState.getStates();
             wins0 = states[0].getWins();
             wins1 = states[1].getWins();
+            updates0 = states[0].getUpdates();
+            updates1 = states[1].getUpdates();            
             if (wins0 < 3 && wins1 < 3) {
                 gotoPlay();
                 return;

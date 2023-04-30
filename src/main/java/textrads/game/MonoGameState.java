@@ -739,6 +739,10 @@ public class MonoGameState implements Serializable {
     public int getCountdownValue() {
         return countdownValue;
     }
+    
+    public void setUpdates(final int updates) {
+        this.updates = updates;
+    }
 
     public int getUpdates() {
         return updates;
