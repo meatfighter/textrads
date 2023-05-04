@@ -399,7 +399,9 @@ public class NetplayState {
         if (channelJustEstablished) {
             channelJustEstablished = false;
             
-            if (clientLevel < 0) {
+            if (serverMayResign) {
+                channel.write(Message.Type.WAIT_GIVE_UP);
+            } else if (clientLevel < 0) {
                 channel.write(Message.Type.GET_LEVEL);
             } else if (serverLevel < 0) {
                 channel.write(Message.Type.WAIT_LEVEL);
@@ -695,6 +697,7 @@ public class NetplayState {
                 break;
             case 'N':
                 clientAckedGameState = false;
+                serverMayResign = false;
                 channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
                 gotoServerWaitingFor("Resuming game");
                 break;
