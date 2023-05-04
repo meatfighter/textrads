@@ -42,7 +42,8 @@ public class NetplayState {
     private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
     private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
     private static final String CLIENT_MIGHT_RESIGN_STR = "Client might resign";
-    private static final String WAITING_TO_DISCONNECT_STR = "Waiting to disconnect";
+    private static final String DISCONNECTING_STR = "Disconnecting";
+    private static final String RESUMING_GAME_STR = "Resuming game";
     
     static enum State {
         PLAY_AS,
@@ -519,7 +520,7 @@ public class NetplayState {
         if (levelQuestion.isEscPressed()) {
             requestedDisconnect = true;            
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoServerWaitingFor(DISCONNECTING_STR);
             return;
         }
         
@@ -549,7 +550,7 @@ public class NetplayState {
         if (disconnectMessageScreen.isSelected()) {
             requestedDisconnect = true;
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoServerWaitingFor(DISCONNECTING_STR);
         }
     }
     
@@ -688,7 +689,7 @@ public class NetplayState {
         if (selection.getKeyType() == KeyType.Escape) {
             requestedDisconnect = true;
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoServerWaitingFor(DISCONNECTING_STR);
             return;
         }
         final Character c = selection.getCharacter();
@@ -703,7 +704,7 @@ public class NetplayState {
                 clientAckedGameState = false;
                 serverMayResign = false;
                 channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
-                gotoServerWaitingFor("Resuming game");
+                gotoServerWaitingFor(RESUMING_GAME_STR);
                 break;
         }
     }
@@ -1058,7 +1059,7 @@ public class NetplayState {
         
         if (levelQuestion.isEscPressed()) {
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoClientWaitingFor(DISCONNECTING_STR);
             return;
         }
         
@@ -1084,7 +1085,7 @@ public class NetplayState {
         disconnectMessageScreen.update();
         if (disconnectMessageScreen.isSelected()) {
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoClientWaitingFor(DISCONNECTING_STR);
         }
     }
     
@@ -1158,7 +1159,7 @@ public class NetplayState {
         }
         if (selection.getKeyType() == KeyType.Escape) {
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
+            gotoClientWaitingFor(DISCONNECTING_STR);
             return;
         }
         final Character c = selection.getCharacter();
@@ -1167,10 +1168,12 @@ public class NetplayState {
         }
         switch (Character.toUpperCase(c)) {
             case 'Y':
-                
+                channel.write(Message.Type.GIVE_UP);
+                gotoClientWaitingFor(DISCONNECTING_STR); // TODO
                 break;
             case 'N':
-                
+                channel.write(Message.Type.RESUME_GAME);
+                gotoClientWaitingFor(RESUMING_GAME_STR);
                 break;
         }        
     }
