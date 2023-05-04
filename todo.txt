@@ -1,7 +1,13 @@
-Break connection after Server submits level:
+Break connection after Client continues
 
-Waiting for client to connect...
-Client asking for level
+Waiting for server...
+
+instead of 
+
+Waiting for server to continue...
+
+
+
 
 No rotation and invisible initial scores need to be lowered.
 
