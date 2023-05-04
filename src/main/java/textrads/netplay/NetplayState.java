@@ -40,7 +40,8 @@ public class NetplayState {
     private static final String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
     private static final String CONNECTING_TO_SERVER_STR = "Connecting to server";
     private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
-    private static final String WAITING_FOR_CLIENT_TO_CONTINUE = "Waiting for client to continue";
+    private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
+    private static final String CLIENT_MIGHT_RESIGN_STR = "Client might resign";
     
     static enum State {
         PLAY_AS,
@@ -412,7 +413,7 @@ public class NetplayState {
                 channel.write(Message.Type.GAME_STATE, gameState);
                 gameState.setSelection(selection);
                 if (waitClientContinue) {
-                    disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE, 
+                    disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE_STR, 
                             MessageState.MessageType.WAITING);
                 }
             }
@@ -592,10 +593,12 @@ public class NetplayState {
         
         for (int i = 0, end = clientEvents.size(); i < end; ++i) {
             final byte event = clientEvents.get(i);
-//            if (event == InputEvent.GIVE_UP_PRESSED) {
-//                gotoGiveUp();
-//                return;
-//            }
+            if (event == InputEvent.GIVE_UP_PRESSED) {
+                clientMayResign = true;
+                channel.write(Message.Type.GET_GIVE_UP);
+                gotoServerWaitingFor(CLIENT_MIGHT_RESIGN_STR);
+                return;
+            }
             gameState.handleInputEvent(event, 1);
         }        
         
@@ -658,7 +661,7 @@ public class NetplayState {
             gotoServerGettingLevel();
         } else {
             channelState = ChannelState.WAITING_FOR;
-            disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE, 
+            disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE_STR, 
                     MessageState.MessageType.WAITING);
             if (!waitClientContinue) {
                 clientAckedGameState = false;
@@ -1002,6 +1005,9 @@ public class NetplayState {
                     return;
                 case Message.Type.WAIT_GIVE_UP:
                     gotoClientWaitingFor("Server might resign");
+                    break;
+                case Message.Type.GET_GIVE_UP:
+                    gotoClientGiveUp();
                     break;
             }
             channel.incrementReadIndex();
