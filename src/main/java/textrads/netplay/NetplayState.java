@@ -42,6 +42,7 @@ public class NetplayState {
     private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
     private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
     private static final String CLIENT_MIGHT_RESIGN_STR = "Client might resign";
+    private static final String WAITING_TO_DISCONNECT_STR = "Waiting to disconnect";
     
     static enum State {
         PLAY_AS,
@@ -518,7 +519,7 @@ public class NetplayState {
         if (levelQuestion.isEscPressed()) {
             requestedDisconnect = true;            
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor("Waiting to disconnect");
+            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
             return;
         }
         
@@ -548,7 +549,7 @@ public class NetplayState {
         if (disconnectMessageScreen.isSelected()) {
             requestedDisconnect = true;
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor("Waiting to disconnect");
+            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
         }
     }
     
@@ -687,7 +688,7 @@ public class NetplayState {
         if (selection.getKeyType() == KeyType.Escape) {
             requestedDisconnect = true;
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoServerWaitingFor("Waiting to disconnect");
+            gotoServerWaitingFor(WAITING_TO_DISCONNECT_STR);
             return;
         }
         final Character c = selection.getCharacter();
@@ -1057,7 +1058,7 @@ public class NetplayState {
         
         if (levelQuestion.isEscPressed()) {
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoClientWaitingFor("Waiting to disconnect");
+            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
             return;
         }
         
@@ -1083,7 +1084,7 @@ public class NetplayState {
         disconnectMessageScreen.update();
         if (disconnectMessageScreen.isSelected()) {
             channel.write(Message.Type.REQUEST_DISCONNECT);
-            gotoClientWaitingFor("Waiting to disconnect");
+            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
         }
     }
     
@@ -1146,10 +1147,32 @@ public class NetplayState {
     
     private void gotoClientGiveUp() {
         channelState = ChannelState.GIVE_UP;
+        giveUpMenu.reset();        
     }
     
     private void updateClientGiveUp() {
-        
+        giveUpMenu.update();
+        final KeyStroke selection = giveUpMenu.getSelection();
+        if (selection == null) {
+            return;
+        }
+        if (selection.getKeyType() == KeyType.Escape) {
+            channel.write(Message.Type.REQUEST_DISCONNECT);
+            gotoClientWaitingFor(WAITING_TO_DISCONNECT_STR);
+            return;
+        }
+        final Character c = selection.getCharacter();
+        if (c == null) {
+            return;
+        }
+        switch (Character.toUpperCase(c)) {
+            case 'Y':
+                
+                break;
+            case 'N':
+                
+                break;
+        }        
     }
 
     private void gotoClientWaiting() {
