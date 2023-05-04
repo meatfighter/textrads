@@ -382,8 +382,6 @@ public class NetplayState {
     
     private void updateServerChannel() {
         
-        // TODO handle serverMayResign and clientMayResign states
-        
         if (channel.isTerminated()) {
             channel = null;
             channelJustEstablished = false;
@@ -471,6 +469,15 @@ public class NetplayState {
                     break;
                 case Message.Type.DISCONNECT:
                     gotoServerConfig();
+                    break;
+                case Message.Type.RESUME_GAME:                    
+                    clientAckedGameState = false;
+                    clientMayResign = serverMayResign = false;
+                    channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
+                    gotoServerWaitingFor(RESUMING_GAME_STR);
+                    break;
+                case Message.Type.GIVE_UP:
+                    gotoServerChannel();
                     break;
             }
             channel.incrementReadIndex();
@@ -702,7 +709,7 @@ public class NetplayState {
                 break;
             case 'N':
                 clientAckedGameState = false;
-                serverMayResign = false;
+                clientMayResign = serverMayResign = false;
                 channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
                 gotoServerWaitingFor(RESUMING_GAME_STR);
                 break;
