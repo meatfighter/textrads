@@ -400,7 +400,10 @@ public class NetplayState {
         if (channelJustEstablished) {
             channelJustEstablished = false;
             
-            if (serverMayResign) {
+            if (clientMayResign) {
+                channel.write(Message.Type.GET_GIVE_UP);
+                gotoServerWaitingFor(CLIENT_MIGHT_RESIGN_STR);
+            } else if (serverMayResign) {
                 channel.write(Message.Type.WAIT_GIVE_UP);
             } else if (clientLevel < 0) {
                 channel.write(Message.Type.GET_LEVEL);
@@ -1293,7 +1296,7 @@ public class NetplayState {
         }        
     }
 
-    public State getState() {
+    State getState() {
         return state;
     }
 
@@ -1329,7 +1332,7 @@ public class NetplayState {
         return disconnectMessageScreen;
     }
 
-    public ChannelState getChannelState() {
+    ChannelState getChannelState() {
         return channelState;
     }
 
