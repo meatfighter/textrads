@@ -40,6 +40,7 @@ public class NetplayState {
     private static final String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
     private static final String CONNECTING_TO_SERVER_STR = "Connecting to server";
     private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
+    private static final String WAITING_FOR_SERVERS_LEVEL_STR = "Waiting for server's level";
     private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
     private static final String CLIENT_MIGHT_RESIGN_STR = "Client might resign";
     private static final String DISCONNECTING_STR = "Disconnecting";
@@ -986,6 +987,9 @@ public class NetplayState {
                 case Message.Type.GET_LEVEL:
                     gotoClientGettingLevel();
                     break;
+                case Message.Type.WAIT_LEVEL:
+                    gotoClientWaitingFor(WAITING_FOR_SERVERS_LEVEL_STR);
+                    break;
                 case Message.Type.GAME_STATE:
                     try {
                         final GameState gameState = IOUtil.fromByteArray(message.getData());                        
@@ -1083,7 +1087,7 @@ public class NetplayState {
         
         channel.write(Message.Type.LEVEL, clientLevel);
         
-        gotoClientWaitingFor("Waiting for server's level");
+        gotoClientWaitingFor(WAITING_FOR_SERVERS_LEVEL_STR);
     }    
     
     private void gotoClientWaitingFor(final String reason) {
