@@ -311,6 +311,9 @@ public class NetplayState {
                     case 'P':
                         gotoServerConfigPort();
                         break;
+                    case 'R':
+                        resetServerConfigReset();
+                        break;
                 }
                 break;
             }
@@ -836,6 +839,20 @@ public class NetplayState {
         database.saveAsync(databaseKey, config.setPort(port));
     }
     
+    private void resetServerConfigReset() {
+        
+        NetplayConfig config = database.get(Database.OtherKeys.SERVER);
+        config = config.setHost(null).setPort(Server.DEFAULT_PORT);        
+        database.saveAsync(Database.OtherKeys.SERVER, config);
+
+        final NetworkInterfaceAddress nia = toNetworkInterfaceAddress(config.getHost());
+        host = nia.getAddress();
+        hostname = nia.getName();
+        port = config.getPort();
+        
+        connectMenuState.init("Server", hostname, Integer.toString(port));
+    }
+    
     private void gotoClientConfig() {
         state = State.CLIENT_CONFIG;
         
@@ -900,6 +917,9 @@ public class NetplayState {
                         break;
                     case 'P':
                         gotoClientConfigPort();
+                        break;
+                    case 'R':
+                        resetClientConfigReset();
                         break;
                 }
                 break;
