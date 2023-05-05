@@ -154,25 +154,18 @@ public class MonoGameState implements Serializable {
         this.gameState = gameState;        
     }
     
-    public void init(
-            final long seed, 
-            final int startingLevel,
-            final int garbageHeight, 
-            final int floorHeight,
-            final boolean skipCountdown,
-            final int wins) {
+    public void init(final Status status, final long seed, final int garbageHeight, final int floorHeight, 
+            final boolean skipCountdown) {
+        
+        storeStatus(status);
         
         attackRows = 0;
         lastAttackRows = 0;
-        score = 0;
-        level = (short) startingLevel;
         tetrominoType = 0;
         tetrominoRotation = 0;
         tetrominoX = 0;
         tetrominoY = 0;
-        framesPerGravityDrop = getFramesPerGravityDrop(startingLevel);       
         gravityDropTimer = 0;
-        framesPerLock = getFramesPerLock(startingLevel);
         lockTimer = 0;
         dropFailed = false;
         lineClearTimer = 0;
@@ -182,8 +175,7 @@ public class MonoGameState implements Serializable {
         rejectSoftDropRepeated = false;
         garbageX = -1;
         garbageCounter = 0;
-        lockCounter = 0;
-        this.wins = (byte) wins;        
+        lockCounter = 0;      
         if (skipCountdown) {
             countdownTimer = 0;
             countdownValue = 0;
@@ -194,7 +186,6 @@ public class MonoGameState implements Serializable {
             mode = Mode.COUNTDOWN;
         }        
         this.floorHeight = (byte) floorHeight;
-        updates = (gameState.getMode() == GameState.Mode.THREE_MINUTES) ? FRAMES_PER_THREE_MINUTES : 0; 
         
         lineYs.clear();
         
@@ -212,12 +203,12 @@ public class MonoGameState implements Serializable {
                 lines = 25;
                 createGarbageHeap(garbageHeight);
                 break;
+            case GameState.Mode.THREE_MINUTES:
+                updates = FRAMES_PER_THREE_MINUTES;
+                break;                
             case GameState.Mode.FORTY_LINES:
                 lines = 40;
-                break;
-            default:
-                lines = 0;
-                break;
+                break;                
         }
     }
     
@@ -739,10 +730,6 @@ public class MonoGameState implements Serializable {
     public int getCountdownValue() {
         return countdownValue;
     }
-    
-    public void setUpdates(final int updates) {
-        this.updates = updates;
-    }
 
     public int getUpdates() {
         return updates;
@@ -790,5 +777,8 @@ public class MonoGameState implements Serializable {
         score = status.getScore();
         updates = status.getUpdates();
         wins = (byte) status.getWins();
+        
+        framesPerGravityDrop = getFramesPerGravityDrop(level);
+        framesPerLock = getFramesPerLock(level);
     }
 }

@@ -7,6 +7,10 @@ public class Status {
     private int score;
     private int updates;
     private int wins;
+    
+    public void reset() {
+        level = lines = score = updates = wins = 0;
+    }
 
     public int getLevel() {
         return level;
