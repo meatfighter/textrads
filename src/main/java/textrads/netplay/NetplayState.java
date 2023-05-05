@@ -1310,6 +1310,10 @@ public class NetplayState {
     private void updateClientConfigPort() {
         updateConfigPort("Client", State.CLIENT_CONFIG, Database.OtherKeys.CLIENT);
     }
+    
+    private void resetClientConfigReset() {
+        // TODO
+    }
 
     private void gotoClientConfigHostError() {
         state = State.CLIENT_CONFIG_HOST_ERROR;
