@@ -169,7 +169,6 @@ public class Database {
                 final ObjectInputStream ois = new ObjectInputStream(bis)) {
             return (T) ois.readObject();
         } catch (final Exception ignored) {
-            ignored.printStackTrace(); // TODO REMOVE
         }
         
         return null;
@@ -182,7 +181,6 @@ public class Database {
                 final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(obj);
         } catch (final Exception ignored) { 
-            ignored.printStackTrace(); // TODO REMOVE
         }
     }
     

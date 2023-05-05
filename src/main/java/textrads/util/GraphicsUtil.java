@@ -49,7 +49,6 @@ public final class GraphicsUtil {
             }
             return textImage;
         } catch (final Exception ignored) {
-            ignored.printStackTrace(); // TODO REMOVE
         }
         return null;
     }

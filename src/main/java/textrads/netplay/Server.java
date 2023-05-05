@@ -58,15 +58,11 @@ public class Server {
     }
        
     private void listen() {
-        System.out.println("-- 1isten");
-        
         try {
             synchronized (monitor) {
                 serverSocket = new ServerSocket(port, BACKLOG, bindAddress);
-                System.out.println("listening on: " + port + " " + bindAddress);
             }
         } catch (final IOException e) {
-            e.printStackTrace(); // TODO REMOVE
             if (e instanceof BindException) {
                 error = "Port already in use.";                
             } else {
@@ -82,18 +78,12 @@ public class Server {
                 synchronized (monitor) {
                     while (running && channel != null && !channel.isTerminated()) {
                         try {
-                            System.out.println("Waiting for disconnection...");
                             monitor.wait();
                         } catch (final InterruptedException ignored) {
                         }
                     }
                     if (!running) {
                         break;
-                    }
-                    
-                    // TODO TESTING
-                    if (channel != null && channel.isTerminated()) {
-                        System.out.println("Channel terminated.");
                     }
                     
                     channel = null;
@@ -106,7 +96,6 @@ public class Server {
                 
                 final MessageChannel c;
                 try {
-                    System.out.println("Waiting for connection...");
                     c = new MessageChannel(ss.accept(), chan -> {
                         synchronized (monitor) {
                             monitor.notifyAll();
@@ -114,7 +103,6 @@ public class Server {
                     });
                     c.start();
                 } catch (final IOException e) {
-                    System.out.println("Connection error: " + e.getMessage());
                     ThreadUtil.sleepOneSecond();
                     continue;
                 }                

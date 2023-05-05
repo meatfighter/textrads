@@ -52,14 +52,12 @@ public class Client {
     }    
     
     private void connect() {
-        System.out.println("-- connect");
         try {
             while (true) {
                 
                 synchronized (monitor) {
                     while (running && channel != null && !channel.isTerminated()) {
                         try {
-                            System.out.println("Waiting for disconnection...");
                             monitor.wait();
                         } catch (final InterruptedException ignored) {
                         }
@@ -68,17 +66,11 @@ public class Client {
                         break;
                     }
                     
-                    // TODO TESTING
-                    if (channel != null && channel.isTerminated()) {
-                        System.out.println("Channel terminated.");
-                    }
-                    
                     channel = null;
                 }
 
                 final MessageChannel c;
                 try {
-                    System.out.println("Connecting...");
                     c = new MessageChannel(new Socket(host, port), chan -> {
                         synchronized (monitor) {
                             monitor.notifyAll();
@@ -86,7 +78,6 @@ public class Client {
                     });
                     c.start();                    
                 } catch (final IOException e) {
-                    e.printStackTrace(); // TODO REMOVE
                     synchronized (monitor) {
                         if (firstConnectionAttempt) {
                             if (e instanceof ConnectException) {
