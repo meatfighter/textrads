@@ -14,6 +14,8 @@ Vs. Human and Vs. AI need to carry over Time, Lines, Score, Wins, Level between 
 
 No rotation and invisible initial scores need to be lowered.
 
+Scores for Vs. AI shows Starting Level
+
 
 
 Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
