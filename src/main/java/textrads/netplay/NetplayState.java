@@ -863,6 +863,12 @@ public class NetplayState {
         hostname = config.getHost();
         port = config.getPort();
         
+        initClientHost();
+        
+        connectMenuState.init("Client", hostname, Integer.toString(config.getPort()));
+    }
+    
+    private void initClientHost() {
         if (isBlank(hostname)) {
             hostname = "localhost";
         }
@@ -889,8 +895,6 @@ public class NetplayState {
                 }
             }
         }
-        
-        connectMenuState.init("Client", hostname, Integer.toString(config.getPort()));
     }
     
     private void updateClientConfig() {
@@ -1312,7 +1316,17 @@ public class NetplayState {
     }
     
     private void resetClientConfigReset() {
-        // TODO
+        
+        NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
+        config = config.setHost(null).setPort(Server.DEFAULT_PORT);        
+        database.saveAsync(Database.OtherKeys.CLIENT, config);
+
+        hostname = config.getHost();
+        port = config.getPort();
+        
+        initClientHost();
+        
+        connectMenuState.init("Client", hostname, Integer.toString(config.getPort()));
     }
 
     private void gotoClientConfigHostError() {
