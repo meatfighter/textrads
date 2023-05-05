@@ -775,4 +775,20 @@ public class MonoGameState implements Serializable {
     public void setLocalPlayer(final boolean localPlayer) {
         this.localPlayer = localPlayer;
     }
+    
+    public void loadStatus(final Status status) {
+        status.setLevel(level);
+        status.setLines(lines);
+        status.setScore(score);
+        status.setUpdates(updates);
+        status.setWins(wins);
+    }
+    
+    public void storeStatus(final Status status) {
+        level = (short) status.getLevel();
+        lines = (short) status.getLines();
+        score = status.getScore();
+        updates = status.getUpdates();
+        wins = (byte) status.getWins();
+    }
 }
