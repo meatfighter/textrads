@@ -34,6 +34,7 @@ import textrads.db.ExtendedRecord;
 import textrads.db.Preferences;
 import textrads.db.Record;
 import textrads.db.RecordList;
+import textrads.game.Status;
 import textrads.keymap.KeyMapModeRenderer;
 import textrads.keymap.KeyMapModeState;
 import textrads.netplay.NetplayRenderer;
@@ -116,17 +117,14 @@ public class Textrads {
     private final KeyMapModeState keyMapModeState = new KeyMapModeState();
     private final KeyMapModeRenderer keyMapModeRenderer = new KeyMapModeRenderer();
     
+    private final Status[] statuses = { new Status(), new Status() };
+    
     private State state = State.ATTRACT;
     
     private byte gameMode;
-    private byte level;
     private byte challenge;
     private float framesPerMove;
     private int selectionTimer;
-    private int wins0;
-    private int wins1;
-    private int updates0;
-    private int updates1;
     private String gameModeName;
     private String allTimesKey;
     private String todaysKey;
@@ -134,7 +132,7 @@ public class Textrads {
     private RecordList<? super Record> todaysList;    
     private int allTimesIndex;
     private int todaysIndex;
-    private AbstractRecordFormatter formatter;
+    private AbstractRecordFormatter formatter;    
     
     public void launch() throws Exception {
         
@@ -395,8 +393,10 @@ public class Textrads {
     
     private void gotoLevelConfig() {
         state = State.LEVEL_CONFIG;
+        statuses[0].reset();
+        statuses[1].reset();
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        level = preferences.getLevel(gameMode);                
+        final int level = preferences.getLevel(gameMode);                
         levelQuestion.init(GameState.Mode.toString(gameMode), (level >= 0) ? Integer.toString(level) : "");
     }    
     
@@ -413,9 +413,12 @@ public class Textrads {
             return;
         }
         
-        level = Byte.parseByte(levelQuestion.getValue());
+        final int level = Integer.parseInt(levelQuestion.getValue());
+        statuses[0].setLevel(level);
+        statuses[1].setLevel(level);
+        
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
-        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setLevel(gameMode, level));
+        database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setLevel(gameMode, (byte) level));
         
         switch (gameMode) {
             case GameState.Mode.GARBAGE_HEAP:
@@ -426,7 +429,6 @@ public class Textrads {
                 gotoDifficultyConfig();
                 break;
             default:
-                updates0 = updates1 = wins0 = wins1 = 0;
                 gotoPlay();
                 break;
         }                
@@ -438,6 +440,8 @@ public class Textrads {
     
     private void gotoHeightConfig() {
         state = State.HEIGHT_CONFIG;
+        statuses[0].resetAllButLevel();
+        statuses[1].resetAllButLevel();        
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         challenge = preferences.getChallenge(gameMode);                
         heightQuestion.init(GameState.Mode.toString(gameMode), (challenge >= 0) ? Integer.toString(challenge) : "");
@@ -458,7 +462,7 @@ public class Textrads {
         challenge = Byte.parseByte(heightQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
-        updates0 = updates1 = wins0 = wins1 = 0;
+        
         gotoPlay();
     }
     
@@ -468,10 +472,11 @@ public class Textrads {
     
     private void gotoDifficultyConfig() {
         state = State.DIFFICULTY_CONFIG;
+        statuses[0].resetAllButLevel();
+        statuses[1].resetAllButLevel();        
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         challenge = preferences.getChallenge(gameMode);                
-        difficultyQuestion.init(GameState.Mode.toString(gameMode), 
-                (challenge >= 0) ? Integer.toString(challenge) : "");
+        difficultyQuestion.init(GameState.Mode.toString(gameMode), (challenge >= 0) ? Integer.toString(challenge) : "");
     }    
     
     private void updateDifficultyConfig() {
@@ -489,7 +494,6 @@ public class Textrads {
         challenge = Byte.parseByte(difficultyQuestion.getValue());
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);
         database.saveAsync(Database.OtherKeys.PREFERENCES, preferences.setChallenge(gameMode, challenge));
-        updates0 = updates1 = wins0 = wins1 = 0;
         gotoPlay();
     }
     
@@ -501,13 +505,10 @@ public class Textrads {
         state = State.PLAY;
         final GameState gameState = GameStateSource.getState();
         final long seed = ThreadLocalRandom.current().nextLong();
-        gameState.init(gameMode, seed, level, level, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
-                (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false, wins0, wins1);
+        gameState.init(gameMode, statuses, seed, (gameMode == GameState.Mode.GARBAGE_HEAP) ? challenge : 0, 
+                (gameMode == GameState.Mode.FORTY_LINES) ? challenge : 0, false);
         if (gameMode == GameState.Mode.VS_AI) {
-            final MonoGameState[] states = gameState.getStates();
-            states[0].setUpdates(updates0);
-            states[1].setUpdates(updates1);
-            ai.init(GameState.Mode.VS_AI, seed, level, 0, 0, challenge, true);
+            ai.init(GameState.Mode.VS_AI, seed, statuses[1].getLevel(), 0, 0, challenge, true);
             framesPerMove = Ai.getFramesPerMove(challenge);
             moveTimer = Float.MAX_VALUE;
         }
@@ -640,16 +641,12 @@ public class Textrads {
         final GameState gameState = GameStateSource.getState();
         
         if (gameMode == GameState.Mode.VS_AI) {
-            final MonoGameState[] states = gameState.getStates();
-            wins0 = states[0].getWins();
-            wins1 = states[1].getWins();
-            updates0 = states[0].getUpdates();
-            updates1 = states[1].getUpdates();            
-            if (wins0 < 3 && wins1 < 3) {
+            gameState.loadStatuses(statuses);            
+            if (statuses[0].getWins() < 3 && statuses[1].getWins() < 3) {
                 gotoPlay();
                 return;
             }
-            if (gameMode == GameState.Mode.VS_AI && wins0 < 3) {
+            if (gameMode == GameState.Mode.VS_AI && statuses[0].getWins() < 3) {
                 gotoDifficultyConfig();
             }
         }

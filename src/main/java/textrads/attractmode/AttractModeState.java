@@ -17,6 +17,7 @@ import textrads.ai.Ai;
 import textrads.ai.AiSource;
 import textrads.db.Database;
 import textrads.db.DatabaseSource;
+import textrads.game.Status;
 
 public class AttractModeState {
     
@@ -120,6 +121,7 @@ public class AttractModeState {
         }
     }
     
+    private final Status[] statuses = { new Status(), new Status() };
     private final List<Byte> demoModes = new ArrayList<>();
     private final List<Psa> psas = new ArrayList<>();
     private final PressEnterState pressEnterState = new PressEnterState();
@@ -145,6 +147,8 @@ public class AttractModeState {
     private int psasIndex;
     
     public AttractModeState() {
+        statuses[0].setLevel(DEMO_LEVEL);
+        statuses[1].setLevel(DEMO_LEVEL);
         initDemoModes();
         initRecordDescriptors();
         initPsas();
@@ -303,7 +307,7 @@ public class AttractModeState {
         final long seed = random.nextLong();
         final int garbageHeight = (demoMode == GameState.Mode.GARBAGE_HEAP) ? DEMO_GARBAGE_HEIGHT : 0;
         final int floorHeight = (demoMode == GameState.Mode.FORTY_LINES) ? DEMO_FLOOR_HEIGHT : 0;
-        gameState.init(demoMode, seed, DEMO_LEVEL, DEMO_LEVEL, garbageHeight, floorHeight, true, 0, 0);
+        gameState.init(demoMode, statuses, seed, garbageHeight, floorHeight, true);
         aiStates[0].reset();
         if (demoMode == GameState.Mode.VS_AI) {
             aiStates[1].reset();

@@ -134,4 +134,9 @@ public class GameState implements Serializable {
     public void setSelection(final byte selection) {
         this.selection = selection;
     }
+    
+    public void loadStatuses(final Status[] statuses) {
+        states[0].loadStatus(statuses[0]);
+        states[1].loadStatus(statuses[1]);
+    }
 }

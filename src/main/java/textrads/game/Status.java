@@ -9,7 +9,12 @@ public class Status {
     private int wins;
     
     public void reset() {
-        level = lines = score = updates = wins = 0;
+        resetAllButLevel();
+        level = 0;        
+    }
+    
+    public void resetAllButLevel() {
+        lines = score = updates = wins = 0;
     }
 
     public int getLevel() {

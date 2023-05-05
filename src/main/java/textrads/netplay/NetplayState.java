@@ -34,6 +34,7 @@ import textrads.util.IOUtil.NetworkInterfaceAddress;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import textrads.game.Status;
 
 public class NetplayState {
 
@@ -80,6 +81,8 @@ public class NetplayState {
         GIVE_UP,
     }
     
+    private final Status[] statuses = { new Status(), new Status() };
+    
     private final Database database = DatabaseSource.getDatabase();
     private final InputQueue inputQueue = new InputQueue();
     
@@ -110,12 +113,6 @@ public class NetplayState {
     private String hostname;
     private InetAddress host;
     private int port;
-    private byte serverLevel;
-    private byte clientLevel;    
-    private byte serverWins;
-    private byte clientWins;
-    private int serverUpdates;
-    private int clientUpdates;
     private boolean serverMayResign;
     private boolean clientMayResign;
     private boolean clientAckedGameState;
@@ -369,13 +366,11 @@ public class NetplayState {
     
     private void gotoServerChannel() {
         state = State.SERVER_CHANNEL;
-        channelJustEstablished = true;        
-        serverLevel = -1;
-        clientLevel = -1;
-        clientWins = 0;
-        serverWins = 0;
-        clientUpdates = 0;
-        serverUpdates = 0;
+        channelJustEstablished = true;
+        statuses[0].reset();
+        statuses[0].setLevel(-1);
+        statuses[1].reset();
+        statuses[1].setLevel(-1);
         clientAckedGameState = false;
         waitClientContinue = false;
         requestedDisconnect = false;
@@ -410,12 +405,12 @@ public class NetplayState {
                 gotoServerWaitingFor(CLIENT_MIGHT_RESIGN_STR);
             } else if (serverMayResign) {
                 channel.write(Message.Type.WAIT_GIVE_UP);
-            } else if (clientLevel < 0) {
+            } else if (statuses[1].getLevel() < 0) {
                 channel.write(Message.Type.GET_LEVEL);
-                if (serverLevel >= 0) {
+                if (statuses[0].getLevel() >= 0) {
                     gotoServerWaitingFor(WAITING_FOR_CLIENTS_LEVEL_STR);
                 }
-            } else if (serverLevel < 0) {
+            } else if (statuses[0].getLevel() < 0) {
                 channel.write(Message.Type.WAIT_LEVEL);
             } else if (!clientAckedGameState) {
                 final GameState gameState = GameStateSource.getState();
@@ -437,22 +432,25 @@ public class NetplayState {
                 return;
             }
             switch (message.getType()) {
-                case Message.Type.LEVEL:
+                case Message.Type.LEVEL: {
+                    final Byte level;
                     try {
-                        clientLevel = IOUtil.fromByteArray(message.getData());
+                        level = IOUtil.fromByteArray(message.getData());
                     } catch (final IOException | ClassNotFoundException ignored) {
                         channel.stop();
                         return;
                     }
-                    if (clientLevel < 0) {
+                    if (level == null || level < 0) {
                         channel.stop();
                         return;                    
                     }
-                    if (serverLevel >= 0) {
+                    statuses[1].setLevel(level);
+                    if (statuses[0].getLevel() >= 0) {
                         initGameState();
                         channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
                     }
                     break;
+                }
                 case Message.Type.ACK_GAME_STATE:
                     clientAckedGameState = true;
                     if (waitClientContinue) {
@@ -466,7 +464,7 @@ public class NetplayState {
                     break;
                 case Message.Type.CONTINUE:                    
                     waitClientContinue = false;
-                    if (clientLevel == -1 || clientWins == 3 || serverWins == 3) {
+                    if (statuses[1].getLevel() < 0 || statuses[0].getWins() >= 3 || statuses[1].getWins() >= 3) {
                         channel.write(Message.Type.GET_LEVEL);
                     } else if (channelState != ChannelState.CONTINUE) {
                         clientAckedGameState = false;
@@ -515,13 +513,10 @@ public class NetplayState {
     
     private void initGameState() {
         final GameState gameState = GameStateSource.getState();
-        gameState.init(GameState.Mode.VS_HUMAN, ThreadLocalRandom.current().nextLong(), serverLevel, clientLevel, 0, 0, 
-                false, serverWins, clientWins);
+        gameState.init(GameState.Mode.VS_HUMAN, statuses, ThreadLocalRandom.current().nextLong(), 0, 0, false);
         final MonoGameState[] monoGameStates = gameState.getStates();
         monoGameStates[0].setLocalPlayer(true);
         monoGameStates[1].setLocalPlayer(false);
-        monoGameStates[0].setUpdates(serverUpdates);
-        monoGameStates[1].setUpdates(clientUpdates);
     }
     
     private void gotoServerGettingLevel() {
@@ -546,11 +541,11 @@ public class NetplayState {
             return;
         }
         
-        serverLevel = (byte) Integer.parseInt(levelQuestion.getValue());
+        statuses[0].setLevel(Integer.parseInt(levelQuestion.getValue()));
         final NetplayConfig config = database.get(Database.OtherKeys.SERVER);
-        database.saveAsync(Database.OtherKeys.SERVER, config.setLevel(serverLevel));
+        database.saveAsync(Database.OtherKeys.SERVER, config.setLevel((byte) statuses[0].getLevel()));
         
-        if (clientLevel >= 0) {
+        if (statuses[1].getLevel() >= 0) {
             initGameState();
             channel.write(Message.Type.GAME_STATE, GameStateSource.getState());
         }
@@ -632,12 +627,7 @@ public class NetplayState {
         
         final GameState gameState = GameStateSource.getState();
         gameState.setSelection((byte) -1);
-        
-        final MonoGameState[] states = gameState.getStates();
-        serverWins = states[0].getWins();
-        clientWins = states[1].getWins();
-        serverUpdates = states[0].getUpdates();
-        clientUpdates = states[1].getUpdates();
+        gameState.loadStatuses(statuses);
 
         channel.write(Message.Type.GET_CONTINUE);
         
@@ -670,13 +660,11 @@ public class NetplayState {
     
     private void handleServerContinue() {
         
-        if (serverWins == 3 || clientWins == 3) {
-            serverLevel = -1;
-            clientLevel = -1;
-            clientWins = 0;
-            serverWins = 0;
-            clientUpdates = 0;
-            serverUpdates = 0;
+        if (statuses[0].getWins() >= 3 || statuses[1].getWins() >= 3) {
+            statuses[0].reset();
+            statuses[0].setLevel(-1);
+            statuses[1].reset();
+            statuses[1].setLevel(-1);
             inputQueue.clear();
             gotoServerGettingLevel();
         } else {
@@ -979,8 +967,10 @@ public class NetplayState {
 
     private void gotoClientChannel() {
         state = State.CLIENT_CHANNEL;
-        serverLevel = -1;
-        clientLevel = -1;
+        statuses[0].reset();
+        statuses[0].setLevel(-1);
+        statuses[1].reset();
+        statuses[1].setLevel(-1);
         requestedDisconnect = false;
         inputQueue.clear();
         gotoClientWaitingFor(WAITING_FOR_SERVER_STR);
@@ -1109,11 +1099,11 @@ public class NetplayState {
             return;
         }
         
-        clientLevel = (byte) Integer.parseInt(levelQuestion.getValue());
+        statuses[1].setLevel(Integer.parseInt(levelQuestion.getValue()));
         final NetplayConfig config = database.get(Database.OtherKeys.CLIENT);
-        database.saveAsync(Database.OtherKeys.CLIENT, config.setLevel(clientLevel));
+        database.saveAsync(Database.OtherKeys.CLIENT, config.setLevel((byte) statuses[1].getLevel()));
         
-        channel.write(Message.Type.LEVEL, clientLevel);
+        channel.write(Message.Type.LEVEL, (byte) statuses[1].getLevel());
         
         gotoClientWaitingFor(WAITING_FOR_SERVERS_LEVEL_STR);
     }    

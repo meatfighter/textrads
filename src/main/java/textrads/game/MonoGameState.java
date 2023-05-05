@@ -771,7 +771,7 @@ public class MonoGameState implements Serializable {
         status.setWins(wins);
     }
     
-    public void storeStatus(final Status status) {
+    private void storeStatus(final Status status) {
         level = (short) status.getLevel();
         lines = (short) status.getLines();
         score = status.getScore();
