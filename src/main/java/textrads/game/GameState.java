@@ -112,23 +112,15 @@ public class GameState implements Serializable {
         return (mode == Mode.VS_AI || mode == Mode.VS_HUMAN) ? 2 : 1;
     }
 
-    public void init(
-            final byte mode, 
-            final long seed, 
-            final int level0,
-            final int level1,
-            final int garbageHeight, 
-            final int floorHeight,
-            final boolean skipCountdown,
-            final int wins0,
-            final int wins1) {
+    public void init(final byte mode, final Status[] statuses, final long seed, final int garbageHeight, 
+            final int floorHeight, final boolean skipCountdown) {
                 
         paused = false;
         this.mode = mode;
         selection = -1;
         
-        states[0].init(seed, level0, garbageHeight, floorHeight, skipCountdown, wins0);
-        states[1].init(seed, level1, garbageHeight, floorHeight, skipCountdown, wins1);
+        states[0].init(statuses[0], seed, garbageHeight, floorHeight, skipCountdown);
+        states[1].init(statuses[1], seed, garbageHeight, floorHeight, skipCountdown);
     }
 
     public byte getMode() {
