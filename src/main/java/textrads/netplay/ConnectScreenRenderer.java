@@ -38,8 +38,8 @@ public class ConnectScreenRenderer {
         
         if (messageState.getMessage() == null) {        
             menuColumnsRenderer.render(g, size, state.getStartMenu(), (size.getColumns() - 9) / 2, oy + 6);
-            menuColumnsRenderer.render(g, size, state.getSetMenu(), (size.getColumns() - (Menu.COLUMN_SPACER + 23)) / 2, 
-                    oy + 9);
+            menuColumnsRenderer.render(g, size, state.getSetMenu(), 
+                    (size.getColumns() - (2 * Menu.COLUMN_SPACER + 33)) / 2, oy + 9);
             return;
         } 
         

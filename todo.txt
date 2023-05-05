@@ -7,6 +7,11 @@ instead of
 Waiting for server to continue...
 
 
+Vs. Human and Vs. AI need to carry over Time, Lines, Score, Wins, Level between rounds
+
+
+Server/Client config menu should have a [R] Reset option
+
 
 
 No rotation and invisible initial scores need to be lowered.

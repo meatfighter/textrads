@@ -43,9 +43,13 @@ public class ConnectScreenState {
         final List<MenuItem> menuItems1 = new ArrayList<>();
         menuItems1.add(new MenuItem("Set Port", 'P'));
         
+        final List<MenuItem> menuItems2 = new ArrayList<>();
+        menuItems2.add(new MenuItem("Reset"));        
+        
         final List<MenuColumn> menuColumns = new ArrayList<>();
         menuColumns.add(new MenuColumn(menuItems0));
         menuColumns.add(new MenuColumn(menuItems1));
+        menuColumns.add(new MenuColumn(menuItems2));
         
         return menuColumns;
     }
