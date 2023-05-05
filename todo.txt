@@ -16,6 +16,8 @@ No rotation and invisible initial scores need to be lowered.
 
 Scores for Vs. AI shows Starting Level
 
+Vs. AI got name up even though I lost?!
+
 
 
 Marathon / Constant Level / Rising Garbage / No Rotation / Invisible:
