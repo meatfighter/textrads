@@ -38,15 +38,18 @@ import textrads.game.Status;
 
 public class NetplayState {
 
-    private static final String WAITING_FOR_CLIENT_STR = "Waiting for client to connect";
-    private static final String CONNECTING_TO_SERVER_STR = "Connecting to server";
-    private static final String WAITING_FOR_SERVER_STR = "Waiting for server";
-    private static final String WAITING_FOR_CLIENTS_LEVEL_STR = "Waiting for client's level";
-    private static final String WAITING_FOR_SERVERS_LEVEL_STR = "Waiting for server's level";
-    private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
+    private static final String WAITING_FOR_CLIENT_TO_CONNECT_STR = "Waiting for client to connect";
+    private static final String WAITING_FOR_SERVER_STR = "Waiting for server";    
+    private static final String CONNECTING_TO_SERVER_STR = "Connecting to server";        
     private static final String CLIENT_MIGHT_RESIGN_STR = "Client might resign";
     private static final String DISCONNECTING_STR = "Disconnecting";
-    private static final String RESUMING_GAME_STR = "Resuming game";
+    private static final String RESUMING_GAME_STR = "Resuming game";    
+    
+    private static final String WAITING_FOR_CLIENTS_LEVEL_STR = "Waiting for client's level";
+    private static final String WAITING_FOR_SERVERS_LEVEL_STR = "Waiting for server's level";
+    
+    private static final String WAITING_FOR_CLIENT_TO_CONTINUE_STR = "Waiting for client to continue";
+    private static final String WAITING_FOR_SERVER_TO_CONTINUE_STR = "Waiting for server to continue";
     
     static enum State {
         PLAY_AS,
@@ -319,7 +322,7 @@ public class NetplayState {
     
     private void gotoServerStartWaiting() {
         state = State.SERVER_START_WAITING;
-        connectMenuState.init("Server", hostname, Integer.toString(port), WAITING_FOR_CLIENT_STR, 
+        connectMenuState.init("Server", hostname, Integer.toString(port), WAITING_FOR_CLIENT_TO_CONNECT_STR, 
                 MessageState.MessageType.WAITING);
         server.setBindAddress(host);
         server.setPort(port);
@@ -453,9 +456,12 @@ public class NetplayState {
                 }
                 case Message.Type.ACK_GAME_STATE:
                     clientAckedGameState = true;
+                    
                     if (waitClientContinue) {
                         channel.write(Message.Type.GET_CONTINUE);
-                    } else if (channelState != ChannelState.CONTINUE) {
+                    } else if (channelState == ChannelState.CONTINUE) {
+                        channel.write(Message.Type.WAIT_CONTINUE);
+                    } else {
                         gotoServerPlaying();
                     }
                     break;
@@ -717,7 +723,7 @@ public class NetplayState {
     
     private void gotoServerWaiting() {
         state = State.SERVER_WAITING;
-        disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_STR, MessageState.MessageType.WAITING);
+        disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONNECT_STR, MessageState.MessageType.WAITING);
     }
     
     private void updateServerWaiting() {
@@ -1043,6 +1049,9 @@ public class NetplayState {
                 case Message.Type.GET_GIVE_UP:
                     gotoClientGiveUp();
                     break;
+                case Message.Type.WAIT_CONTINUE:
+                    gotoClientWaitingFor(WAITING_FOR_SERVER_TO_CONTINUE_STR);
+                    break;
             }
             channel.incrementReadIndex();
         }
@@ -1175,7 +1184,7 @@ public class NetplayState {
     
     private void handleClientContinue() {
         channel.write(Message.Type.CONTINUE);
-        gotoClientWaitingFor("Waiting for server to continue");
+        gotoClientWaitingFor(WAITING_FOR_SERVER_TO_CONTINUE_STR);
     }
     
     private void gotoClientGiveUp() {

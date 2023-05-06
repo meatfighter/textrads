@@ -92,9 +92,6 @@ public class MessageChannel {
     }
     
     public void stop() {
-        
-        Thread.dumpStack(); // TODO REMOVE
-        
         synchronized (monitor) {
             if (state != State.RUNNING) {
                 return;

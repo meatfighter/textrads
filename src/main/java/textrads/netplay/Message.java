@@ -28,6 +28,7 @@ public class Message {
         byte GET_GIVE_UP = 14;
         byte RESUME_GAME = 15;
         byte GIVE_UP = 16;
+        byte WAIT_CONTINUE = 17;
     }    
     
     private final InputEventList[] inputEvents;
