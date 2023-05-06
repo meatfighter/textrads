@@ -18,11 +18,14 @@ public class RecordList<T extends Record> implements Serializable {
     
     public static final Supplier<RecordList> RECORD_LIST_SUPPLIER = () -> new RecordList(DefaultRecordMaker.RECORD);
     
+    public static final Supplier<RecordList> DIFFICULT_RECORD_LIST_SUPPLIER 
+            = () -> new RecordList(DefaultRecordMaker.DIFFICULT_RECORD);
+
     public static final Supplier<RecordList> EXTENDED_RECORD_LIST_SUPPLIER 
             = () -> new RecordList(DefaultRecordMaker.EXTENDED_RECORD);
     
     public static final Function<RecordList, RecordList> TODAYS_INITIALIZATION_TASK 
-            = recordList -> recordList.removeExpired(); 
+            = recordList -> recordList.removeExpired();
     
     private final DefaultRecordMaker recordMaker;
     private final List<T> records;
