@@ -751,6 +751,10 @@ public class MonoGameState implements Serializable {
         return won;
     }
     
+    public boolean isLost() {
+        return !won;
+    }
+    
     public boolean isEnd() {
         return mode == Mode.END && (won || endTimer >= 110);
     }

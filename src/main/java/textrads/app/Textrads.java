@@ -639,20 +639,10 @@ public class Textrads {
     private void handleContinue() {
         
         final GameState gameState = GameStateSource.getState();
+        final MonoGameState monoGameState = gameState.getStates()[0];
         
-        if (gameMode == GameState.Mode.VS_AI) {
-            gameState.loadStatuses(statuses);            
-            if (statuses[0].getWins() < 3 && statuses[1].getWins() < 3) {
-                gotoPlay();
-                return;
-            }
-            if (gameMode == GameState.Mode.VS_AI && statuses[0].getWins() < 3) {
-                gotoDifficultyConfig();
-                return;
-            }
-        }
+        gameState.loadStatuses(statuses);        
         
-        gameModeName = GameState.Mode.toString(gameMode);
         switch (gameMode) {
             case GameState.Mode.MARATHON:
                 allTimesKey = Database.AllTimeKeys.MARATHON;
@@ -663,6 +653,10 @@ public class Textrads {
                 todaysKey = Database.TodaysKeys.CONSTANT_LEVEL;                
                 break;
             case GameState.Mode.GARBAGE_HEAP:
+                if (monoGameState.isLost()) {
+                    gotoHeightConfig();
+                    return;
+                }
                 allTimesKey = Database.AllTimeKeys.GARBAGE_HEAP;
                 todaysKey = Database.TodaysKeys.GARBAGE_HEAP;
                 break;                
@@ -671,10 +665,18 @@ public class Textrads {
                 todaysKey = Database.TodaysKeys.RISING_GARBAGE;
                 break;
             case GameState.Mode.THREE_MINUTES:
+                if (monoGameState.isLost()) {
+                    gotoLevelConfig();
+                    return;
+                }
                 allTimesKey = Database.AllTimeKeys.THREE_MINUTES;
                 todaysKey = Database.TodaysKeys.THREE_MINUTES;
                 break;
             case GameState.Mode.FORTY_LINES:
+                if (monoGameState.isLost()) {
+                    gotoHeightConfig();
+                    return;
+                }
                 allTimesKey = Database.AllTimeKeys.FORTY_LINES;
                 todaysKey = Database.TodaysKeys.FORTY_LINES;
                 break;                
@@ -687,12 +689,18 @@ public class Textrads {
                 todaysKey = Database.TodaysKeys.INVISIBLE;
                 break;
             case GameState.Mode.VS_AI:
+                if (statuses[0].getWins() < 3 && statuses[1].getWins() < 3) {
+                    gotoPlay();
+                    return;
+                } else if (monoGameState.isLost()) {
+                    gotoDifficultyConfig();
+                    return;
+                }
                 allTimesKey = Database.AllTimeKeys.VS_AI;
                 todaysKey = Database.TodaysKeys.VS_AI;
                 break;
         }
-        
-        final MonoGameState monoGameState = gameState.getStates()[0];
+                
         final Record record;
         switch (gameMode) {
             case GameState.Mode.GARBAGE_HEAP:
@@ -722,7 +730,7 @@ public class Textrads {
         }
     }
     
-    private void gotoCongrats() {    
+    private void gotoCongrats() {
         
         final String prefix;
         final int index;
@@ -750,9 +758,11 @@ public class Textrads {
                 break;
         }
         
+        gameModeName = GameState.Mode.toString(gameMode);
+        
         final Preferences preferences = database.get(Database.OtherKeys.PREFERENCES);        
-        congratsScreenState.init(String.format("Congratulations! You got %s Best %s Place.", prefix, place), 
-                preferences.getInitials());
+        congratsScreenState.init(String.format("Congratulations! You got %s Place in %s Best %s Records.", place, 
+                prefix, gameModeName), preferences.getInitials());
         state = State.CONGRATS;
     }
     
