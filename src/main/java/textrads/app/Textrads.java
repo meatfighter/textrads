@@ -648,6 +648,7 @@ public class Textrads {
             }
             if (gameMode == GameState.Mode.VS_AI && statuses[0].getWins() < 3) {
                 gotoDifficultyConfig();
+                return;
             }
         }
         
