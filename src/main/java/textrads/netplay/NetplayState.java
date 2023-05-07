@@ -408,12 +408,12 @@ public class NetplayState {
                 gotoServerWaitingFor(CLIENT_MIGHT_RESIGN_STR);
             } else if (serverMayResign) {
                 channel.write(Message.Type.WAIT_GIVE_UP);
-            } else if (statuses[1].getLevel() < 0) {
+            } else if (!waitClientContinue && statuses[1].getLevel() < 0) {
                 channel.write(Message.Type.GET_LEVEL);
                 if (statuses[0].getLevel() >= 0) {
                     gotoServerWaitingFor(WAITING_FOR_CLIENTS_LEVEL_STR);
                 }
-            } else if (statuses[0].getLevel() < 0) {
+            } else if (!waitClientContinue && statuses[0].getLevel() < 0) {
                 channel.write(Message.Type.WAIT_LEVEL);
             } else if (!clientAckedGameState) {
                 final GameState gameState = GameStateSource.getState();
@@ -421,7 +421,7 @@ public class NetplayState {
                 gameState.setSelection((byte) -1);
                 channel.write(Message.Type.GAME_STATE, gameState);
                 gameState.setSelection(selection);
-                if (waitClientContinue) {
+                if (waitClientContinue && statuses[0].getLevel() >= 0) {
                     disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE_STR, 
                             MessageState.MessageType.WAITING);
                 }
@@ -1210,7 +1210,7 @@ public class NetplayState {
         switch (Character.toUpperCase(c)) {
             case 'Y':
                 channel.write(Message.Type.GIVE_UP);
-                gotoClientWaitingFor(DISCONNECTING_STR); // TODO
+                gotoClientWaitingFor(DISCONNECTING_STR);
                 break;
             case 'N':
                 channel.write(Message.Type.RESUME_GAME);
