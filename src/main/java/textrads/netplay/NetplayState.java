@@ -470,7 +470,7 @@ public class NetplayState {
                     break;
                 case Message.Type.CONTINUE:                    
                     waitClientContinue = false;
-                    if (statuses[1].getLevel() < 0 || statuses[0].getWins() >= 3 || statuses[1].getWins() >= 3) {
+                    if (statuses[1].getLevel() < 0) {
                         channel.write(Message.Type.GET_LEVEL);
                     } else if (channelState != ChannelState.CONTINUE) {
                         clientAckedGameState = false;
@@ -638,6 +638,13 @@ public class NetplayState {
         channel.write(Message.Type.GET_CONTINUE);
         
         InputSource.clear();
+        
+        if (statuses[0].getWins() >= 3 || statuses[1].getWins() >= 3) {
+            statuses[0].reset();
+            statuses[0].setLevel(-1);
+            statuses[1].reset();
+            statuses[1].setLevel(-1);
+        }
     }
     
     private void updateServerContinue() {
@@ -664,14 +671,8 @@ public class NetplayState {
         }        
     }
     
-    private void handleServerContinue() {
-        
-        if (statuses[0].getWins() >= 3 || statuses[1].getWins() >= 3) {
-            statuses[0].reset();
-            statuses[0].setLevel(-1);
-            statuses[1].reset();
-            statuses[1].setLevel(-1);
-            inputQueue.clear();
+    private void handleServerContinue() {        
+        if (statuses[0].getLevel() < 0) {
             gotoServerGettingLevel();
         } else {
             channelState = ChannelState.WAITING_FOR;
