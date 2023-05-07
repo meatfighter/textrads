@@ -106,6 +106,7 @@ public class Client {
                         }
                     }                    
                     if (!running) {
+                        c.stop();
                         break;
                     }
                     

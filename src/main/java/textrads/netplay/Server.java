@@ -121,6 +121,7 @@ public class Server {
                         }
                     }                    
                     if (!running) {
+                        c.stop();
                         break;
                     }
                     
