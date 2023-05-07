@@ -422,7 +422,8 @@ public class NetplayState {
                 channel.write(Message.Type.GAME_STATE, gameState);
                 gameState.setSelection(selection);
                 if (waitClientContinue && statuses[0].getLevel() >= 0) {
-                    disconnectMessageScreen.init("Server", WAITING_FOR_CLIENT_TO_CONTINUE_STR, 
+                    disconnectMessageScreen.init("Server", (statuses[1].getLevel() >= 0) 
+                            ? WAITING_FOR_CLIENT_TO_CONTINUE_STR : WAITING_FOR_CLIENTS_LEVEL_STR, 
                             MessageState.MessageType.WAITING);
                 }
             }
