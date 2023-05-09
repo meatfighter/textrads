@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -154,7 +156,25 @@ public final class IOUtil {
                 final ObjectInputStream ois = new ObjectInputStream(bais)) {
             return (T) ois.readObject();
         }
-    }    
+    }
+
+    public static void close(final Socket socket) {
+        try {   
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (final IOException ignored) {            
+        }
+    }
+    
+    public static void close(final ServerSocket socket) {
+        try {   
+            if (socket != null) {
+                socket.close();
+            }                
+        } catch (final IOException ignored) {            
+        }
+    }
     
     private IOUtil() {        
     }

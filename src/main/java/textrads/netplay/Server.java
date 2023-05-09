@@ -1,10 +1,14 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.TimeUnit;
+import textrads.util.IOUtil;
 import textrads.util.ThreadUtil;
 
 public class Server {
@@ -15,11 +19,10 @@ public class Server {
 
     private static final int BACKLOG = 50;  
     
-    private volatile InetAddress bindAddress;
-    private volatile int port = DEFAULT_PORT;
-    
     private final Object monitor = new Object();
-    
+
+    private InetAddress bindAddress;
+    private int port = DEFAULT_PORT;    
     private boolean running;    
     private Thread listenerThread;
     private MessageChannel channel;
@@ -45,7 +48,8 @@ public class Server {
                 return;
             }
             running = false;
-            closeServerSocket();
+            IOUtil.close(serverSocket);
+            serverSocket = null;
             if (listenerThread != null) {
                 ThreadUtil.interrupt(listenerThread);
                 listenerThread = null;
@@ -94,18 +98,25 @@ public class Server {
                     return;
                 }
                 
-                final MessageChannel c;
+                Socket socket = null;
+                final InputStream in;
+                final OutputStream out;
                 try {
-                    c = new MessageChannel(ss.accept(), chan -> {
-                        synchronized (monitor) {
-                            monitor.notifyAll();
-                        }
-                    });
-                    c.start();
+                    socket = ss.accept();
+                    in = socket.getInputStream();
+                    out = socket.getOutputStream();
                 } catch (final IOException e) {
+                    IOUtil.close(socket);
                     ThreadUtil.sleepOneSecond();
                     continue;
-                }                
+                }  
+                
+                final MessageChannel c = new MessageChannel(socket, in, out, chan -> {
+                    synchronized (monitor) {
+                        monitor.notifyAll();
+                    }
+                });
+                c.start();
 
                 synchronized (monitor) {                    
                     final long startTime = System.currentTimeMillis();
@@ -144,18 +155,6 @@ public class Server {
         }
     }
     
-    private void closeServerSocket() {
-        synchronized (monitor) {
-            try {   
-                if (serverSocket != null) {
-                    serverSocket.close();
-                    serverSocket = null;
-                }                
-            } catch (final IOException ignored) {            
-            }
-        }
-    }
-    
     public MessageChannel getMessageChannel() {
         synchronized (monitor) {
             return channel;
@@ -175,18 +174,26 @@ public class Server {
     }    
 
     public InetAddress getBindAddress() {
-        return bindAddress;
+        synchronized (monitor) {
+            return bindAddress;
+        }
     }
 
     public void setBindAddress(final InetAddress bindAddress) {
-        this.bindAddress = bindAddress;
+        synchronized (monitor) {
+            this.bindAddress = bindAddress;
+        }
     }
 
     public int getPort() {
-        return port;
+        synchronized (monitor) {
+            return port;
+        }
     }
 
     public void setPort(final int port) {
-        this.port = port;
+        synchronized (monitor) {
+            this.port = port;
+        }
     }
 }

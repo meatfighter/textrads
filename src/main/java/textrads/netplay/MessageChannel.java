@@ -5,6 +5,8 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
@@ -51,25 +53,25 @@ public class MessageChannel {
 
     private HandshakeStatus handshakeStatus = HandshakeStatus.PENDING;
     
-    public MessageChannel(final Socket socket) throws IOException {
-        this(socket, null, DEFAULT_OUT_QUEUE_PLAYERS);
+    public MessageChannel(final Socket socket, final InputStream in, final OutputStream out) {
+        this(socket, in, out, null, DEFAULT_OUT_QUEUE_PLAYERS);
     }
     
-    public MessageChannel(final Socket socket, final StatusListener statusListener) throws IOException {
-        this(socket, statusListener, DEFAULT_OUT_QUEUE_PLAYERS);
+    public MessageChannel(final Socket socket, final InputStream in, final OutputStream out, 
+            final StatusListener statusListener) {
+        this(socket, in, out, statusListener, DEFAULT_OUT_QUEUE_PLAYERS);
     }
     
-    public MessageChannel(final Socket socket, final StatusListener statusListener, final int outPlayers) 
-            throws IOException {        
-        
+    public MessageChannel(final Socket socket, final InputStream in, final OutputStream out,
+            final StatusListener statusListener, final int outPlayers) {        
+
         this.socket = socket;
+        this.in = new DataInputStream(new BufferedInputStream(in));
+        this.out = new DataOutputStream(new BufferedOutputStream(out));
         this.statusListener = statusListener;
         
         inQueue = new MessageQueue();
         outQueue = new MessageQueue(outPlayers);
-        
-        in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         
         outQueueThread = new Thread(this::runOutQueue);
         inQueueThread = new Thread(this::runInQueue);
@@ -99,7 +101,7 @@ public class MessageChannel {
             state = State.CANCELLED;
         }
         
-        closeSocket();
+        IOUtil.close(socket);
         outQueue.stop();
         inQueue.stop();
         ThreadUtil.interrupt(outQueueThread);
@@ -114,15 +116,6 @@ public class MessageChannel {
             outQueue.incrementWriteIndex();
         } catch (final IOException ignored) {
             stop();
-        }
-    }
-    
-    private void closeSocket() {
-        try {   
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (final IOException ignored) {            
         }
     }
     

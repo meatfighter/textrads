@@ -1,12 +1,15 @@
 package textrads.netplay;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import textrads.util.ThreadUtil;
 
 import static textrads.netplay.Server.MAX_HANDSHAKE_WAIT_MILLIS;
+import textrads.util.IOUtil;
 
 public class Client {
     
@@ -69,15 +72,15 @@ public class Client {
                     channel = null;
                 }
 
-                final MessageChannel c;
+                Socket socket = null;
+                final InputStream in;
+                final OutputStream out;
                 try {
-                    c = new MessageChannel(new Socket(host, port), chan -> {
-                        synchronized (monitor) {
-                            monitor.notifyAll();
-                        }
-                    });
-                    c.start();                    
+                    socket = new Socket(host, port);
+                    in = socket.getInputStream();
+                    out = socket.getOutputStream();                                       
                 } catch (final IOException e) {
+                    IOUtil.close(socket);
                     synchronized (monitor) {
                         if (firstConnectionAttempt) {
                             if (e instanceof ConnectException) {
@@ -91,6 +94,13 @@ public class Client {
                     ThreadUtil.sleepOneSecond();
                     continue;
                 }
+                
+                final MessageChannel c = new MessageChannel(socket, in, out, chan -> {
+                    synchronized (monitor) {
+                        monitor.notifyAll();
+                    }
+                });
+                c.start(); 
                 
                 synchronized (monitor) {
                     final long startTime = System.currentTimeMillis();
