@@ -24,6 +24,7 @@ import textrads.ai.AiSource;
 import textrads.attractmode.AbstractRecordFormatter;
 import textrads.attractmode.AttractModeRenderer;
 import textrads.attractmode.AttractModeState;
+import textrads.attractmode.ExtendedRecordDifficultyFormatter;
 import textrads.attractmode.ExtendedRecordHeightFormatter;
 import textrads.attractmode.RecordFormatter;
 import textrads.attractmode.RecordsRenderer;
@@ -110,6 +111,8 @@ public class Textrads {
     private final RecordsRenderer recordsRenderer = new RecordsRenderer();
     private final RecordFormatter recordFormatter = new RecordFormatter();
     private final ExtendedRecordHeightFormatter extendedRecordHeightFormatter = new ExtendedRecordHeightFormatter();
+    private final ExtendedRecordDifficultyFormatter extendedRecordDifficultyFormatter 
+            = new ExtendedRecordDifficultyFormatter();
     
     private final NetplayState netplayState = new NetplayState();
     private final NetplayRenderer netplayRenderer = new NetplayRenderer();
@@ -708,14 +711,24 @@ public class Textrads {
             case GameState.Mode.VS_AI:
                 record = new ExtendedRecord("AAA", challenge, monoGameState.getLevel(), monoGameState.getUpdates(), 
                         monoGameState.getScore(), System.currentTimeMillis());
-                formatter = extendedRecordHeightFormatter;
                 break;
             default:
                 record = new Record("AAA", monoGameState.getScore(), monoGameState.getLevel(), 
                         System.currentTimeMillis());
-                formatter = recordFormatter;
                 break;
         }
+        switch (gameMode) {
+            case GameState.Mode.GARBAGE_HEAP:
+            case GameState.Mode.FORTY_LINES:
+                formatter = extendedRecordHeightFormatter;
+                break;
+            case GameState.Mode.VS_AI:
+                formatter = extendedRecordDifficultyFormatter;                
+                break;
+            default:
+                formatter = recordFormatter;
+                break;
+        }        
         
         allTimesList = database.get(allTimesKey, false);
         allTimesIndex = allTimesList.findIndex(record);
