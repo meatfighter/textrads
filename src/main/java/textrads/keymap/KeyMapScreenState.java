@@ -47,7 +47,7 @@ public class KeyMapScreenState {
         menuColumns.add(setMenuColumn);
         menuColumns.add(resetMenuColumn);
         
-        menu = new Menu(menuColumns, "Key Mapping", 10, 3);
+        menu = new Menu(menuColumns, "Keymapping", 10, 3);
     }
     
     public void init(final KeyMap keyMap) {
