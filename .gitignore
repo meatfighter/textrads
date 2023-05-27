@@ -1,28 +1,7 @@
-# compiled classes
-*.class
-
-# logs
-*.log
-
-# BlueJ files
-*.ctxt
-
-# J2ME
-.mtj.tmp/
-
-# packages
-/target/
-!/target/textrads.jar # except for executable
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# VM crash logs
+data/*
+target/*
+!/target/textrads.jar
 hs_err_pid*
 
-# preferences and leaderboards
-/data/
+# TODO
+#nbactions-*.xml
