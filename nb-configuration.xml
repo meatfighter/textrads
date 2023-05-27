@@ -20,4 +20,7 @@ Any value defined here will override the pom.xml file value but is only applicab
             <configuration id="textrads" profiles=""/>
         </configurations>
     </config-data>
+    <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+        <word>leaderboards</word>
+    </spellchecker-wordlist>
 </project-shared-configuration>

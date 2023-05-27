@@ -1,16 +1,18 @@
-# Compiled class file
+# compiled classes
 *.class
 
-# Log file
+# logs
 *.log
 
 # BlueJ files
 *.ctxt
 
-# Mobile Tools for Java (J2ME)
+# J2ME
 .mtj.tmp/
 
-# Package Files #
+# packages
+/target/
+!/target/textrads.jar # except for executable
 *.jar
 *.war
 *.nar
@@ -19,8 +21,8 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# VM crash logs
 hs_err_pid*
-/target/
 
+# preferences and leaderboards
 /data/
