@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bentham&family=Open+Sans&family=Roboto+Mono&family=Source+Code+Pro&family=Work+Sans:wght@100&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Open+Sans&display=swap');
 
 svg {
     background-color: #FFFFFF;
@@ -6,56 +6,86 @@ svg {
 
 text.axes {
     font-family: 'Source Code Pro', monospace;
-    fill: #FFFFF0;
+    fill: #000000;
 }
 
-text.descriptions {
-    font-family: 'Open Sans', monospace;
-    fill: #FFFFF0;
+text.keys {
+    font-family: 'Noto Sans Symbols 2', sans-serif;
+    fill: #000000;
 }
 
 line.grid {
-    stroke: #EEEEEE;
+    stroke: #D0D0D0;
     stroke-width: 1; 
     stroke-linecap: square;
 }
 
+circle.tetromino-center {
+    fill: #000000;
+    stroke: #000000;
+    stroke-width: 1; 
+    stroke-linecap: round;    
+}
+
 circle.grid-center {
-    fill: #FFFFF0;
-    stroke: none;
+    fill: none;
+    stroke: #000000;
+    stroke-width: 1; 
+    stroke-linecap: round;    
 }
 
 rect.t {
     fill: #AF5FAF;
-    stroke: none;
+    stroke: #AF5FAF;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.j {
     fill: #5F5FAF;
-    stroke: none;
+    stroke: #5F5FAF;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.z {
     fill: #D75F5F;
-    stroke: none;
+    stroke: #D75F5F;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.o {
     fill: #D7AF5F;
-    stroke: none;
+    stroke: #D7AF5F;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.s {
     fill: #AFD75F;
-    stroke: none;
+    stroke: #AFD75F;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.l {
     fill: #D7875F;
-    stroke: none;
+    stroke: #D7875F;
+    stroke-width: 1; 
+    stroke-linecap: square;
 }
 
 rect.i {
     fill: #00AF87;
-    stroke: none;
+    stroke: #00AF87;
+    stroke-width: 1; 
+    stroke-linecap: square;
+}
+
+rect.g {
+    fill: #D0D0D0;
+    stroke: #D0D0D0;
+    stroke-width: 1; 
+    stroke-linecap: square;    
 }
