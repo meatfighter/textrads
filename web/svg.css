@@ -20,6 +20,13 @@ line.grid {
     stroke-linecap: square;
 }
 
+circle.i-tetromino-pivot {
+    fill: #00FFFF;
+    stroke: #00FFFF;
+    stroke-width: 1; 
+    stroke-linecap: round;    
+}
+
 circle.tetromino-center {
     fill: #000000;
     stroke: #000000;
