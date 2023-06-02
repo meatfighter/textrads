@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="svg.css"?>
+<svg width="131.0" height="131.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+    <marker class="arrow-head" id="Arrow2Mend" refX="0.0" refY="0.0" orient="auto">
+        <path class="arrow-head" transform="scale(0.6) rotate(180) translate(0,0)"
+                d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z " />
+    </marker>
+</defs>
+    <line x1="15.5" y1="15.5" x2="15.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="15.5" x2="115.5" y2="15.5" class="grid"/>
+    <line x1="35.5" y1="15.5" x2="35.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="35.5" x2="115.5" y2="35.5" class="grid"/>
+    <line x1="55.5" y1="15.5" x2="55.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="55.5" x2="115.5" y2="55.5" class="grid"/>
+    <line x1="75.5" y1="15.5" x2="75.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="75.5" x2="115.5" y2="75.5" class="grid"/>
+    <line x1="95.5" y1="15.5" x2="95.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="95.5" x2="115.5" y2="95.5" class="grid"/>
+    <line x1="115.5" y1="15.5" x2="115.5" y2="115.5" class="grid"/>
+    <line x1="15.5" y1="115.5" x2="115.5" y2="115.5" class="grid"/>
+    <circle cx="65.5" cy="65.5" r="2.5" class="grid-center"/>
+    <circle cx="45.5" cy="65.5" r="2.5" class="tetromino-center"/>
+    <circle cx="85.5" cy="65.5" r="2.5" class="tetromino-center"/>
+    <circle cx="65.5" cy="45.5" r="2.5" class="tetromino-center"/>
+    <circle cx="65.5" cy="85.5" r="2.5" class="tetromino-center"/>
+    <path class="arrow-line" d="M 68.43641,48.43641 80.929063,60.929063" />
+    <path class="arrow-line" d="M 82.56359,68.43641 70.070937,80.929063" />
+    <path class="arrow-line" d="M 62.563590000000005,82.56359 50.070937,70.070937" />
+    <path class="arrow-line" d="M 48.43641,62.563590000000005 60.929063,50.070937" />
+</svg>

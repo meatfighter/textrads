@@ -17,7 +17,9 @@
     <rect x="45.5" y="65.5" width="20.0" height="20.0" class="l"/>
     <rect x="45.5" y="45.5" width="20.0" height="20.0" class="l"/>
     <rect x="85.5" y="45.5" width="20.0" height="20.0" class="l"/>
-    <circle cx="75.5" cy="55.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="75.5" r="2.5" class="grid-center"/>    <line x1="140.5" y1="25.5" x2="140.5" y2="125.5" class="grid"/>
+    <circle cx="75.5" cy="55.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="75.5" r="2.5" class="grid-center"/>
+    <line x1="140.5" y1="25.5" x2="140.5" y2="125.5" class="grid"/>
     <line x1="140.5" y1="25.5" x2="240.5" y2="25.5" class="grid"/>
     <line x1="160.5" y1="25.5" x2="160.5" y2="125.5" class="grid"/>
     <line x1="140.5" y1="45.5" x2="240.5" y2="45.5" class="grid"/>
@@ -33,7 +35,9 @@
     <rect x="200.5" y="45.5" width="20.0" height="20.0" class="l"/>
     <rect x="180.5" y="45.5" width="20.0" height="20.0" class="l"/>
     <rect x="200.5" y="85.5" width="20.0" height="20.0" class="l"/>
-    <circle cx="210.5" cy="75.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="75.5" r="2.5" class="grid-center"/>    <line x1="255.5" y1="25.5" x2="255.5" y2="125.5" class="grid"/>
+    <circle cx="210.5" cy="75.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="75.5" r="2.5" class="grid-center"/>
+    <line x1="255.5" y1="25.5" x2="255.5" y2="125.5" class="grid"/>
     <line x1="255.5" y1="25.5" x2="355.5" y2="25.5" class="grid"/>
     <line x1="275.5" y1="25.5" x2="275.5" y2="125.5" class="grid"/>
     <line x1="255.5" y1="45.5" x2="355.5" y2="45.5" class="grid"/>
@@ -49,7 +53,9 @@
     <rect x="315.5" y="65.5" width="20.0" height="20.0" class="l"/>
     <rect x="275.5" y="85.5" width="20.0" height="20.0" class="l"/>
     <rect x="315.5" y="85.5" width="20.0" height="20.0" class="l"/>
-    <circle cx="305.5" cy="95.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="75.5" r="2.5" class="grid-center"/>    <line x1="370.5" y1="25.5" x2="370.5" y2="125.5" class="grid"/>
+    <circle cx="305.5" cy="95.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="75.5" r="2.5" class="grid-center"/>
+    <line x1="370.5" y1="25.5" x2="370.5" y2="125.5" class="grid"/>
     <line x1="370.5" y1="25.5" x2="470.5" y2="25.5" class="grid"/>
     <line x1="390.5" y1="25.5" x2="390.5" y2="125.5" class="grid"/>
     <line x1="370.5" y1="45.5" x2="470.5" y2="45.5" class="grid"/>
@@ -65,7 +71,9 @@
     <rect x="390.5" y="45.5" width="20.0" height="20.0" class="l"/>
     <rect x="390.5" y="85.5" width="20.0" height="20.0" class="l"/>
     <rect x="410.5" y="85.5" width="20.0" height="20.0" class="l"/>
-    <circle cx="400.5" cy="75.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="75.5" r="2.5" class="grid-center"/>    <line x1="25.5" y1="140.5" x2="25.5" y2="240.5" class="grid"/>
+    <circle cx="400.5" cy="75.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="75.5" r="2.5" class="grid-center"/>
+    <line x1="25.5" y1="140.5" x2="25.5" y2="240.5" class="grid"/>
     <line x1="25.5" y1="140.5" x2="125.5" y2="140.5" class="grid"/>
     <line x1="45.5" y1="140.5" x2="45.5" y2="240.5" class="grid"/>
     <line x1="25.5" y1="160.5" x2="125.5" y2="160.5" class="grid"/>
@@ -81,7 +89,9 @@
     <rect x="65.5" y="180.5" width="20.0" height="20.0" class="t"/>
     <rect x="45.5" y="160.5" width="20.0" height="20.0" class="t"/>
     <rect x="85.5" y="160.5" width="20.0" height="20.0" class="t"/>
-    <circle cx="75.5" cy="170.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="190.5" r="2.5" class="grid-center"/>    <line x1="140.5" y1="140.5" x2="140.5" y2="240.5" class="grid"/>
+    <circle cx="75.5" cy="170.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="190.5" r="2.5" class="grid-center"/>
+    <line x1="140.5" y1="140.5" x2="140.5" y2="240.5" class="grid"/>
     <line x1="140.5" y1="140.5" x2="240.5" y2="140.5" class="grid"/>
     <line x1="160.5" y1="140.5" x2="160.5" y2="240.5" class="grid"/>
     <line x1="140.5" y1="160.5" x2="240.5" y2="160.5" class="grid"/>
@@ -97,7 +107,9 @@
     <rect x="200.5" y="160.5" width="20.0" height="20.0" class="t"/>
     <rect x="180.5" y="180.5" width="20.0" height="20.0" class="t"/>
     <rect x="200.5" y="200.5" width="20.0" height="20.0" class="t"/>
-    <circle cx="210.5" cy="190.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="190.5" r="2.5" class="grid-center"/>    <line x1="255.5" y1="140.5" x2="255.5" y2="240.5" class="grid"/>
+    <circle cx="210.5" cy="190.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="190.5" r="2.5" class="grid-center"/>
+    <line x1="255.5" y1="140.5" x2="255.5" y2="240.5" class="grid"/>
     <line x1="255.5" y1="140.5" x2="355.5" y2="140.5" class="grid"/>
     <line x1="275.5" y1="140.5" x2="275.5" y2="240.5" class="grid"/>
     <line x1="255.5" y1="160.5" x2="355.5" y2="160.5" class="grid"/>
@@ -113,7 +125,9 @@
     <rect x="295.5" y="180.5" width="20.0" height="20.0" class="t"/>
     <rect x="275.5" y="200.5" width="20.0" height="20.0" class="t"/>
     <rect x="315.5" y="200.5" width="20.0" height="20.0" class="t"/>
-    <circle cx="305.5" cy="210.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="190.5" r="2.5" class="grid-center"/>    <line x1="370.5" y1="140.5" x2="370.5" y2="240.5" class="grid"/>
+    <circle cx="305.5" cy="210.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="190.5" r="2.5" class="grid-center"/>
+    <line x1="370.5" y1="140.5" x2="370.5" y2="240.5" class="grid"/>
     <line x1="370.5" y1="140.5" x2="470.5" y2="140.5" class="grid"/>
     <line x1="390.5" y1="140.5" x2="390.5" y2="240.5" class="grid"/>
     <line x1="370.5" y1="160.5" x2="470.5" y2="160.5" class="grid"/>
@@ -129,7 +143,9 @@
     <rect x="390.5" y="160.5" width="20.0" height="20.0" class="t"/>
     <rect x="410.5" y="180.5" width="20.0" height="20.0" class="t"/>
     <rect x="390.5" y="200.5" width="20.0" height="20.0" class="t"/>
-    <circle cx="400.5" cy="190.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="190.5" r="2.5" class="grid-center"/>    <line x1="25.5" y1="255.5" x2="25.5" y2="355.5" class="grid"/>
+    <circle cx="400.5" cy="190.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="190.5" r="2.5" class="grid-center"/>
+    <line x1="25.5" y1="255.5" x2="25.5" y2="355.5" class="grid"/>
     <line x1="25.5" y1="255.5" x2="125.5" y2="255.5" class="grid"/>
     <line x1="45.5" y1="255.5" x2="45.5" y2="355.5" class="grid"/>
     <line x1="25.5" y1="275.5" x2="125.5" y2="275.5" class="grid"/>
@@ -145,7 +161,9 @@
     <rect x="85.5" y="295.5" width="20.0" height="20.0" class="j"/>
     <rect x="45.5" y="275.5" width="20.0" height="20.0" class="j"/>
     <rect x="85.5" y="275.5" width="20.0" height="20.0" class="j"/>
-    <circle cx="75.5" cy="285.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="305.5" r="2.5" class="grid-center"/>    <line x1="140.5" y1="255.5" x2="140.5" y2="355.5" class="grid"/>
+    <circle cx="75.5" cy="285.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="305.5" r="2.5" class="grid-center"/>
+    <line x1="140.5" y1="255.5" x2="140.5" y2="355.5" class="grid"/>
     <line x1="140.5" y1="255.5" x2="240.5" y2="255.5" class="grid"/>
     <line x1="160.5" y1="255.5" x2="160.5" y2="355.5" class="grid"/>
     <line x1="140.5" y1="275.5" x2="240.5" y2="275.5" class="grid"/>
@@ -161,7 +179,9 @@
     <rect x="200.5" y="275.5" width="20.0" height="20.0" class="j"/>
     <rect x="180.5" y="315.5" width="20.0" height="20.0" class="j"/>
     <rect x="200.5" y="315.5" width="20.0" height="20.0" class="j"/>
-    <circle cx="210.5" cy="305.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="305.5" r="2.5" class="grid-center"/>    <line x1="255.5" y1="255.5" x2="255.5" y2="355.5" class="grid"/>
+    <circle cx="210.5" cy="305.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="305.5" r="2.5" class="grid-center"/>
+    <line x1="255.5" y1="255.5" x2="255.5" y2="355.5" class="grid"/>
     <line x1="255.5" y1="255.5" x2="355.5" y2="255.5" class="grid"/>
     <line x1="275.5" y1="255.5" x2="275.5" y2="355.5" class="grid"/>
     <line x1="255.5" y1="275.5" x2="355.5" y2="275.5" class="grid"/>
@@ -177,7 +197,9 @@
     <rect x="275.5" y="295.5" width="20.0" height="20.0" class="j"/>
     <rect x="275.5" y="315.5" width="20.0" height="20.0" class="j"/>
     <rect x="315.5" y="315.5" width="20.0" height="20.0" class="j"/>
-    <circle cx="305.5" cy="325.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="305.5" r="2.5" class="grid-center"/>    <line x1="370.5" y1="255.5" x2="370.5" y2="355.5" class="grid"/>
+    <circle cx="305.5" cy="325.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="305.5" r="2.5" class="grid-center"/>
+    <line x1="370.5" y1="255.5" x2="370.5" y2="355.5" class="grid"/>
     <line x1="370.5" y1="255.5" x2="470.5" y2="255.5" class="grid"/>
     <line x1="390.5" y1="255.5" x2="390.5" y2="355.5" class="grid"/>
     <line x1="370.5" y1="275.5" x2="470.5" y2="275.5" class="grid"/>
@@ -193,7 +215,9 @@
     <rect x="390.5" y="275.5" width="20.0" height="20.0" class="j"/>
     <rect x="410.5" y="275.5" width="20.0" height="20.0" class="j"/>
     <rect x="390.5" y="315.5" width="20.0" height="20.0" class="j"/>
-    <circle cx="400.5" cy="305.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="305.5" r="2.5" class="grid-center"/>    <line x1="25.5" y1="370.5" x2="25.5" y2="470.5" class="grid"/>
+    <circle cx="400.5" cy="305.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="305.5" r="2.5" class="grid-center"/>
+    <line x1="25.5" y1="370.5" x2="25.5" y2="470.5" class="grid"/>
     <line x1="25.5" y1="370.5" x2="125.5" y2="370.5" class="grid"/>
     <line x1="45.5" y1="370.5" x2="45.5" y2="470.5" class="grid"/>
     <line x1="25.5" y1="390.5" x2="125.5" y2="390.5" class="grid"/>
@@ -209,7 +233,9 @@
     <rect x="85.5" y="390.5" width="20.0" height="20.0" class="s"/>
     <rect x="45.5" y="410.5" width="20.0" height="20.0" class="s"/>
     <rect x="65.5" y="410.5" width="20.0" height="20.0" class="s"/>
-    <circle cx="75.5" cy="400.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="420.5" r="2.5" class="grid-center"/>    <line x1="140.5" y1="370.5" x2="140.5" y2="470.5" class="grid"/>
+    <circle cx="75.5" cy="400.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="420.5" r="2.5" class="grid-center"/>
+    <line x1="140.5" y1="370.5" x2="140.5" y2="470.5" class="grid"/>
     <line x1="140.5" y1="370.5" x2="240.5" y2="370.5" class="grid"/>
     <line x1="160.5" y1="370.5" x2="160.5" y2="470.5" class="grid"/>
     <line x1="140.5" y1="390.5" x2="240.5" y2="390.5" class="grid"/>
@@ -225,7 +251,9 @@
     <rect x="180.5" y="390.5" width="20.0" height="20.0" class="s"/>
     <rect x="180.5" y="410.5" width="20.0" height="20.0" class="s"/>
     <rect x="200.5" y="430.5" width="20.0" height="20.0" class="s"/>
-    <circle cx="210.5" cy="420.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="420.5" r="2.5" class="grid-center"/>    <line x1="255.5" y1="370.5" x2="255.5" y2="470.5" class="grid"/>
+    <circle cx="210.5" cy="420.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="420.5" r="2.5" class="grid-center"/>
+    <line x1="255.5" y1="370.5" x2="255.5" y2="470.5" class="grid"/>
     <line x1="255.5" y1="370.5" x2="355.5" y2="370.5" class="grid"/>
     <line x1="275.5" y1="370.5" x2="275.5" y2="470.5" class="grid"/>
     <line x1="255.5" y1="390.5" x2="355.5" y2="390.5" class="grid"/>
@@ -241,7 +269,9 @@
     <rect x="295.5" y="410.5" width="20.0" height="20.0" class="s"/>
     <rect x="275.5" y="430.5" width="20.0" height="20.0" class="s"/>
     <rect x="315.5" y="410.5" width="20.0" height="20.0" class="s"/>
-    <circle cx="305.5" cy="440.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="420.5" r="2.5" class="grid-center"/>    <line x1="370.5" y1="370.5" x2="370.5" y2="470.5" class="grid"/>
+    <circle cx="305.5" cy="440.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="420.5" r="2.5" class="grid-center"/>
+    <line x1="370.5" y1="370.5" x2="370.5" y2="470.5" class="grid"/>
     <line x1="370.5" y1="370.5" x2="470.5" y2="370.5" class="grid"/>
     <line x1="390.5" y1="370.5" x2="390.5" y2="470.5" class="grid"/>
     <line x1="370.5" y1="390.5" x2="470.5" y2="390.5" class="grid"/>
@@ -257,7 +287,9 @@
     <rect x="390.5" y="390.5" width="20.0" height="20.0" class="s"/>
     <rect x="410.5" y="430.5" width="20.0" height="20.0" class="s"/>
     <rect x="410.5" y="410.5" width="20.0" height="20.0" class="s"/>
-    <circle cx="400.5" cy="420.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="420.5" r="2.5" class="grid-center"/>    <line x1="25.5" y1="485.5" x2="25.5" y2="585.5" class="grid"/>
+    <circle cx="400.5" cy="420.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="420.5" r="2.5" class="grid-center"/>
+    <line x1="25.5" y1="485.5" x2="25.5" y2="585.5" class="grid"/>
     <line x1="25.5" y1="485.5" x2="125.5" y2="485.5" class="grid"/>
     <line x1="45.5" y1="485.5" x2="45.5" y2="585.5" class="grid"/>
     <line x1="25.5" y1="505.5" x2="125.5" y2="505.5" class="grid"/>
@@ -273,7 +305,9 @@
     <rect x="85.5" y="525.5" width="20.0" height="20.0" class="z"/>
     <rect x="45.5" y="505.5" width="20.0" height="20.0" class="z"/>
     <rect x="65.5" y="525.5" width="20.0" height="20.0" class="z"/>
-    <circle cx="75.5" cy="515.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="535.5" r="2.5" class="grid-center"/>    <line x1="140.5" y1="485.5" x2="140.5" y2="585.5" class="grid"/>
+    <circle cx="75.5" cy="515.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="535.5" r="2.5" class="grid-center"/>
+    <line x1="140.5" y1="485.5" x2="140.5" y2="585.5" class="grid"/>
     <line x1="140.5" y1="485.5" x2="240.5" y2="485.5" class="grid"/>
     <line x1="160.5" y1="485.5" x2="160.5" y2="585.5" class="grid"/>
     <line x1="140.5" y1="505.5" x2="240.5" y2="505.5" class="grid"/>
@@ -289,7 +323,9 @@
     <rect x="200.5" y="505.5" width="20.0" height="20.0" class="z"/>
     <rect x="180.5" y="525.5" width="20.0" height="20.0" class="z"/>
     <rect x="180.5" y="545.5" width="20.0" height="20.0" class="z"/>
-    <circle cx="210.5" cy="535.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="535.5" r="2.5" class="grid-center"/>    <line x1="255.5" y1="485.5" x2="255.5" y2="585.5" class="grid"/>
+    <circle cx="210.5" cy="535.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="535.5" r="2.5" class="grid-center"/>
+    <line x1="255.5" y1="485.5" x2="255.5" y2="585.5" class="grid"/>
     <line x1="255.5" y1="485.5" x2="355.5" y2="485.5" class="grid"/>
     <line x1="275.5" y1="485.5" x2="275.5" y2="585.5" class="grid"/>
     <line x1="255.5" y1="505.5" x2="355.5" y2="505.5" class="grid"/>
@@ -305,7 +341,9 @@
     <rect x="295.5" y="525.5" width="20.0" height="20.0" class="z"/>
     <rect x="275.5" y="525.5" width="20.0" height="20.0" class="z"/>
     <rect x="315.5" y="545.5" width="20.0" height="20.0" class="z"/>
-    <circle cx="305.5" cy="555.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="535.5" r="2.5" class="grid-center"/>    <line x1="370.5" y1="485.5" x2="370.5" y2="585.5" class="grid"/>
+    <circle cx="305.5" cy="555.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="535.5" r="2.5" class="grid-center"/>
+    <line x1="370.5" y1="485.5" x2="370.5" y2="585.5" class="grid"/>
     <line x1="370.5" y1="485.5" x2="470.5" y2="485.5" class="grid"/>
     <line x1="390.5" y1="485.5" x2="390.5" y2="585.5" class="grid"/>
     <line x1="370.5" y1="505.5" x2="470.5" y2="505.5" class="grid"/>
@@ -321,7 +359,9 @@
     <rect x="410.5" y="505.5" width="20.0" height="20.0" class="z"/>
     <rect x="410.5" y="525.5" width="20.0" height="20.0" class="z"/>
     <rect x="390.5" y="545.5" width="20.0" height="20.0" class="z"/>
-    <circle cx="400.5" cy="535.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="535.5" r="2.5" class="grid-center"/>    <line x1="25.5" y1="600.5" x2="25.5" y2="700.5" class="grid"/>
+    <circle cx="400.5" cy="535.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="535.5" r="2.5" class="grid-center"/>
+    <line x1="25.5" y1="600.5" x2="25.5" y2="700.5" class="grid"/>
     <line x1="25.5" y1="600.5" x2="125.5" y2="600.5" class="grid"/>
     <line x1="45.5" y1="600.5" x2="45.5" y2="700.5" class="grid"/>
     <line x1="25.5" y1="620.5" x2="125.5" y2="620.5" class="grid"/>
@@ -337,7 +377,10 @@
     <rect x="45.5" y="620.5" width="20.0" height="20.0" class="i"/>
     <rect x="85.5" y="620.5" width="20.0" height="20.0" class="i"/>
     <rect x="105.5" y="620.5" width="20.0" height="20.0" class="i"/>
-    <circle cx="75.5" cy="630.5" r="2.5" class="tetromino-center"/>    <circle cx="75.5" cy="650.5" r="2.5" class="grid-center"/>    <circle cx="85.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>    <line x1="140.5" y1="600.5" x2="140.5" y2="700.5" class="grid"/>
+    <circle cx="75.5" cy="630.5" r="2.5" class="tetromino-center"/>
+    <circle cx="75.5" cy="650.5" r="2.5" class="grid-center"/>
+    <circle cx="85.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>
+    <line x1="140.5" y1="600.5" x2="140.5" y2="700.5" class="grid"/>
     <line x1="140.5" y1="600.5" x2="240.5" y2="600.5" class="grid"/>
     <line x1="160.5" y1="600.5" x2="160.5" y2="700.5" class="grid"/>
     <line x1="140.5" y1="620.5" x2="240.5" y2="620.5" class="grid"/>
@@ -353,7 +396,10 @@
     <rect x="200.5" y="600.5" width="20.0" height="20.0" class="i"/>
     <rect x="200.5" y="620.5" width="20.0" height="20.0" class="i"/>
     <rect x="200.5" y="660.5" width="20.0" height="20.0" class="i"/>
-    <circle cx="210.5" cy="650.5" r="2.5" class="tetromino-center"/>    <circle cx="190.5" cy="650.5" r="2.5" class="grid-center"/>    <circle cx="200.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>    <line x1="255.5" y1="600.5" x2="255.5" y2="700.5" class="grid"/>
+    <circle cx="210.5" cy="650.5" r="2.5" class="tetromino-center"/>
+    <circle cx="190.5" cy="650.5" r="2.5" class="grid-center"/>
+    <circle cx="200.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>
+    <line x1="255.5" y1="600.5" x2="255.5" y2="700.5" class="grid"/>
     <line x1="255.5" y1="600.5" x2="355.5" y2="600.5" class="grid"/>
     <line x1="275.5" y1="600.5" x2="275.5" y2="700.5" class="grid"/>
     <line x1="255.5" y1="620.5" x2="355.5" y2="620.5" class="grid"/>
@@ -369,7 +415,10 @@
     <rect x="275.5" y="640.5" width="20.0" height="20.0" class="i"/>
     <rect x="315.5" y="640.5" width="20.0" height="20.0" class="i"/>
     <rect x="335.5" y="640.5" width="20.0" height="20.0" class="i"/>
-    <circle cx="305.5" cy="670.5" r="2.5" class="tetromino-center"/>    <circle cx="305.5" cy="650.5" r="2.5" class="grid-center"/>    <circle cx="315.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>    <line x1="370.5" y1="600.5" x2="370.5" y2="700.5" class="grid"/>
+    <circle cx="305.5" cy="670.5" r="2.5" class="tetromino-center"/>
+    <circle cx="305.5" cy="650.5" r="2.5" class="grid-center"/>
+    <circle cx="315.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>
+    <line x1="370.5" y1="600.5" x2="370.5" y2="700.5" class="grid"/>
     <line x1="370.5" y1="600.5" x2="470.5" y2="600.5" class="grid"/>
     <line x1="390.5" y1="600.5" x2="390.5" y2="700.5" class="grid"/>
     <line x1="370.5" y1="620.5" x2="470.5" y2="620.5" class="grid"/>
@@ -385,7 +434,10 @@
     <rect x="410.5" y="600.5" width="20.0" height="20.0" class="i"/>
     <rect x="410.5" y="620.5" width="20.0" height="20.0" class="i"/>
     <rect x="410.5" y="660.5" width="20.0" height="20.0" class="i"/>
-    <circle cx="400.5" cy="650.5" r="2.5" class="tetromino-center"/>    <circle cx="420.5" cy="650.5" r="2.5" class="grid-center"/>    <circle cx="430.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>    <g style="font-size: 16.0px;">
+    <circle cx="400.5" cy="650.5" r="2.5" class="tetromino-center"/>
+    <circle cx="420.5" cy="650.5" r="2.5" class="grid-center"/>
+    <circle cx="430.5" cy="640.5" r="2.5" class="i-tetromino-pivot"/>
+    <g style="font-size: 16.0px;">
         <text x="75.5" y="13.5" dy="0.25em" class="axes" text-anchor="middle">0</text>
         <text x="190.5" y="13.5" dy="0.25em" class="axes" text-anchor="middle">1</text>
         <text x="305.5" y="13.5" dy="0.25em" class="axes" text-anchor="middle">2</text>
