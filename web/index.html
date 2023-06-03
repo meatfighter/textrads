@@ -52,11 +52,11 @@ MathJax = {
     
 <h1 id="run"><a class="header" href="#run">Run</a></h1> 
 
-<p>Textrads requires <span class="nowrap">Java 8+</span> and an xterm terminal emulator. For Unix-like operating systems, open and maximize a console, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
+<p>Textrads requires <span class="nowrap">Java 8+</span> and an <a href="https://en.wikipedia.org/wiki/List_of_terminal_emulators">xterm terminal emulator</a>. For Unix-like operating systems, open and maximize a console, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
 
 <p><span class="command">java -jar textrads.jar</span> <a class="copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText('java -jar textrads.jar')">&#x2BBA;</a></p>
 
-<p>For Windows, the best option is the Windows Subsystem for Linux (WSL). If WSL is unavailable, open a Command Prompt, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
+<p>For Windows, the best option is the <a href="https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux">Windows Subsystem for Linux (WSL)</a>. If WSL is unavailable, open a Command Prompt, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
 
 <p><span class="command">javaw -jar textrads.jar</span> <a class="copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText('javaw -jar textrads.jar')">&#x2BBA;</a></p> 
 
@@ -64,15 +64,151 @@ MathJax = {
 
 <h1 id="source"><a class="header" href="#source">Source</a></h1>
 
-The source is available <a href="https://github.com/meatfighter/textrads">here</a>. 
+<p>The source is available <a href="https://github.com/meatfighter/textrads">here</a>.</p>
 
+<h1 id="uninstall"><a class="header" href="#uninstall">Uninstall</a></h1> 
+
+<p>Textrads creates a subdirectory called <span class="mono">data</span> to store preferences and leaderboards. To uninstall Textrads, delete <span class="mono">textrads.jar</span> along with that subdirectory.</p>
+
+<h1 id="keymapping"><a class="header" href="#keymapping">Keymapping</a></h1>
+
+<p>Press <span class="mono">K</span> on the main menu to adjust the keymapping. The defaults appear below.</p>
+
+<table class="borderless">
+<tr><th class="borderless">Action</th><th class="borderless">Key</th></tr>
+<tr><td class="borderless">Shift Left</td><td class="borderless centered symbol">&#x1F804;</td></tr>
+<tr><td class="borderless">Shift Right</td><td class="borderless centered symbol">&#x1F806;</td></tr>
+<tr><td class="borderless">Soft Drop</td><td class="borderless centered symbol">&#x1F807;</td></tr>
+<tr><td class="borderless">Rotate Counterclockwise</td><td class="borderless centered symbol">Z</td></tr>
+<tr><td class="borderless">Rotate Clockwise</td><td class="borderless centered symbol">X</td></tr>
+<tr><td class="borderless">Pause</td><td class="borderless centered symbol">Enter</td></tr>
+<tr><td class="borderless">Give Up</td><td class="borderless centered symbol">Esc</td></tr>
+</table> 
+
+<p>Xterm limitations restrict the keymapping to printable character keys, the arrow keys, the function keys, and the following keys: Backspace, Delete, End, Enter, Esc, Home, Insert, Page Down, Page Up, and Tab.</p>
+
+<h1 id="modes"><a class="header" href="#modes">Modes</a></h1>
+
+<ul>
+
+<li>Marathon &ndash; The standard endurance game. From an empty playfield, the player keeps going until blocks reach the top. The level increases as the player progresses.</li>
+
+<li>Constant Level &ndash; Marathon mode, but the game remains forever at a chosen level.</li> 
+
+<li>Garbage Heap &ndash; In a garbage-filled playfield, the player clears twenty-five lines to win.</li> 
+
+<li>Rising Garbage &ndash; Marathon mode, but garbage slowly rises from the floor.</li>  
+
+<li>Three Minutes &ndash; The player maximizes the score within a three-minute time limit.</li> 
+
+<li>Forty Lines &ndash; In a raised-floor playfield, the player clears forty lines to win.</li> 
+
+<li>No Rotation &ndash; Marathon mode, but the player cannot rotate the pieces. According to the opening scene of <a href="https://watch.ecstasyoforder.com/">Ecstasy of Order</a>, it is a &ldquo;very unusual style of playing&rdquo;.</li> 
+
+<li>Invisible &ndash; Marathon mode, but the game renders only the falling piece and line clear animations. It is inspired by the invisible credit roll challenge in <a href="https://tetris.wiki/Tetris_The_Absolute_The_Grand_Master_2">TGM2</a>.</li> 
+
+<li>Vs. AI &ndash; A garbage-attack battle against an AI opponent.</li>  
+
+<li>Vs. Human &ndash; A garbage-attack battle against a human opponent.</li>
+
+</ul>
+
+<h1 id="aesthetic"><a class="header" href="#aesthetic">Aesthetic</a></h1>
+
+<p>Textrads is built on top of a pure-Java library for text-based user interfaces called <a href="https://github.com/mabe02/lanterna">Lanterna</a> that provides elements with the distinctive blue-background look-and-feel reminiscent of text mode DOS applications, such as <a href="https://en.wikipedia.org/wiki/MS-DOS_Editor">edit</a>, <a href="https://en.wikipedia.org/wiki/Norton_Utilities">Norton Utilities</a>, <a href="https://en.wikipedia.org/wiki/WordPerfect">WordPerfect</a>, <a href="https://en.wikipedia.org/wiki/QBasic">QBasic</a>, <a href="https://en.wikipedia.org/wiki/Turbo_Vision">Borland’s IDEs</a>, and many more. However, Textrads taps into a lower-level of Lanterna to deliver custom components with a visual style evoking <a href="https://16colo.rs/">Bulletin Board Systems</a> of the pre-internet era. Users navigate through menus of key-bound items:</p>
+
+<p><img class="centered" alt="main-menu" id="main-menu.png" src="main-menu.png"></p>
+
+<p>Textrads adapts the layout of its components based on the available screen space, and it uses two different scales for displaying graphics. It alters its rendering behavior at runtime by using Lanterna’s ability to detect window resizing:</p>
+
+<p><img class="centered" alt="playfield-small" id="playfield-small.png" src="playfield-small.png"></p>
+
+<p><img class="centered" alt="playfield-big" id="playfield-big.png" src="playfield-big.png"></p>
+
+<p>Textrads outputs <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit">256-color ANSI escape codes</a>. Since terminal users commonly customize the original sixteen colors, particularly the background color, Textrads avoids them for a consistent chromatic experience. Unfortunately, the restricted palette constrained the animals on the congratulations screen to sixteen shades of gray:</p>
+
+<p><img class="centered" alt="puppy" id="puppy.png" src="puppy.png"></p>
+
+<p>Despite the opportunity for &ldquo;true color&rdquo; animals with the vast palette of <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit">24-bit color ANSI escape codes</a>, Textrads opted not to use them due to limited adoption of the standard.</p>
+
+<p>The images on the congratulations screen and the PSA screens consist of rectangular <a href="https://en.wikipedia.org/wiki/Block_Elements">Right Half Blocks (U+2590)</a> rather than square <a href="https://en.wikipedia.org/wiki/Block_Elements">Upper Half Blocks (U+2580)</a> because tests across multiple terminal emulators revealed Right Half Blocks render consistently, whereas adjacent Upper Half Blocks and related block elements experience visual discontinuities around adjoining seams. The stretched-pixel look of the Right Half Blocks images evokes memories of era of slow internet connections, a time when browsers displayed a low-resolution version of <a href="https://en.wikipedia.org/wiki/GIF#Interlacing">interlaced GIFs</a> that progressively improved with each downloading pass.</p>
+
+<p>As for the game, Textrads borrows visual elements of <a href="https://tetr.io/">Tetr.io</a>, particularly the colors, the frame, the preview queue, the attack bar, and the stats. But, since its mechanics are based off <a href="https://tetris.wiki/Tetris_DX">DX</a>, there is no hold space or ghost piece.</p>
+
+<h1 id="playfield"><a class="header" href="#playfield">Playfield</a></h1>
+
+<p>Textrads employs the standard <span class="nowrap">20 rows &times; 10 columns</span> playfield. Tetrominoes spawn at <span class="nowrap">(4,0)</span>, the cell with the black dot:</p> 
+
+<object id="playfield.svg" data="playfield.svg" type="image/svg+xml" class="diagram">playfield</object>
+
+<p>If a spawned tetromino overlaps a playfield block, it’s game over by <a href="https://tetris.wiki/Top_out">block out</a>.</p>
+
+<p>If a tetromino partially locks into the vanish zone&mdash;the region above the playfield ceiling&mdash;the game truncated it. Similarly, if garbage rows lift blocks into the vanish zone, the game deletes them. However, the player can rotate the falling piece into the vanish zone, temporarily hiding part or all of it from view.</p>
+
+<h1 id="level"><a class="header" href="#level">Level</a></h1> 
+
+<p>The player selects a starting level <span class="nowrap">(0&ndash;29)</span> at the beginning of all modes. Except for <span class="nowrap">Constant Level</span> mode, the level advances as the player progresses per:</p>
+
+<p class="centered" id="current-level">$currentLevel = max(startingLevel, \big\lfloor \frac{clearedLines}{10} \big\rfloor)$</p> 
+
+<p>The games determines the number of frames per gravity drop on a given level via:</p>
+
+<p class="centered" id="frames-per-drop-zero">$framesPerDrop_0 = 52$</p>
+
+<p class="centered" id="frames-per-drop-thirty">$framesPerDrop_{30} = 2$</p>
+
+<p class="centered" id="lambda">$\lambda = \frac{1}{30} ln(\frac{framesPerDrop_0}{framesPerDrop_{30}})$</p>
+
+<p class="centered" id="frames-per-drop-level">$framesPerDrop_{level} = framesPerDrop_0 e^{-\lambda \: level}$</p> 
+
+<p>The table and plots below describe the first thirty levels:</p> 
+
+<table class="borderless">
+<tr><th class="borderless">level</th><th class="borderless">frames/drop</th><th class="borderless">drops/frame</th></tr>
+<tr><td class="borderless right">0</td><td class="borderless right">52.000000</td><td class="borderless right">0.019231</td></tr>
+<tr><td class="borderless right">1</td><td class="borderless right">46.648487</td><td class="borderless right">0.021437</td></tr>
+<tr><td class="borderless right">2</td><td class="borderless right">41.847719</td><td class="borderless right">0.023896</td></tr>
+<tr><td class="borderless right">3</td><td class="borderless right">37.541015</td><td class="borderless right">0.026638</td></tr>
+<tr><td class="borderless right">4</td><td class="borderless right">33.677530</td><td class="borderless right">0.029693</td></tr>
+<tr><td class="borderless right">5</td><td class="borderless right">30.211651</td><td class="borderless right">0.033100</td></tr>
+<tr><td class="borderless right">6</td><td class="borderless right">27.102458</td><td class="borderless right">0.036897</td></tr>
+<tr><td class="borderless right">7</td><td class="borderless right">24.313243</td><td class="borderless right">0.041130</td></tr>
+<tr><td class="borderless right">8</td><td class="borderless right">21.811077</td><td class="borderless right">0.045848</td></tr>
+<tr><td class="borderless right">9</td><td class="borderless right">19.566419</td><td class="borderless right">0.051108</td></tr>
+<tr><td class="borderless right">10</td><td class="borderless right">17.552766</td><td class="borderless right">0.056971</td></tr>
+<tr><td class="borderless right">11</td><td class="borderless right">15.746346</td><td class="borderless right">0.063507</td></tr>
+<tr><td class="borderless right">12</td><td class="borderless right">14.125831</td><td class="borderless right">0.070792</td></tr>
+<tr><td class="borderless right">13</td><td class="borderless right">12.672089</td><td class="borderless right">0.078914</td></tr>
+<tr><td class="borderless right">14</td><td class="borderless right">11.367958</td><td class="borderless right">0.087967</td></tr>
+<tr><td class="borderless right">15</td><td class="borderless right">10.198039</td><td class="borderless right">0.098058</td></tr>
+<tr><td class="borderless right">16</td><td class="borderless right">9.148521</td><td class="borderless right">0.109307</td></tr>
+<tr><td class="borderless right">17</td><td class="borderless right">8.207013</td><td class="borderless right">0.121847</td></tr>
+<tr><td class="borderless right">18</td><td class="borderless right">7.362399</td><td class="borderless right">0.135825</td></tr>
+<tr><td class="borderless right">19</td><td class="borderless right">6.604707</td><td class="borderless right">0.151407</td></tr>
+<tr><td class="borderless right">20</td><td class="borderless right">5.924992</td><td class="borderless right">0.168777</td></tr>
+<tr><td class="borderless right">21</td><td class="borderless right">5.315229</td><td class="borderless right">0.188139</td></tr>
+<tr><td class="borderless right">22</td><td class="borderless right">4.768219</td><td class="borderless right">0.209722</td></tr>
+<tr><td class="borderless right">23</td><td class="borderless right">4.277504</td><td class="borderless right">0.233781</td></tr>
+<tr><td class="borderless right">24</td><td class="borderless right">3.837290</td><td class="borderless right">0.260601</td></tr>
+<tr><td class="borderless right">25</td><td class="borderless right">3.442381</td><td class="borderless right">0.290497</td></tr>
+<tr><td class="borderless right">26</td><td class="borderless right">3.088112</td><td class="borderless right">0.323822</td></tr>
+<tr><td class="borderless right">27</td><td class="borderless right">2.770303</td><td class="borderless right">0.360971</td></tr>
+<tr><td class="borderless right">28</td><td class="borderless right">2.485201</td><td class="borderless right">0.402382</td></tr>
+<tr><td class="borderless right">29</td><td class="borderless right">2.229440</td><td class="borderless right">0.448543</td></tr>
+<tr><td class="borderless right">30</td><td class="borderless right">2.000000</td><td class="borderless right">0.500000</td></tr>
+</table>
+
+[ plot of frames/drop ]
+
+[ plot of drops/frame ]
+
+<p>As a piece descends, the game increases or decreases the integer number of frames per gravity drop to ensure it achieves the fraction values listed above in the average.</p>
 
 <!--<p>This is an \$2.50 inline equation: $E = mc^2$</p>
 
 <p>This is an block equation: \[E = mc^2\]</p>-->
     
-<!--<object id="playfield.svg" data="playfield.svg" type="image/svg+xml" class="diagram">playfield</object>-->
-    
+   
 <!--<object id="primary-rotations.svg" data="primary-rotations.svg" type="image/svg+xml" class="diagram">primary rotations</object>-->
 
 <!--<object id="secondary-rotations.svg" data="secondary-rotations.svg" type="image/svg+xml" class="diagram">secondary rotations</object>-->

@@ -61,6 +61,8 @@ object.diagram {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    max-width: 100%;
+    height: auto;    
 }
 
 a,a:visited {
@@ -108,11 +110,18 @@ p.home {
     text-align: right;
 }
 
+p.centered {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;    
+}
+
 img.centered {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    max-width: 978px;
+    max-width: 100%;
+    height: auto;
 }
 
 span.nowrap {
@@ -131,3 +140,42 @@ span.command {
     display: inline-block;
 }
 
+table.borderless {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;  
+}
+
+th.borderless {
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1pt solid silver;  
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;  
+}
+
+td.borderless {
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+td.symbol {
+    font-family: 'Noto Sans Symbols 2', sans-serif;
+    padding-top: 0px;
+    padding-bottom: 0px;    
+}
+
+td.centered {
+    text-align: center; 
+}
+
+td.right {
+    text-align: right; 
+}
+
+td.mono {
+    font-size: 16px;
+    font-family: 'Source Code Pro', monospace;    
+}

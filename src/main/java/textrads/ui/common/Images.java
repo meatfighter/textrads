@@ -63,7 +63,4 @@ public interface Images {
     TextImage SMALL_TOUCAN = GraphicsUtil.loadImage("small-toucan");    
     TextImage BIG_TURTLE = GraphicsUtil.loadImage("big-turtle");
     TextImage SMALL_TURTLE = GraphicsUtil.loadImage("small-turtle");
-
-
-   
 }
