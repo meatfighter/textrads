@@ -4,11 +4,11 @@
 <head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="date" content="2023-06-02">
+<meta name="date" content="2023-06-03">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 
-<link rel="stylesheet" href="style.css?v=2023-06-02" type="text/css">
+<link rel="stylesheet" href="style.css?v=2023-06-03" type="text/css">
 <link rel="manifest" href="manifest.json">
 <link rel="mask-icon" href="mask-icon.svg" color="#000000">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link rel="shortcut icon" href="favicon.ico" sizes="any" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Open+Sans&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&family=Source+Code+Pro&family=Open+Sans&family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <script>
 MathJax = {
@@ -37,10 +37,39 @@ MathJax = {
 </head>
 
 <body>
-    
-<p>This is an \$2.50 inline equation: $E = mc^2$</p>
 
-<p>This is an block equation: \[E = mc^2\]</p>
+<p id="TEXTRADS" class="title">TEXTRADS</p>
+    
+<p id="introduction">Textrads is an xterm implementation of the classic block-stacking puzzle game, where players arrange falling tetrominoes to form horizontal lines that disappear, with the goal of prolonging the pile from reaching the top. Its name is a portmanteau of &ldquo;text&rdquo;, the medium of terminals, and &ldquo;tetrads&rdquo;, another word for the plummeting pieces.</p>
+
+<p>Textrads combines a modern aesthetic with old-school gameplay. It supports multiple single-player modes, a <span class="nowrap">Vs. AI</span> mode, and a two-player mode via peer-to-peer netplay. But it lacks hard drop, ghost piece, and hold piece mechanics. It plays without music or sound effects. And it relies on the operating system’s autorepeat for DAS.</p> 
+
+[ video of gameplay ]
+
+<h1 id="install"><a class="header" href="#install">Install</a></h1>
+
+<p>Textrads is a Java app bundled into in a single jar. To install Textrads, <a href="https://github.com/meatfighter/textrads/raw/main/target/textrads.jar">download the jar</a>, and put it into a directory of your choice.</p>
+    
+<h1 id="run"><a class="header" href="#run">Run</a></h1> 
+
+<p>Textrads requires <span class="nowrap">Java 8+</span> and an xterm terminal emulator. For Unix-like operating systems, open and maximize a console, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
+
+<p><span class="command">java -jar textrads.jar</span> <a class="copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText('java -jar textrads.jar')">&#x2BBA;</a></p>
+
+<p>For Windows, the best option is the Windows Subsystem for Linux (WSL). If WSL is unavailable, open a Command Prompt, navigate to the directory containing <span class="mono">textrads.jar</span>, and run:</p>
+
+<p><span class="command">javaw -jar textrads.jar</span> <a class="copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText('javaw -jar textrads.jar')">&#x2BBA;</a></p> 
+
+<p>That command executes Textrads in a Swing-based xterm terminal emulator included in the jar.</p>
+
+<h1 id="source"><a class="header" href="#source">Source</a></h1>
+
+The source is available <a href="https://github.com/meatfighter/textrads">here</a>. 
+
+
+<!--<p>This is an \$2.50 inline equation: $E = mc^2$</p>
+
+<p>This is an block equation: \[E = mc^2\]</p>-->
     
 <!--<object id="playfield.svg" data="playfield.svg" type="image/svg+xml" class="diagram">playfield</object>-->
     
@@ -52,12 +81,11 @@ MathJax = {
 
 <!--<object id="wall-climb.svg" data="wall-climb.svg" type="image/svg+xml" class="diagram">wall climb</object>-->
 
-<!--<p class="title">TEXTRADS</p>
 
 <hr>
 <table class="copyright">
 <tr><td><p class="copyright">&copy; 2023 meatfighter.com<br>This content is licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt="CC"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt="BY"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt="SA"></a></p></td><td><p class="home"><a href="https://meatfighter.com">Home</a></p></td></tr>
-</table>-->
+</table>
 
 
 </body>

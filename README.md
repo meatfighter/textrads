@@ -1,2 +1,1 @@
-# textrads
-Terminal implementation of a popular block falling game
+Project page: https://meatfighter.com/textrads

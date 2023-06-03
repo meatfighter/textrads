@@ -28,12 +28,18 @@ li {
 
 p.title {
     font-family: 'Press Start 2P', cursive;
-    font-size: 64px;   
+    font-size: 64px;    
     font-weight: 400;
     text-align: center;
     margin-top: 42px;
     margin-bottom: 20px;
     line-height: 50px;
+}
+
+@media only screen and (max-width: 400px) {
+    p.title {
+        font-size: 32px;
+    }
 }
 
 h1 {  
@@ -69,6 +75,22 @@ a:hover {
     white-space: nowrap;
 }
 
+a.header,a.header:visited {
+    color: #000000;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a.header:hover {
+    color: #3367D6;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a.copy {
+    font-family: 'Noto Sans Symbols 2', sans-serif;
+}
+
 table.copyright {
     width: 100%;
     margin-top: -15px;
@@ -92,3 +114,20 @@ img.centered {
     margin-right: auto;
     max-width: 978px;
 }
+
+span.nowrap {
+    white-space: nowrap;
+}
+
+span.mono {
+    font-family: 'Source Code Pro', monospace;
+}
+
+span.command {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    padding-left: 2em;
+    text-indent: -2em;
+    display: inline-block;
+}
+
