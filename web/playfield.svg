@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/css" href="svg.css"?>
-<svg width="251.0" height="441.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="100%" height="auto" viewBox="0 0 251.0 441.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <line x1="25.5" y1="20.5" x2="225.5" y2="20.5" class="grid"/>
     <line x1="25.5" y1="40.5" x2="225.5" y2="40.5" class="grid"/>
     <line x1="25.5" y1="60.5" x2="225.5" y2="60.5" class="grid"/>

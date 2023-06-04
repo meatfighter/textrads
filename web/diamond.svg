@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/css" href="svg.css"?>
-<svg width="131.0" height="131.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="100%" height="auto" viewBox="0 0 131.0 131.0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
     <marker class="arrow-head" id="Arrow2Mend" refX="0.0" refY="0.0" orient="auto">
         <path class="arrow-head" transform="scale(0.6) rotate(180) translate(0,0)"
