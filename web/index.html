@@ -74,7 +74,7 @@ MathJax = {
 
 <p>Press <span class="mono">K</span> on the main menu to adjust the keymapping. The defaults appear below.</p>
 
-<table class="borderless">
+<table class="borderless" id="keymapping-table">
 <tr><th class="borderless">Action</th><th class="borderless">Key</th></tr>
 <tr><td class="borderless">Shift Left</td><td class="borderless centered symbol">&#x1F804;</td></tr>
 <tr><td class="borderless">Shift Right</td><td class="borderless centered symbol">&#x1F806;</td></tr>
@@ -163,7 +163,7 @@ MathJax = {
 
 <p>The table and plots below describe the first thirty levels:</p> 
 
-<table class="borderless">
+<table class="borderless" id="frames-per-drop-table">
 <tr><th class="borderless">level</th><th class="borderless">frames/drop</th><th class="borderless">drops/frame</th></tr>
 <tr><td class="borderless right">0</td><td class="borderless right">52.000000</td><td class="borderless right">0.019231</td></tr>
 <tr><td class="borderless right">1</td><td class="borderless right">46.648487</td><td class="borderless right">0.021437</td></tr>
@@ -262,7 +262,7 @@ MathJax = {
 
 <p>It consists of lines with <span class="nowrap">1&ndash;9</span> holes that manifest with probabilities derived from the values in <span class="nowrap">row 10</span> of <a href="https://en.wikipedia.org/wiki/Pascal%27s_triangle" target="_blank">Pascal’s triangle</a>: 
 
-<table class="borderless">
+<table class="borderless" id="probability-table">
 <tr><th class="borderless">Holes</th><th class="borderless">Probability</th></tr>
 <tr><td class="borderless right">0</td><td class="borderless right">0.000000</td></tr>
 <tr><td class="borderless right">1</td><td class="borderless right">0.009785</td></tr>
@@ -282,6 +282,41 @@ MathJax = {
 <p class="centered" id="normal-distribution-formulae">$\mu = 5,\:\sigma = \dfrac{511}{126\sqrt{2\pi}},\:p(h) = \dfrac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{h-\mu}{\sigma})^2}$</p>
 
 <object id="normal-distribution.svg" data="normal-distribution.svg" type="image/svg+xml" class="diagram" style="max-width: 640px;">normal distribution</object>
+
+<p>In <span class="nowrap">Rising Garbage</span> mode, during certain lines-cleared ranges, a random garbage row ascends from the floor every $n$ spawns:</p>
+
+<table class="borderless" id="rising-garbage-table">
+<tr><th class="borderless">$cleared \bmod 60$</th><th class="borderless">$n$</th></tr>
+<tr><td class="borderless centered">0&ndash;9</td><td class="borderless centered">6</td></tr>
+<tr><td class="borderless centered">20&ndash;29</td><td class="borderless centered">16</td></tr>
+<tr><td class="borderless centered">50&ndash;59</td><td class="borderless centered">12</td></tr>
+</table>
+
+<p>In <span class="nowrap">Vs. AI</span> mode and <span class="nowrap">Vs. Human</span> mode, when a player concurrently clears multiple lines, garbage rows containing a single hole rise from the floor of the opponent’s playfield. The game randomly positions the hole at the start and after every nine garbage rows. Both players receive the same hole sequence:</p>
+
+<p><img class="centered" alt="holes" id="holes.png" src="holes.png"></p>
+
+<p>The number of simultaneous clears determines the number of garbage rows sent to the opponent per the following table.</p>
+
+<table class="borderless" id="attack-table">
+<tr><th class="borderless">Clears</th><th class="borderless">Garbage Rows</th></tr>
+<tr><td class="borderless centered">1</td><td class="borderless centered">0</td></tr>
+<tr><td class="borderless centered">2</td><td class="borderless centered">1</td></tr>
+<tr><td class="borderless centered">3</td><td class="borderless centered">2</td></tr>
+<tr><td class="borderless centered">4</td><td class="borderless centered">4</td></tr>
+</table>
+
+<p>In applying that table, the game treats normal blocks and garbage blocks equally, enabling retaliatory attacks, where the players exchange garbage.</p>
+
+<p>The game waits for a player to lock a piece before inserting accumulated garbage from one or more attacks. The number of rows to insert is capped at twenty.</p>
+
+<h1 id="randomizer"><a class="header" href="#randomizer">Randomizer</a></h1> 
+
+<p>Textrads employs a <span class="nowrap">7-piece</span> bag randomizer. Meaning, it deals out all seven tetrominoes as if they were randomly drawn from a bag. Then it refills and repeats. For the current piece and the preview of the next five pieces, the game prepopulates and maintains a six-piece buffer.</p>
+
+<p>At the start of the <span class="nowrap">Vs. modes</span>, the game randomly selects, with equal probability, one of the ten columns for the garbage rows hole. Every nine garbage rows, it randomly selects a new hole position, again with equal probability. If necessary, the game continues to make new selections until the new column differs from the previous one.</p> 
+
+<p>Separate <a href="https://en.wikipedia.org/wiki/Pseudorandom_number_generator" target="_blank">pseudorandom number generators</a> drive the piece sequence and the hole sequence randomizers, ensuring they do not influence each other. In the <span class="nowrap">Vs. modes</span>, each player receives the same pseudorandom number generator seeds, guaranteeing the same piece and holes sequences regardless of the players’ actions.</p> 
 
 <hr>
 <table class="copyright">
