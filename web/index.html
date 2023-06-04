@@ -38,7 +38,9 @@ MathJax = {
 
 <body>
 
-<p id="TEXTRADS" class="title">TEXTRADS</p>
+<p id="textrads" class="title">TEXTRADS</p>
+
+[ INDEX ]
     
 <p id="introduction">Textrads is an xterm implementation of the classic block-stacking puzzle game, where players arrange falling tetrominoes to form horizontal lines that disappear, with the goal of prolonging the pile from reaching the top. Its name is a portmanteau of &ldquo;text&rdquo;, the medium of terminals, and &ldquo;tetrads&rdquo;, another word for the plummeting pieces.</p>
 
@@ -317,6 +319,64 @@ MathJax = {
 <p>At the start of the <span class="nowrap">Vs. modes</span>, the game randomly selects, with equal probability, one of the ten columns for the garbage rows hole. Every nine garbage rows, it randomly selects a new hole position, again with equal probability. If necessary, the game continues to make new selections until the new column differs from the previous one.</p> 
 
 <p>Separate <a href="https://en.wikipedia.org/wiki/Pseudorandom_number_generator" target="_blank">pseudorandom number generators</a> drive the piece sequence and the hole sequence randomizers, ensuring they do not influence each other. In the <span class="nowrap">Vs. modes</span>, each player receives the same pseudorandom number generator seeds, guaranteeing the same piece and holes sequences regardless of the players’ actions.</p> 
+
+<h1 id="das"><a class="header" href="#das">Delayed Auto Shift (DAS)</a></h1> 
+
+<p>Xterms relay key pressed events to applications, but not key released events. This limitation inhibits a software-level DAS. However, the operating system generates a key pressed event when the player presses a key, and after a brief delay, it generates repeated key pressed events at a constant rate until the player releases the key. That behavior resembles DAS. And most operating systems provide a way to customize the autorepeat delay and rate.</p>
+
+<p>The operating system’s autorepeat mechanism acts on all keys, while DAS normally applies to horizontal translation only, hence the &ldquo;shift&rdquo; in its name. In Textrads, if the player holds down a rotation key, the falling piece spins after a brief delay, an unusual, but not detrimental behavior. On the other hand, the player experiences the autorepeat delay when holding down the soft drop key, which may not be desired.</p>  
+
+<p>To prevent the player from inadvertently soft dropping to a newly spawned piece, Textrads ignores soft drop events until the player releases the key after soft dropping a piece onto the pile. Since, as just mentioned, xterms do not provide key released events, Textrads uses the period between soft drop events to differentiate the initial key pressed event from the autorepeated ones.</p> 
+
+<p>The operating system’s autorepeat mechanism typically responds to individual keys only, as opposed to key combinations. This negatively impacts control. For example, while auto-shifting, if the player presses a rotation key, the auto-shift will abruptly stop.</p>
+
+<p>The only recourse around these issues is hypertapping, as it avoids autorepeat entirely.</p>
+
+<h1 id="attract-mode"><a class="header" href="#attract-mode">Attract Mode</a></h1> 
+
+<p>Textrads’ attract mode draws inspiration from the captivating presentations of classic arcade video games that allured passers-by to dispense with their money. At startup, attract mode announces itself by stacking falling lines to form the game's title in a blocky font, an animation that evokes gameplay. Then an obligatory copyright notice appears alongside a pulsating <span class="nowrap">&ldquo;PRESS ENTER&rdquo;</span> in place of the traditional <span class="nowrap">&ldquo;INSERT COIN&rdquo;</span>.</p>
+
+<p>If the player resists the urge to press Enter for seven seconds, attract mode advances to an AI-controlled demo accompanied by a flashing <span class="nowrap">&ldquo;PRESS ENTER&rdquo;</span>, which makes it clear play has yet to begin.</p>
+
+<p>After twenty-five seconds of demo, attract mode displays a leaderboard for seven seconds.</p> 
+
+<p>Finally, attract mode displays one of three public service announcements for four seconds:</p> 
+
+<ul>
+
+<li><a href="https://en.wikipedia.org/wiki/Winners_Don%27t_Use_Drugs" target="_blank">&ldquo;WINNERS DON'T USE DRUGS&rdquo;</a> &ndash; Former FBI Director William S. Sessions’ iconic anti-drug slogan prominently displayed under the FBI seal, as seen in North American arcade machine attract modes from 1989 to 2000.</li>
+
+<li><a href="https://en.everybodywiki.com/Recycle_It,_Don%27t_Trash_It!" target="_blank">&ldquo;RECYCLE IT, DON'T TRASH IT!&rdquo;</a> &ndash; Former EPA Administrator William K. Reilly’s lesser-known anti-pollution slogan displayed above the EPA seal, as seen in North American arcade machine attract modes from 1992 to 2000.</li>
+
+<li><a href="https://en.wikipedia.org/wiki/Hackers_(film)" target="_blank">&ldquo;HACK THE PLANET&rdquo;</a> &ndash; Not an PSA, but the rallying cry from the movie &ldquo;Hackers&rdquo; that is now a symbol of the passion of technology enthusiasts for exploring and pushing the boundaries of technology, displayed under a false color Earth.</li>
+
+</ul>
+
+<p>Here’s a sample of attract mode:</p>
+
+[ video of attract mode ]
+
+<h1 id="leaderboards"><a class="header" href="#leaderboards">Leaderboards</a></h1>
+
+<p>Textrads saves today’s top ten achievements and the top ten achievements of all time for all modes except for <span class="nowrap">Vs. Human</span>. One of those leaderboards prominently appears in each attract mode loop.</p>
+
+<p>Upon setting a record, the game presents a congratulatory screen where players enter their initials. It randomly displays a one of twenty-six different animals as a reward.</p>
+
+<p>Textrads persists the leaderboards as a separate file in the <span class="mono">data</span> subdirectory. To clear the all-time best records, delete the <span class="mono nowrap">all-time-*.dat</span> files.</p>
+
+<h1 id="netplay"><a class="header" href="#netplay">Netplay</a></h1> 
+
+<p>In <span class="nowrap">Vs. Human</span> mode, the players establish a socket connection between two instances of Textrads. One instance acts as the server, and the other acts as the client. The server’s job is to keep the client’s memory model consistent with its own. It operates as the source of truth.</p>
+
+<p>The peers treat the connection as unreliable. To that end, when they connect, the client disregards anything in its memory model, and instead, it asks the server what it should do. If play has yet to begin, the server instructs the client to gather information from the player, such as the starting level. The client does so, and it submits the result back to the server in a request-response cycle resembling HTML forms. Concurrently, the server prompts its player for the same information.</p> 
+
+<p>When play commences, or if it already began and the client reconnected, the server sends the full game state of both players to the client. From that point forward, the client transmits key presses entered by its player to the server. The server updates its copy of the game state, for each frame, with key presses from its player and those submitted by the client player. Then the server sends to the client the full set of key presses it just applied. The client uses them to update its copy of the game state, maintaining consistency. This works because the update operation reacts deterministically to player inputs and the game state transmitted by the server includes the current seeds of the pseudorandom number generators that drive the piece sequence and garbage row hole sequence randomizers.</p>
+
+<p>With this architecture, intermittent network disruptions do not end a game in progress. Bouncing the client does not either. In both situations, the server pauses the game until the client returns. However, terminating the server ends the game by destroying the source of truth.</p>
+
+<h1 id="license"><a class="header" href="#license">License</a></h1> 
+
+<p>Textrads is free software licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">GPLv3</a>.</p>
 
 <hr>
 <table class="copyright">
