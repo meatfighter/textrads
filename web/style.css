@@ -36,6 +36,13 @@ p.title {
     line-height: 50px;
 }
 
+p.index {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;    
+    font-weight: 200;
+    text-align: center;
+}
+
 @media only screen and (max-width: 400px) {
     p.title {
         font-size: 32px;
@@ -43,18 +50,10 @@ p.title {
 }
 
 h1 {  
-    font-size: 32px;
-    font-weight: 300;
-}
-
-h2 {  
+    font-family: 'Press Start 2P', cursive;
     font-size: 24px;
     font-weight: 300;
-}
-
-h3 {  
-    font-size: 18px;
-    font-weight: 600;
+    padding-top: 40px;
 }
 
 object.diagram {
