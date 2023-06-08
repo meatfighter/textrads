@@ -4,11 +4,11 @@
 <head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="date" content="2023-06-07">
+<meta name="date" content="2023-06-08">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 
-<link rel="stylesheet" href="style.css?v=2023-06-07" type="text/css">
+<link rel="stylesheet" href="style.css?v=2023-06-08" type="text/css">
 <link rel="manifest" href="manifest.json">
 <link rel="mask-icon" href="mask-icon.svg" color="#000000">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -53,15 +53,15 @@ MathJax = {
 
 <p id="textrads" class="title">TEXTRADS</p>
 
-<p id="index" class="centered"><span class="nowrap">[ <a href="#about">About</a></span> | <a href="#install">Install</a> | <a href="#run">Run</a> | <a href="#source">Source</a> | <a href="#uninstall">Uninstall</a> | <a href="#keymapping">Keymapping</a> | <a href="#modes">Modes</a> | <a href="#aesthetic">Aesthetic</a> | <a href="#playfield">Playfield</a> | <a href="#level">Level</a> | <a href="#ai">AI</a> | <a href="#rotation-system">Rotation System</a> | <a href="#lock-delay">Lock Delay</a> | <a href="#garbage">Garbage</a> | <a href="#randomizer">Randomizer</a> | <a href="#das">Delayed Auto Shift (DAS)</a> | <a href="#attract-mode">Attract Mode</a> | <a href="#leaderboards">Leaderboards</a> | <a href="#netplay">Netplay</a> | <span class="nowrap"><a href="#license" class="index">License</a> ]</span></p>
+<p id="index" class="centered"><span class="nowrap">[ <a href="#about">About</a> |</span> <span class="nowrap"><a href="#install">Install</a> |</span> <span class="nowrap"><a href="#run">Run</a> |</span> <span class="nowrap"><a href="#source">Source</a> |</span> <span class="nowrap"><a href="#uninstall">Uninstall</a> |</span> <span class="nowrap"><a href="#keymapping">Keymapping</a> |</span> <span class="nowrap"><a href="#modes">Modes</a> |</span> <span class="nowrap"><a href="#aesthetic">Aesthetic</a> |</span> <span class="nowrap"><a href="#playfield">Playfield</a> |</span> <span class="nowrap"><a href="#level">Level</a> |</span> <span class="nowrap"><a href="#ai">AI</a> |</span> <span class="nowrap"><a href="#rotation-system">Rotation System</a> |</span> <span class="nowrap"><a href="#lock-delay">Lock Delay</a> |</span> <span class="nowrap"><a href="#garbage">Garbage</a> |</span> <span class="nowrap"><a href="#randomizer">Randomizer</a> |</span> <span class="nowrap"><a href="#das">Delayed Auto Shift (DAS)</a> |</span> <span class="nowrap"><a href="#attract-mode">Attract Mode</a> |</span> <span class="nowrap"><a href="#leaderboards">Leaderboards</a> |</span> <span class="nowrap"><a href="#netplay">Netplay</a> |</span> <span class="nowrap"><a href="#license" class="index">License</a> ]</span></p>
     
 <h1 id="about"><a class="header" href="#about">About</a></h1>
 
 <p id="introduction">Textrads is an xterm implementation of the classic block-stacking puzzle game, where players arrange falling tetrominoes to form horizontal lines that disappear, with the goal of prolonging the pile from reaching the top. Its name is a portmanteau of &ldquo;text&rdquo;, the medium of terminals, and &ldquo;tetrads&rdquo;, another word for the plummeting pieces.</p>
 
-<p>Textrads combines a modern aesthetic with old-school gameplay. It supports multiple single-player modes, a <span class="nowrap">Vs. AI</span> mode, and a two-player mode via peer-to-peer netplay. But it lacks hard drop, ghost piece, and hold piece mechanics. It plays without music or sound effects. And it relies on the operating system’s autorepeat for DAS.</p> 
+<p>Textrads combines a modern aesthetic with old-school gameplay. It supports multiple single-player modes, a <span class="nowrap">Vs. AI</span> mode, and a two-player mode via peer-to-peer netplay. But it lacks hard drop, ghost piece, and hold piece mechanics. It has no music or sound effects. And it relies on the operating system’s autorepeat for DAS.</p> 
 
-[ video of gameplay ]
+[ attract mode loop ]
 
 <h1 id="install"><a class="header" href="#install">Install</a></h1>
 
@@ -148,7 +148,7 @@ MathJax = {
 
 <p>Despite the opportunity for &ldquo;true color&rdquo; animals with the vast palette of <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit" target="_blank">24-bit color ANSI escape codes</a>, Textrads opted not to use them due to limited adoption of the standard.</p>
 
-<p>The images on the congratulations screen and the PSA screens consist of rectangular <a href="https://en.wikipedia.org/wiki/Block_Elements" target="_blank">Right Half Blocks (U+2590)</a> rather than square <a href="https://en.wikipedia.org/wiki/Block_Elements" target="_blank">Upper Half Blocks (U+2580)</a> because tests across multiple terminal emulators revealed Right Half Blocks render consistently, whereas adjacent Upper Half Blocks and related block elements experience visual discontinuities around adjoining seams. The stretched-pixel look of the Right Half Blocks images evokes memories of era of slow internet connections, a time when browsers displayed a low-resolution version of <a href="https://en.wikipedia.org/wiki/GIF#Interlacing" target="_blank">interlaced GIFs</a> that progressively improved with each downloading pass.</p>
+<p>The images on the congratulations screen and the PSA screens consist of rectangular <a href="https://en.wikipedia.org/wiki/Block_Elements" target="_blank">Right Half Blocks (U+2590)</a> rather than square <a href="https://en.wikipedia.org/wiki/Block_Elements" target="_blank">Upper Half Blocks (U+2580)</a> because tests across multiple terminal emulators revealed Right Half Blocks render consistently, whereas adjacent Upper Half Blocks and related block elements experience visual discontinuities around adjoining seams. The stretched-pixel look evokes memories of the era of slow internet connections, a time when web browsers rendered a low-resolution version of <a href="https://en.wikipedia.org/wiki/GIF#Interlacing" target="_blank">interlaced GIFs</a> that progressively improved with each download pass.</p>
 
 <p>As for the game, Textrads borrows visual elements of <a href="https://tetr.io/" target="_blank">Tetr.io</a>, particularly the colors, the frame, the preview queue, the attack bar, and the stats. But, since its mechanics are based off <a href="https://tetris.wiki/Tetris_DX" target="_blank">DX</a>, there is no hold space or ghost piece.</p>
 
@@ -277,7 +277,7 @@ MathJax = {
 
 <p><img class="centered" alt="garbage" id="garbage.png" src="garbage.png"></p>
 
-<p>It consists of lines with <span class="nowrap">1&ndash;9</span> holes that manifest with probabilities derived from the values in <span class="nowrap">row 10</span> of <a href="https://en.wikipedia.org/wiki/Pascal%27s_triangle" target="_blank">Pascal’s triangle</a>: 
+<p>It consists of lines with holes that manifest with probabilities based on the tenth row of <a href="https://en.wikipedia.org/wiki/Pascal%27s_triangle" target="_blank">Pascal’s triangle</a>, such that the ones at both ends of the triangle row were changed to zeros to avoid completely empty and completely filled lines: 
 
 <table class="borderless" id="probability-table">
 <tr><th class="borderless">Holes</th><th class="borderless">Probability</th></tr>
@@ -294,7 +294,7 @@ MathJax = {
 <tr><td class="borderless right">10</td><td class="borderless right">0.000000</td></tr>
 </table>
 
-<p>This is approximately equal to a <a href="https://en.wikipedia.org/wiki/Normal_distribution" target="_blank">normal distribution</a>, where:</p>
+<p>The distribution is approximately <a href="https://en.wikipedia.org/wiki/Normal_distribution" target="_blank">normal</a>, where:</p>
 
 <p class="centered" id="normal-distribution-formulae">$\mu = 5,\:\sigma = \dfrac{511}{126\sqrt{2\pi}},\:p(h) = \dfrac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{h-\mu}{\sigma})^2}$</p>
 
@@ -367,10 +367,6 @@ MathJax = {
 
 </ul>
 
-<p>Here’s a sample of attract mode:</p>
-
-[ video of attract mode ]
-
 <h1 id="leaderboards"><a class="header" href="#leaderboards">Leaderboards</a></h1>
 
 <p>Textrads saves today’s top ten achievements and the top ten achievements of all time for all modes except for <span class="nowrap">Vs. Human</span>. One of those leaderboards prominently appears in each attract mode loop.</p>
@@ -385,7 +381,7 @@ MathJax = {
 
 <p>The peers treat the connection as unreliable. To that end, when they connect, the client disregards anything in its memory model, and instead, it asks the server what it should do. If play has yet to begin, the server instructs the client to gather information from the player, such as the starting level. The client does so, and it submits the result back to the server in a request-response cycle resembling HTML forms. Concurrently, the server prompts its player for the same information.</p> 
 
-<p>When play commences, or if it already began and the client reconnected, the server sends the full game state of both players to the client. From that point forward, the client transmits key presses entered by its player to the server. The server updates its copy of the game state, for each frame, with key presses from its player and those submitted by the client player. Then the server sends to the client the full set of key presses it just applied. The client uses them to update its copy of the game state, maintaining consistency. This works because the update operation reacts deterministically to player inputs and the game state transmitted by the server includes the current seeds of the pseudorandom number generators that drive the piece sequence and garbage row hole sequence randomizers.</p>
+<p>When play commences, or if it already began and the client reconnected, the server sends the full game state of both players to the client. From that point forward, the client transmits key presses entered by its player to the server. The server updates its copy of the game state, for each frame, with key presses from its player and those submitted by the client player. Then the server sends the client the full set of key presses it just applied. The client uses them to update its copy of the game state, maintaining consistency. This works because the update operation reacts deterministically to player inputs and the game state transmitted by the server includes the current seeds of the pseudorandom number generators that drive the piece sequence and garbage row hole sequence randomizers.</p>
 
 <p>With this architecture, intermittent network disruptions do not end a game in progress. Bouncing the client does not either. In both situations, the server pauses the game until the client returns. However, terminating the server ends the game by destroying the source of truth.</p>
 
