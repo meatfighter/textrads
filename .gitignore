@@ -2,6 +2,4 @@ data/*
 target/*
 !/target/textrads.jar
 hs_err_pid*
-
-# TODO
-#nbactions-*.xml
+nbactions-*.xml
